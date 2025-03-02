@@ -24,7 +24,7 @@ return {
         callback = function(event)
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
+            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = desc })
           end
 
           local function client_supports_method(client, method, bufnr)
@@ -39,12 +39,12 @@ return {
 
           map('gd', require('telescope.builtin').lsp_definitions, 'Go to definition')
           map('gD', vim.lsp.buf.declaration, 'Go to declaration')
-          map('gr', require('telescope.builtin').lsp_references, 'Go to references')
-          map('gI', require('telescope.builtin').lsp_implementations, 'Go to implementation')
+          map('grr', require('telescope.builtin').lsp_references, 'Go to references')
+          map('gri', require('telescope.builtin').lsp_implementations, 'Go to implementation')
+          map('grn', vim.lsp.buf.rename, 'Rename')
+          map('gra', vim.lsp.buf.code_action, 'Code action')
           map('<leader>Ds', require('telescope.builtin').lsp_document_symbols, 'Document symbols')
-          map('<leader>Ws', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'Workspace symbols')
-          map('<leader>rn', vim.lsp.buf.rename, 'Rename')
-          map('<leader>ca', vim.lsp.buf.code_action, 'Code Action', { 'n', 'x' })
+          map('<leader>Ws', require('telescope.builtin').lsp_workspace_symbols, 'Workspace symbols')
 
           if client and client.name == 'clangd' then
             -- client.server_capabilities.semanticTokensProvider = nil
