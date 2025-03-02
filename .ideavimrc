@@ -1,0 +1,38 @@
+let mapleader = " "
+
+set hlsearch
+set clipboard+=unnamed
+set visualbell
+set noerrorbells
+set scrolloff=5
+set incsearch
+set smartcase
+set wrapscan
+set relativenumber
+
+map Q gq
+
+Plug 'machakann/vim-highlightedyank'
+Plug 'tpope/vim-commentary'
+
+vnoremap < <gv
+vnoremap > >gv
+vnoremap = =gv
+
+nmap <M-h> <C-w>h
+nmap <M-j> <C-w>j
+nmap <M-k> <C-w>k
+nmap <M-l> <C-w>l
+
+map <leader>\\x <Action>(HideActiveWindow)
+map <leader>bd <Action>(Debug)
+map <leader>rn <Action>(RenameElement)
+map <leader>ca <Action>(ShowIntentionActions)
+map <leader>to <Action>(CIDR.Lang.SwitchHeaderSource)
+map <leader>cf <Action>(ReformatCode)
+map <leader>bd <Action>(Debug)
+map <leader>db <Action>(ToggleLineBreakpoint)
+map <leader>sf <Action>(GotoFile)
+map <leader>/ <Action>(Find)
+map <leader><leader> <Action>(Switcher)
+map gr <Action>(ShowUsages)
