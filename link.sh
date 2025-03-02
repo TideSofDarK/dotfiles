@@ -17,7 +17,6 @@ for folder in "${HOME_FOLDERS[@]}";do
     cp -lR "${folder}" "${HOME}/"
 done
 
-
 HOME_FILES=(
     ".fakevimrc"
     ".ideavimrc"
