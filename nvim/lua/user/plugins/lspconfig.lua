@@ -41,10 +41,10 @@ return {
           map('gD', vim.lsp.buf.declaration, 'Go to declaration')
           map('grr', require('telescope.builtin').lsp_references, 'Go to references')
           map('gri', require('telescope.builtin').lsp_implementations, 'Go to implementation')
+          map('gO', require('telescope.builtin').lsp_document_symbols, 'Document symbols')
+          map('gW', require('telescope.builtin').lsp_workspace_symbols, 'Workspace symbols')
           map('grn', vim.lsp.buf.rename, 'Rename')
           map('gra', vim.lsp.buf.code_action, 'Code action')
-          map('<leader>Ds', require('telescope.builtin').lsp_document_symbols, 'Document symbols')
-          map('<leader>Ws', require('telescope.builtin').lsp_workspace_symbols, 'Workspace symbols')
 
           if client and client.name == 'clangd' then
             -- client.server_capabilities.semanticTokensProvider = nil
