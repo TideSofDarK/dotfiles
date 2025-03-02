@@ -1,25 +1,25 @@
-[shell]
-program = 'pwsh'
-args = [
-"-noexit",
-"-c",
-"$vsPath = 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community'; Import-Module (Join-Path $vsPath 'Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll'); Enter-VsDevShell -VsInstallPath $vsPath -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'",
-]
+# [shell]
+# program = 'pwsh'
+# args = [
+# "-noexit",
+# "-c",
+# "$vsPath = 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community'; Import-Module (Join-Path $vsPath 'Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll'); Enter-VsDevShell -VsInstallPath $vsPath -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'",
+# ]
 
 [cursor]
-style = "Beam"
+style = "Block"
 
 [font]
-size = 13.5
+size = 12
 [font.normal]
-family = "IosevkaTerm Nerd Font Mono"
+family = "Sarasa Fixed CL Nerd Font"
 
 [selection]
 save_to_clipboard = true
 
 [window]
 decorations = "Full"
-padding = { x = 3, y = 3 }
+# padding = { x = 3, y = 3 }
 dynamic_padding = true
 dynamic_title = false
 resize_increments = true
