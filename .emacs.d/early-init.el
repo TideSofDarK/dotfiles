@@ -1,4 +1,5 @@
 ; Packages
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 (add-to-list 'package-archives '("gnu-devel" . "https://elpa.gnu.org/devel/"))
@@ -9,12 +10,14 @@
                (allow-no-window . t)))
 
 ; Theme
+
 (use-package kanagawa-themes
   :ensure t
   :config
   (load-theme 'kanagawa-wave :no-confirm-loading))
 
 ; Disable some GUI elements
+
 (setq use-dialog-box nil)
 (setq confirm-kill-processes nil)
 (set-buffer-modified-p nil)
@@ -24,10 +27,12 @@
 (blink-cursor-mode -1)
 
 ; Default tab width
+
 (setq-default indent-tabs-mode nil
               tab-width 4)
 
 ; Set fonts
+
 (let ((mono-spaced-font "Sarasa Fixed CL Nerd Font")
       (proportionately-spaced-font "Sarasa UI CL Nerd Font"))
   (set-face-attribute 'default nil :family mono-spaced-font :height 120)
@@ -35,6 +40,7 @@
   (set-face-attribute 'variable-pitch nil :family proportionately-spaced-font :height 1.0))
 
 ; Setup evil-mode
+
 (setq evil-want-C-u-scroll t)
 (use-package evil
   :ensure t
@@ -55,12 +61,14 @@
   (evil-commentary-mode))
 
 ; Hightlight on copy
+
 (defun meain/evil-yank-advice (orig-fn beg end &rest args)
   (pulse-momentary-highlight-region beg end)
   (apply orig-fn beg end args))
 (advice-add 'evil-yank :around 'meain/evil-yank-advice)
 
 ; No default messages
+
 (setq inhibit-splash-screen t)
 (setq inhibit-startup-message t)
 (setq initial-scratch-message nil)
@@ -73,28 +81,26 @@
 (global-display-line-numbers-mode) 
 
 ; No weird gap on the left
+
 (set-fringe-mode 0)
 
 ; Scrolloffs
+
 (setq scroll-conservatively 10)
 (setq scroll-margin 7)
 
 ; No softwrap
+
 (set-default 'truncate-lines t)
 
 ; Save history
+
 (savehist-mode 1)
 
 ; Misc
+
 (fset 'yes-or-no-p 'y-or-n-p)
 (display-time)
-
-; Modeline
-(use-package smart-mode-line
-  :config
-  (progn
-   (setq sml/no-confirm-load-theme t)
-   (sml/setup)))
 
 ; Mappings
 
@@ -106,8 +112,11 @@
 (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
 (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
 
-(define-key evil-normal-state-map "H" 'evil-beginning-of-line)
-(define-key evil-normal-state-map "L" 'evil-end-of-line)
+(evil-define-key '(normal motion visual) 'global
+                 (kbd "H") 'evil-beginning-of-line
+                 (kbd "L") 'evil-end-of-line)    
 
 (define-key evil-normal-state-map (kbd "<leader>w") 'evil-write)
 (define-key evil-normal-state-map (kbd "<leader>a") 'evil-write-all)
+(define-key evil-normal-state-map (kbd "<leader>d") 'evil-delete-buffer)
+(define-key evil-normal-state-map (kbd "<leader>q") 'evil-window-delete)
