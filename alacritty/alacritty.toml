@@ -1,0 +1,66 @@
+[shell]
+program = 'pwsh'
+args = [
+"-noexit",
+"-c",
+"$vsPath = 'C:\\Program Files\\Microsoft Visual Studio\\2022\\Community'; Import-Module (Join-Path $vsPath 'Common7\\Tools\\Microsoft.VisualStudio.DevShell.dll'); Enter-VsDevShell -VsInstallPath $vsPath -SkipAutomaticLocation -DevCmdArguments '-arch=x64 -host_arch=x64'",
+]
+
+[cursor]
+style = "Beam"
+
+[font]
+size = 13.5
+[font.normal]
+family = "IosevkaTerm Nerd Font Mono"
+
+[selection]
+save_to_clipboard = true
+
+[window]
+decorations = "Full"
+padding = { x = 3, y = 3 }
+dynamic_padding = true
+dynamic_title = false
+resize_increments = true
+
+[keyboard]
+bindings = [
+  { action = "ToggleFullscreen", key = "F11" },
+]
+
+[colors.primary]
+background = '#1f1f28'
+foreground = '#dcd7ba'
+
+[colors.normal]
+black   = '#090618'
+red     = '#c34043'
+green   = '#76946a'
+yellow  = '#c0a36e'
+blue    = '#7e9cd8'
+magenta = '#957fb8'
+cyan    = '#6a9589'
+white   = '#c8c093'
+
+[colors.bright]
+black   = '#727169'
+red     = '#e82424'
+green   = '#98bb6c'
+yellow  = '#e6c384'
+blue    = '#7fb4ca'
+magenta = '#938aa9'
+cyan    = '#7aa89f'
+white   = '#dcd7ba'
+
+[colors.selection]
+background = '#2d4f67'
+foreground = '#c8c093'
+
+[[colors.indexed_colors]]
+index = 16
+color = '#ffa066'
+
+[[colors.indexed_colors]]
+index = 17
+color = '#ff5d62'
