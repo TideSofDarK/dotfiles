@@ -1,0 +1,28 @@
+set hlsearch
+set ignorecase
+set smartcase
+set incsearch
+set wrapscan
+set showcmd
+set expandtab
+set tabstop=4
+set shiftwidth=4
+set scrolloff=5
+set clipboard=unnamedplus
+set tildeop
+
+" Reselect visual block after indent
+vnoremap < <gv
+vnoremap > >gv
+
+" Move line/block
+nnoremap <C-S-J> :m+<CR>==
+nnoremap <C-S-K> :m-2<CR>==
+inoremap <C-S-J> <Esc>:m+<CR>==gi
+inoremap <C-S-K> <Esc>:m-2<CR>==gi
+vnoremap <C-S-J> :m'>+<CR>gv=gv
+vnoremap <C-S-K> :m-2<CR>gv=gv
+
+" Faster H and L jumps
+map H ^
+map L $
