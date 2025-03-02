@@ -1,20 +1,23 @@
+#!/usr/bin/env bash
+cd "$(dirname "$0")"
+
 CONFIG_FOLDERS=(
-    "nvim/"
-    "alacritty/"
+    "nvim"
+    "alacritty"
 )
 
 for folder in "${CONFIG_FOLDERS[@]}";do
     rm -rf "${HOME}/.config/${folder}"
-    cp -lR "${folder}" "${HOME}/.config/"
+    ln -s "${PWD}/${folder}" "${HOME}/.config/${folder}"
 done
 
 HOME_FOLDERS=(
-    ".emacs.d/"
+    ".emacs.d"
 )
 
 for folder in "${HOME_FOLDERS[@]}";do
     rm -rf "${HOME}/${folder}"
-    cp -lR "${folder}" "${HOME}/"
+    ln -s "${PWD}/${folder}" "${HOME}/${folder}"
 done
 
 HOME_FILES=(
@@ -25,5 +28,5 @@ HOME_FILES=(
 
 for file in "${HOME_FILES[@]}";do
     rm -rf "${HOME}/${file}"
-    cp -lR "${file}" "${HOME}/${file}"
+    ln -s "${PWD}/${file}" "${HOME}/${file}"
 done
