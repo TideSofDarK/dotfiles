@@ -6,3 +6,4 @@ eln-cache
 .lsp*
 tree-sitter
 elisp-autofmt-cache
+custom-vars.el

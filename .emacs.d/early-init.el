@@ -1,44 +1,94 @@
-; Packages
+; Init GC
 
-(require 'package)
-(add-to-list
- 'package-archives '("melpa" . "https://melpa.org/packages/")
- t)
-(add-to-list
- 'package-archives '("gnu-devel" . "https://elpa.gnu.org/devel/"))
-(package-initialize)
+(setq gc-cons-threshold (* 50 1000 1000))
+
+; Suppress package install noise
+
 (add-to-list
  'display-buffer-alist
  '("\\`\\*\\(Warnings\\|Compile-Log\\)\\*\\'"
    (display-buffer-no-window)
    (allow-no-window . t)))
 
+; Packages
+
+(require 'package)
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+(setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")
+                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(package-initialize)
+
 ; Theme
 
 (use-package
  kanagawa-themes
- :ensure t
  :config (load-theme 'kanagawa-wave :no-confirm-loading))
 
-; Disable some GUI elements
+; Basic configuration
 
-(setq use-dialog-box nil)
-(setq confirm-kill-processes nil)
-(set-buffer-modified-p nil)
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-(menu-bar-mode -1)
-(blink-cursor-mode -1)
+(use-package emacs
+  :custom
+  (menu-bar-mode nil)
+  (scroll-bar-mode nil)
+  (tool-bar-mode nil)
+  (inhibit-startup-screen t)
+  (inhibit-splash-screen t)
+  (initial-scratch-message nil)
 
-; Default tab width
+  (delete-selection-mode t)
+  (electric-indent-mode nil)
+  (electric-pair-mode t)
 
-(setq-default
- indent-tabs-mode nil
- tab-width 4)
+  (blink-cursor-mode nil)
+  (global-auto-revert-mode t)
 
-; .editorconfig
+  (dired-kill-when-opening-new-dired-buffer t)
+  (recentf-mode t)
 
-(use-package editorconfig :ensure t :config (editorconfig-mode 1))
+  (display-line-numbers-type 'relative)
+  (global-display-line-numbers-mode t)
+  (global-visual-line-mode t)
+
+  (mouse-wheel-progressive-speed nil)
+  (scroll-conservatively 10)
+  (scroll-margin 8)
+
+  (tab-width 4)
+  (sgml-basic-offset 4)
+
+  (use-dialog-box nil)
+  (confirm-kill-processes nil)
+  (set-buffer-modified-p nil)
+
+  (make-backup-files nil)
+  (auto-save-default nil)
+  :hook
+  (prog-mode . (lambda () (hs-minor-mode t)))
+  :config
+  (setq custom-file (locate-user-emacs-file "custom-vars.el"))
+  (load custom-file 'noerror 'nomessage)
+  :bind (
+         ([escape] . keyboard-escape-quit) ;; Makes Escape quit prompts (Minibuffer Escape)
+         ("C-g" . evil-normal-state)
+         )
+  )
+
+; Easy scaling
+
+(use-package emacs
+  :bind
+  ("C-=" . text-scale-increase)
+  ("C--" . text-scale-decrease)
+  ("<C-wheel-up>" . text-scale-increase)
+  ("<C-wheel-down>" . text-scale-decrease))
+
+; undo-tree
+
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode))
 
 ; Set fonts
 
@@ -56,26 +106,37 @@
 
 ; Setup evil-mode
 
-(setq evil-ex-previous-command nil)
-(setq evil-want-empty-ex-last-command t)
-(setq evil-want-C-u-scroll t)
-(use-package
- evil
- :ensure t
+(use-package evil
  :init
- (setq evil-want-integration t)
- (setq evil-want-keybinding nil)
- :config (evil-mode 1))
+ (evil-mode)
+ :custom
+ (evil-undo-system 'undo-tree)
+ (evil-ex-previous-command nil)
+ (evil-want-empty-ex-last-command t)
+ (evil-want-C-u-scroll t)
+ (evil-want-integration t)
+ (evil-want-keybinding nil))
 (use-package
  evil-collection
  :after evil
- :ensure t
- :config (evil-collection-init))
+ :config
+ ; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
+ (setq evil-collection-mode-list '(magit vertico consult))
+ (evil-collection-init))
 (use-package
  evil-commentary
  :after evil
- :ensure t
  :config (evil-commentary-mode))
+
+; magit
+
+(use-package magit
+  :custom (magit-diff-refine-hunk (quote all))
+  :commands magit-status)
+
+; .editorconfig
+
+(use-package editorconfig :ensure t :config (editorconfig-mode 1))
 
 ; Hightlight on copy
 
@@ -84,11 +145,8 @@
   (apply orig-fn beg end args))
 (advice-add 'evil-yank :around 'meain/evil-yank-advice)
 
-; No default messages
+; Disable startup message
 
-(setq inhibit-splash-screen t)
-(setq inhibit-startup-message t)
-(setq initial-scratch-message nil)
 (fset 'display-startup-echo-area-message 'ignore)
 
 ; Fixed size line number column and relative numbers
@@ -102,11 +160,6 @@
 
 (set-fringe-mode 0)
 
-; Scrolloffs
-
-(setq scroll-conservatively 10)
-(setq scroll-margin 7)
-
 ; No softwrap
 
 (set-default 'truncate-lines t)
@@ -115,39 +168,84 @@
 
 (savehist-mode 1)
 
-; Misc
-
-(fset 'yes-or-no-p 'y-or-n-p)
-(setq make-backup-files nil)
-(global-eldoc-mode -1)
-
 ; LSP
 
-(use-package
- eglot
- :hook (prog-mode . eglot-ensure)
- :init (setq eglot-stay-out-of '(flymake eldoc)))
+(use-package eglot
+  :ensure nil
+  :hook ((c-ts-mode c++-ts-mode
+                    csharp-mode java-ts-mode
+                    html-mode css-ts-mode
+                    js-ts-mode typescript-ts-mode
+                    php-mode cmake-ts-mode
+                    go-mode rust-ts-mode
+                    gdscript-mode glsl-mode)
+         . eglot-ensure)
+  :custom
+  (eglot-ignored-server-capabilities '(:inlayHintProvider))
+  (eglot-events-buffer-size 0)
+  (eglot-autoshutdown t)
+  (eglot-report-progress nil)
+  (eglot-stay-out-of '(flymake eldoc)))
+  ; :config
+  ; (add-to-list 'eglot-server-programs
+  ;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+  ; (add-to-list 'eglot-server-programs
+  ;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
 
-(setq eglot-ignored-server-capabilities '(:inlayHintProvider))
-(setq eglot-report-progress nil)
+(defvar my-intercept-mode-map (make-sparse-keymap)
+  "High precedence keymap.")
+
+(define-minor-mode my-intercept-mode
+  "Global minor mode for higher precedence evil keybindings."
+  :global t)
+
+(my-intercept-mode)
+
+(dolist (state '(normal))
+  (evil-make-intercept-map
+   (evil-get-auxiliary-keymap my-intercept-mode-map state t t) state))
+
+(evil-define-key
+ 'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
+(evil-define-key
+ 'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
+(evil-define-key
+ 'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format)
 
 ; Treesitter
 
-(use-package treesit)
-(setq treesit-font-lock-level 4)
-(treesit-font-lock-recompute-features)
+(use-package treesit
+  :ensure nil
+  :config
+  (setq treesit-font-lock-level 4))
 
-(use-package
- treesit-auto
- :ensure t
- :custom (treesit-auto-install 'prompt)
- :config
- (treesit-auto-add-to-auto-mode-alist 'all)
- (global-treesit-auto-mode))
+(use-package treesit-auto
+  :custom
+  (treesit-auto-install 't)
+  (c-ts-mode-indent-offset 4)
+  (treesit-auto-langs '(c cpp glsl cmake))
+  :config
+  ;; Remove treesitter modes, go-ts-mode not working currently
+  ;; glsl-ts-mode don't work because of a rewrite in glsl-mode
+  ;; https://github.com/jimhourihan/glsl-mode/commit/c5f2c2e7edf8a647eda74abe2cdf73fa6f62ebd2
+  (setq treesit-auto-langs (cl-set-difference treesit-auto-langs '(go gomod glsl c-sharp)))
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
+(use-package cmake-ts-mode
+  :ensure nil
+  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+
+(use-package glsl-mode
+  :mode ("\\.shader\\'" "\\.glsl\\'"))
 
 ; Vertico
 
-(use-package vertico :ensure t :init (vertico-mode))
+(use-package vertico
+  :config
+  (setq vertico-cycle t)
+  (setq vertico-resize nil)
+  (vertico-mode 1))
 
 (use-package
  emacs
@@ -157,11 +255,23 @@
  (minibuffer-prompt-properties
   '(read-only t cursor-intangible t face minibuffer-prompt)))
 
+; Orderless
+
+(use-package orderless
+  :config
+  (setq completion-styles '(orderless basic)))
+
+; Consult
+
+(use-package consult)
+
+(define-key evil-normal-state-map (kbd "<leader>sg") 'consult-ripgrep)
+(define-key evil-normal-state-map (kbd "<leader>sf") 'consult-fd)
+
 ; Format elisp
 
 (use-package
  elisp-autofmt
- :ensure t
  :commands (elisp-autofmt-mode elisp-autofmt-buffer)
  :hook (emacs-lisp-mode . elisp-autofmt-mode))
 
@@ -190,22 +300,11 @@
 (define-key
  evil-normal-state-map (kbd "<leader>q") 'evil-window-delete)
 
-(define-key evil-normal-state-map (kbd "<leader>cf") 'eglot-format)
+; Misc
 
-(defvar my-intercept-mode-map (make-sparse-keymap)
-  "High precedence keymap.")
+(fset 'yes-or-no-p 'y-or-n-p)
 
-(define-minor-mode my-intercept-mode
-  "Global minor mode for higher precedence evil keybindings."
-  :global t)
+; Runtime GC
 
-(my-intercept-mode)
-
-(dolist (state '(normal))
-  (evil-make-intercept-map
-   (evil-get-auxiliary-keymap my-intercept-mode-map state t t) state))
-
-(evil-define-key
- 'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
-(evil-define-key
- 'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
+(setq gc-cons-threshold (* 2 1000 1000))
+(setq read-process-output-max (* 1024 1024))
