@@ -7,3 +7,6 @@ eln-cache
 tree-sitter
 elisp-autofmt-cache
 custom-vars.el
+recentf
+projects
+*.~undo-tree~

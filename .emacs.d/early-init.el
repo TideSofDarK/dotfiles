@@ -268,6 +268,16 @@
 (define-key evil-normal-state-map (kbd "<leader>sg") 'consult-ripgrep)
 (define-key evil-normal-state-map (kbd "<leader>sf") 'consult-fd)
 
+; Affe
+
+(use-package affe
+  :ensure t)
+
+(defun affe-orderless-regexp-compiler (input _type _ignorecase)
+  (setq input (cdr (orderless-compile input)))
+  (cons input (apply-partially #'orderless--highlight input t)))
+(setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
+
 ; Format elisp
 
 (use-package
