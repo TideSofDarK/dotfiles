@@ -12,10 +12,12 @@ set clipboard=unnamedplus
 set tildeop
 
 " Reselect visual block after indent
+
 vnoremap < <gv
 vnoremap > >gv
 
 " Move line/block
+
 nnoremap <C-S-J> :m+<CR>==
 nnoremap <C-S-K> :m-2<CR>==
 inoremap <C-S-J> <Esc>:m+<CR>==gi
@@ -24,5 +26,12 @@ vnoremap <C-S-J> :m'>+<CR>gv=gv
 vnoremap <C-S-K> :m-2<CR>gv=gv
 
 " Faster H and L jumps
+
 map H ^
 map L $
+
+" Faster writes
+
+map <Space>w :w<cr>
+map <Space>a :wa<cr>
+
