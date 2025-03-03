@@ -15,9 +15,10 @@
 (require 'package)
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
-(setq package-archives '(("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")
-                         ("elpa" . "https://elpa.gnu.org/packages/")))
+(setq package-archives
+      '(("melpa" . "https://melpa.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")
+        ("elpa" . "https://elpa.gnu.org/packages/")))
 (package-initialize)
 
 ; Theme
@@ -28,67 +29,71 @@
 
 ; Basic configuration
 
-(use-package emacs
-  :custom
-  (menu-bar-mode nil)
-  (scroll-bar-mode nil)
-  (tool-bar-mode nil)
-  (inhibit-startup-screen t)
-  (inhibit-splash-screen t)
-  (initial-scratch-message nil)
+(use-package
+ emacs
+ :custom
+ (menu-bar-mode nil)
+ (scroll-bar-mode nil)
+ (tool-bar-mode nil)
+ (inhibit-startup-screen t)
+ (inhibit-splash-screen t)
+ (initial-scratch-message nil)
 
-  (delete-selection-mode t)
-  (electric-indent-mode nil)
-  (electric-pair-mode t)
+ (delete-selection-mode t)
+ (electric-indent-mode nil)
+ (electric-pair-mode t)
 
-  (blink-cursor-mode nil)
-  (global-auto-revert-mode t)
+ (blink-cursor-mode nil)
+ (global-auto-revert-mode t)
 
-  (dired-kill-when-opening-new-dired-buffer t)
-  (recentf-mode t)
+ (dired-kill-when-opening-new-dired-buffer t)
+ (recentf-mode t)
 
-  (display-line-numbers-type 'relative)
-  (global-display-line-numbers-mode t)
-  (global-visual-line-mode t)
+ (display-line-numbers-type 'relative)
+ (global-display-line-numbers-mode t)
+ (global-visual-line-mode t)
 
-  (mouse-wheel-progressive-speed nil)
-  (scroll-conservatively 10)
-  (scroll-margin 8)
+ (mouse-wheel-progressive-speed nil)
+ (scroll-conservatively 10)
+ (scroll-margin 8)
 
-  (tab-width 4)
-  (sgml-basic-offset 4)
+ (tab-width 4)
+ (sgml-basic-offset 4)
 
-  (use-dialog-box nil)
-  (confirm-kill-processes nil)
-  (set-buffer-modified-p nil)
+ (use-dialog-box nil)
+ (confirm-kill-processes nil)
+ (set-buffer-modified-p nil)
 
-  (make-backup-files nil)
-  (auto-save-default nil)
-  :hook
-  (prog-mode . (lambda () (hs-minor-mode t)))
-  :config
-  (setq custom-file (locate-user-emacs-file "custom-vars.el"))
-  (load custom-file 'noerror 'nomessage)
-  :bind (
-         ([escape] . keyboard-escape-quit) ;; Makes Escape quit prompts (Minibuffer Escape)
-         ("C-g" . evil-normal-state)
-         )
-  )
+ (make-backup-files nil)
+ (auto-save-default nil)
+ :hook (prog-mode . (lambda () (hs-minor-mode t)))
+ :config
+ (setq custom-file (locate-user-emacs-file "custom-vars.el"))
+ (load custom-file 'noerror 'nomessage)
+ :bind
+ (([escape] . keyboard-escape-quit) ;; Makes Escape quit prompts (Minibuffer Escape)
+  ("C-g" . evil-normal-state)))
 
 ; Easy scaling
 
-(use-package emacs
-  :bind
-  ("C-=" . text-scale-increase)
-  ("C--" . text-scale-decrease)
-  ("<C-wheel-up>" . text-scale-increase)
-  ("<C-wheel-down>" . text-scale-decrease))
+(use-package
+ emacs
+ :bind
+ ("C-=" . text-scale-increase)
+ ("C--" . text-scale-decrease)
+ ("<C-wheel-up>" . text-scale-increase)
+ ("<C-wheel-down>" . text-scale-decrease))
 
 ; undo-tree
 
-(use-package undo-tree
-  :init
-  (global-undo-tree-mode))
+(use-package
+ undo-tree
+ :demand
+ :custom (undo-tree-mode-lighter "")
+ :custom
+ (undo-tree-history-directory-alist
+  `((".*" . ,(expand-file-name "undo-tree/" user-emacs-directory))))
+ :config (global-undo-tree-mode))
 
 ; Set fonts
 
@@ -106,9 +111,9 @@
 
 ; Setup evil-mode
 
-(use-package evil
- :init
- (evil-mode)
+(use-package
+ evil
+ :init (evil-mode)
  :custom
  (evil-undo-system 'undo-tree)
  (evil-ex-previous-command nil)
@@ -130,9 +135,10 @@
 
 ; magit
 
-(use-package magit
-  :custom (magit-diff-refine-hunk (quote all))
-  :commands magit-status)
+(use-package
+ magit
+ :custom (magit-diff-refine-hunk (quote all))
+ :commands magit-status)
 
 ; .editorconfig
 
@@ -170,27 +176,36 @@
 
 ; LSP
 
-(use-package eglot
-  :ensure nil
-  :hook ((c-ts-mode c++-ts-mode
-                    csharp-mode java-ts-mode
-                    html-mode css-ts-mode
-                    js-ts-mode typescript-ts-mode
-                    php-mode cmake-ts-mode
-                    go-mode rust-ts-mode
-                    gdscript-mode glsl-mode)
-         . eglot-ensure)
-  :custom
-  (eglot-ignored-server-capabilities '(:inlayHintProvider))
-  (eglot-events-buffer-size 0)
-  (eglot-autoshutdown t)
-  (eglot-report-progress nil)
-  (eglot-stay-out-of '(flymake eldoc)))
-  ; :config
-  ; (add-to-list 'eglot-server-programs
-  ;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-  ; (add-to-list 'eglot-server-programs
-  ;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+(use-package
+ eglot
+ :ensure nil
+ :hook
+ ((c-ts-mode
+   c++-ts-mode
+   csharp-mode
+   java-ts-mode
+   html-mode
+   css-ts-mode
+   js-ts-mode
+   typescript-ts-mode
+   php-mode
+   cmake-ts-mode
+   go-mode
+   rust-ts-mode
+   gdscript-mode
+   glsl-mode)
+  . eglot-ensure)
+ :custom
+ (eglot-ignored-server-capabilities '(:inlayHintProvider))
+ (eglot-events-buffer-size 0)
+ (eglot-autoshutdown t)
+ (eglot-report-progress nil)
+ (eglot-stay-out-of '(flymake eldoc)))
+; :config
+; (add-to-list 'eglot-server-programs
+;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+; (add-to-list 'eglot-server-programs
+;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
 
 (defvar my-intercept-mode-map (make-sparse-keymap)
   "High precedence keymap.")
@@ -214,38 +229,42 @@
 
 ; Treesitter
 
-(use-package treesit
-  :ensure nil
-  :config
-  (setq treesit-font-lock-level 4))
+(use-package
+ treesit
+ :ensure nil
+ :config (setq treesit-font-lock-level 4))
 
-(use-package treesit-auto
-  :custom
-  (treesit-auto-install 't)
-  (c-ts-mode-indent-offset 4)
-  (treesit-auto-langs '(c cpp glsl cmake))
-  :config
-  ;; Remove treesitter modes, go-ts-mode not working currently
-  ;; glsl-ts-mode don't work because of a rewrite in glsl-mode
-  ;; https://github.com/jimhourihan/glsl-mode/commit/c5f2c2e7edf8a647eda74abe2cdf73fa6f62ebd2
-  (setq treesit-auto-langs (cl-set-difference treesit-auto-langs '(go gomod glsl c-sharp)))
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+(use-package
+ treesit-auto
+ :custom
+ (treesit-auto-install 't)
+ (c-ts-mode-indent-offset 4)
+ (treesit-auto-langs '(c cpp glsl cmake))
+ :config
+ ;; Remove treesitter modes, go-ts-mode not working currently
+ ;; glsl-ts-mode don't work because of a rewrite in glsl-mode
+ ;; https://github.com/jimhourihan/glsl-mode/commit/c5f2c2e7edf8a647eda74abe2cdf73fa6f62ebd2
+ (setq treesit-auto-langs
+       (cl-set-difference
+        treesit-auto-langs '(go gomod glsl c-sharp)))
+ (treesit-auto-add-to-auto-mode-alist 'all)
+ (global-treesit-auto-mode))
 
-(use-package cmake-ts-mode
-  :ensure nil
-  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+(use-package
+ cmake-ts-mode
+ :ensure nil
+ :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 
-(use-package glsl-mode
-  :mode ("\\.shader\\'" "\\.glsl\\'"))
+(use-package glsl-mode :mode ("\\.shader\\'" "\\.glsl\\'"))
 
 ; Vertico
 
-(use-package vertico
-  :config
-  (setq vertico-cycle t)
-  (setq vertico-resize nil)
-  (vertico-mode 1))
+(use-package
+ vertico
+ :config
+ (setq vertico-cycle t)
+ (setq vertico-resize nil)
+ (vertico-mode 1))
 
 (use-package
  emacs
@@ -257,9 +276,11 @@
 
 ; Orderless
 
-(use-package orderless
-  :config
-  (setq completion-styles '(orderless basic)))
+(use-package
+ orderless
+ :custom (completion-styles '(orderless basic))
+ (completion-category-overrides
+  '((file (styles basic partial-completion)))))
 
 ; Consult
 
@@ -270,8 +291,7 @@
 
 ; Affe
 
-(use-package affe
-  :ensure t)
+(use-package affe :ensure t)
 
 (defun affe-orderless-regexp-compiler (input _type _ignorecase)
   (setq input (cdr (orderless-compile input)))
