@@ -38,10 +38,7 @@
 
 ; .editorconfig
 
-(use-package editorconfig
-  :ensure t
-  :config
-  (editorconfig-mode 1))
+(use-package editorconfig :ensure t :config (editorconfig-mode 1))
 
 ; Set fonts
 
@@ -136,7 +133,9 @@
 
 ; Treesitter
 
-(use-package treesit :config (setq treesit-font-lock-level 4))
+(use-package treesit)
+(setq treesit-font-lock-level 4)
+(treesit-font-lock-recompute-features)
 
 (use-package
  treesit-auto
