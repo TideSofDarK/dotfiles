@@ -121,7 +121,7 @@
 ; Misc
 
 (fset 'yes-or-no-p 'y-or-n-p)
-(display-time)
+(setq make-backup-files nil)
 (global-eldoc-mode -1)
 
 ; LSP

@@ -3,3 +3,6 @@ history
 transient
 elpa
 eln-cache
+.lsp*
+tree-sitter
+elisp-autofmt-cache
