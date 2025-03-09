@@ -67,7 +67,7 @@ return {
   end,
   keys = {
     {
-      '<leader>tn',
+      '<leader>tt',
       '<cmd>NvimTreeToggle<CR>',
       desc = 'Toggle nvim-tree'
     },
