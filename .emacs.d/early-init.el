@@ -46,19 +46,9 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
-; Set fonts
+; Set font
 
-(let ((mono-spaced-font "Sarasa Fixed CL Nerd Font")
-      (proportionately-spaced-font "Sarasa UI CL Nerd Font"))
-  (set-face-attribute 'default nil
-                      :family mono-spaced-font
-                      :height 120)
-  (set-face-attribute 'fixed-pitch nil
-                      :family mono-spaced-font
-                      :height 1.0)
-  (set-face-attribute 'variable-pitch nil
-                      :family proportionately-spaced-font
-                      :height 1.0))
+(add-to-list 'default-frame-alist '(font . "Sarasa Fixed CL Nerd Font"))
 
 ; Theme
 
@@ -101,6 +91,7 @@
  (scroll-conservatively 10)
  (scroll-margin 8)
 
+ (indent-tabs-mode nil)
  (tab-width 4)
  (sgml-basic-offset 4)
 
@@ -118,6 +109,7 @@
 
  :hook (prog-mode . (lambda () (hs-minor-mode t)))
  :config
+ (setq eldoc-echo-area-use-multiline-p nil)
  (fset 'display-startup-echo-area-message 'ignore)
  (set-fringe-mode 0)
  (savehist-mode 1)
@@ -129,7 +121,7 @@
  ("C--" . text-scale-decrease)
  ("<C-wheel-up>" . text-scale-increase)
  ("<C-wheel-down>" . text-scale-decrease))
- ; (([escape] . keyboard-escape-quit) ;; Makes Escape quit prompts (Minibuffer Escape)
+ ;; (([escape] . keyboard-escape-quit)))
  ;  ("C-g" . evil-normal-state)))
 
 ; undo-tree
@@ -200,7 +192,7 @@
  :after evil
  :config
  ; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
- (setq evil-collection-mode-list '(dired ibuffer magit vertico consult))
+ (setq evil-collection-mode-list '(dired ibuffer magit vertico consult eldoc eglot))
  (evil-collection-init))
 (use-package
  evil-commentary
@@ -220,7 +212,9 @@
 
 ; EditorConfig
 
-(use-package editorconfig :ensure t :config (editorconfig-mode 1))
+(use-package editorconfig
+ :ensure t
+ :config (editorconfig-mode 1))
 
 ; LSP
 
@@ -230,15 +224,8 @@
  :hook
  ((c-ts-mode
    c++-ts-mode
-   csharp-mode
-   java-ts-mode
-   html-mode
-   css-ts-mode
-   js-ts-mode
    typescript-ts-mode
-   php-mode
    ; cmake-ts-mode
-   go-mode
    rust-ts-mode
    ; glsl-mode
    gdscript-mode)
@@ -299,11 +286,20 @@
 ; Completion
 
 (use-package
-  consult
-  :ensure t
-  :config
- (define-key evil-normal-state-map (kbd "<leader>sg") 'consult-ripgrep)
- (define-key evil-normal-state-map (kbd "<leader>sf") 'consult-fd))
+ company
+ :ensure t
+ :demand t
+ :bind (:map company-active-map
+           ("C-y" . company-complete-selection)
+           ("RET" . nil)
+           ("<return>" . nil))
+ :config
+ (global-company-mode))
+(use-package
+ consult
+ :ensure t
+ :config
+ (define-key evil-normal-state-map (kbd "<leader>SPC") 'consult-buffer))
 (use-package
  vertico
  :ensure t
@@ -324,10 +320,17 @@
  :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
  :init
  (marginalia-mode))
-(elpaca
-  company
-  :config
-  (global-company-mode))
+(use-package affe
+ :ensure t
+ :config
+ (define-key evil-normal-state-map (kbd "<leader>sg") 'affe-grep)
+ (define-key evil-normal-state-map (kbd "<leader>sf") 'affe-find)
+ (setq affe-find-command "fd --color=never --full-path")
+ (defun affe-orderless-regexp-compiler (input _type _ignorecase)
+  (setq input (cdr (orderless-compile input)))
+  (cons input (apply-partially #'orderless--highlight input t)))
+ (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
+ (consult-customize affe-grep :preview-key "M-."))
 
 ; Format elisp
 
