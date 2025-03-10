@@ -2,6 +2,10 @@
 
 (setq gc-cons-threshold (* 50 1000 1000))
 
+; Add lisp path
+
+(add-to-list 'load-path (concat user-emacs-directory "lisp"))
+
 ; Packages
 
 (setq package-enable-at-startup nil)
@@ -48,14 +52,26 @@
 
 ; Set font
 
-(add-to-list 'default-frame-alist '(font . "Sarasa Fixed CL Nerd Font"))
+(let ((mono-spaced-font "Sarasa Fixed CL Nerd Font")
+      (proportionately-spaced-font "Sarasa UI CL Nerd Font"))
+  (set-face-attribute 'default nil
+                      :family mono-spaced-font
+                      :height 120)
+  (set-face-attribute 'fixed-pitch nil
+                      :family mono-spaced-font
+                      :height 1.0)
+  (set-face-attribute 'variable-pitch nil
+                      :family proportionately-spaced-font
+                      :height 1.0))
 
-; Theme
+; Themes
 
-(use-package
- kanagawa-themes
+(use-package autothemer
  :ensure t
- :config (load-theme 'kanagawa-wave :no-confirm-loading))
+ :init
+ (require 'kanagawa-themes)
+ (require 'rose-pine-theme)
+ (load-theme 'kanagawa-wave :no-confirm-loading))
 
 ; Basic configuration
 
@@ -192,7 +208,7 @@
  :after evil
  :config
  ; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
- (setq evil-collection-mode-list '(dired ibuffer magit vertico consult eldoc eglot))
+ (setq evil-collection-mode-list '(dired ibuffer magit vertico consult eldoc eglot corfu))
  (evil-collection-init))
 (use-package
  evil-commentary
@@ -231,7 +247,7 @@
    gdscript-mode)
   . eglot-ensure)
  :custom
- (eglot-ignored-server-capabilities '(:inlayHintProvider))
+ (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
  (eglot-events-buffer-size 0)
  (eglot-autoshutdown t)
  (eglot-report-progress nil)
@@ -247,6 +263,28 @@
   'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
  (evil-define-key
   'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+(use-package eldoc-box
+  :ensure t
+  :config
+ (evil-define-key
+  'normal my-intercept-mode-map (kbd "K") 'eldoc-box-help-at-point))
+  ;; (defun eldoc-box-scroll-up ()
+  ;;   "Scroll up in `eldoc-box--frame'"
+  ;;   (interactive)
+  ;;   (with-current-buffer eldoc-box--buffer
+  ;;     (with-selected-frame eldoc-box--frame
+  ;;       (scroll-down 3))))
+  ;; (defun eldoc-box-scroll-down ()
+  ;;   "Scroll down in `eldoc-box--frame'"
+  ;;   (interactive)
+  ;;   (with-current-buffer eldoc-box--buffer
+  ;;     (with-selected-frame eldoc-box--frame
+  ;;       (scroll-up 3))))
+  ;; (:keymaps 'eglot-mode-map
+  ;;  :states '(insert normal hybrid motion visual operator emacs)
+  ;;  "C-k" 'eldoc-box-scroll-up
+  ;;  "C-j" 'eldoc-box-scroll-down
+  ;;  "K" 'eldoc-box-eglot-help-at-point))
 
 ; Treesitter
 
@@ -257,16 +295,26 @@
 (use-package
  treesit-auto
  :ensure t
+ :demand t
  :custom
  (treesit-auto-install 't)
  :config
- (setq treesit-auto-langs '(c cpp cmake toml yaml commonlisp))
+ (setq treesit-auto-langs '(c cpp cmake toml yaml commonlisp markdown))
  (treesit-auto-install-all)
  (global-treesit-auto-mode))
 (use-package
  cmake-ts-mode
  :ensure nil
  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+
+; Markdown
+
+(use-package markdown-mode
+ :ensure t
+ :mode ("README\\.md\\'" . gfm-mode)
+ :init (setq markdown-command "multimarkdown")
+ :bind (:map markdown-mode-map
+        ("C-c C-e" . markdown-do)))
 
 ; GLSL
 
@@ -286,16 +334,6 @@
 ; Completion
 
 (use-package
- company
- :ensure t
- :demand t
- :bind (:map company-active-map
-           ("C-y" . company-complete-selection)
-           ("RET" . nil)
-           ("<return>" . nil))
- :config
- (global-company-mode))
-(use-package
  consult
  :ensure t
  :config
@@ -310,14 +348,16 @@
 (use-package
  orderless
  :ensure t
- :custom (completion-styles '(orderless basic))
- (completion-category-overrides
-  '((file (styles basic partial-completion)))))
+ :custom
+ ;; (orderless-style-dispatchers '(orderless-affix-dispatch))
+ ;; (orderless-component-separator #'orderless-escapable-split-on-space)
+ (completion-styles '(orderless basic))
+ (completion-category-defaults nil)
+ (completion-category-overrides '(
+  (file (styles basic partial-completion))
+  (eglot (styles orderless)))))
 (use-package marginalia
  :ensure t
- :hook
- ((marginalia-mode . all-the-icons-completion-marginalia-setup))
- :bind (:map minibuffer-local-map ("M-A" . marginalia-cycle))
  :init
  (marginalia-mode))
 (use-package affe
@@ -331,6 +371,29 @@
   (cons input (apply-partially #'orderless--highlight input t)))
  (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
  (consult-customize affe-grep :preview-key "M-."))
+(use-package corfu
+ :ensure t
+ :custom
+ (corfu-cycle t)
+ (corfu-quit-at-boundary nil)
+ (corfu-auto t)
+ (corfu-quit-no-match 'separator)
+ (corfu-preview-current 'insert)
+ (corfu-preselect-first t)
+ :bind (:map corfu-map
+           ("C-h" . corfu-info-documentation)
+           ("C-y" . corfu-complete)
+           ("RET" . nil)
+           ("<return>" . nil))
+ :init
+ (corfu-popupinfo-mode)
+ (global-corfu-mode))
+(use-package emacs
+  :ensure nil
+  :custom
+  (tab-always-indent 'complete)
+  (text-mode-ispell-word-completion nil)
+  (read-extended-command-predicate #'command-completion-default-include-p))
 
 ; Format elisp
 
