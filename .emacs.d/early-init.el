@@ -222,14 +222,6 @@
 
 (use-package editorconfig :ensure t :config (editorconfig-mode 1))
 
-; Godot
-
-(elpaca
- (gdscript-mode
-  :host github
-  :repo "godotengine/emacs-gdscript-mode"
-  :inherit nil))
-
 ; LSP
 
 (use-package
@@ -245,11 +237,11 @@
    js-ts-mode
    typescript-ts-mode
    php-mode
-   cmake-ts-mode
+   ; cmake-ts-mode
    go-mode
    rust-ts-mode
-   gdscript-mode
-   glsl-mode)
+   ; glsl-mode
+   gdscript-mode)
   . eglot-ensure)
  :custom
  (eglot-ignored-server-capabilities '(:inlayHintProvider))
@@ -258,17 +250,16 @@
  (eglot-report-progress nil)
  (eglot-stay-out-of '(flymake eldoc))
  :config
+; (add-to-list 'eglot-server-programs
+;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+; (add-to-list 'eglot-server-programs
+;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
  (evil-define-key
   'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
  (evil-define-key
   'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
  (evil-define-key
   'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
-; :config
-; (add-to-list 'eglot-server-programs
-;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-; (add-to-list 'eglot-server-programs
-;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
 
 ; Treesitter
 
@@ -281,24 +272,29 @@
  :ensure t
  :custom
  (treesit-auto-install 't)
- (treesit-auto-langs '(c cpp glsl cmake gdscript))
  :config
- ;; Remove treesitter modes, go-ts-mode not working currently
- ;; glsl-ts-mode don't work because of a rewrite in glsl-mode
- ;; https://github.com/jimhourihan/glsl-mode/commit/c5f2c2e7edf8a647eda74abe2cdf73fa6f62ebd2
- (setq treesit-auto-langs
-       (cl-set-difference
-        treesit-auto-langs '(glsl)))
- (treesit-auto-add-to-auto-mode-alist 'all)
+ (setq treesit-auto-langs '(c cpp cmake toml yaml commonlisp))
+ (treesit-auto-install-all)
  (global-treesit-auto-mode))
 (use-package
  cmake-ts-mode
  :ensure nil
  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+
+; GLSL
+
 (use-package
-  glsl-mode
-  :ensure t
-  :mode ("\\.shader\\'" "\\.glsl\\'"))
+ glsl-mode
+ :ensure t
+ :mode ("\\.shader\\'" "\\.glsl\\'"))
+
+; Godot
+
+(elpaca
+ (gdscript-mode
+  :host github
+  :repo "godotengine/emacs-gdscript-mode"
+  :inherit nil))
 
 ; Completion
 
