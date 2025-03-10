@@ -1,0 +1,1 @@
+/home/tides/.emacs.d/elpaca/repos/kanagawa-emacs/kanagawa-themes.el

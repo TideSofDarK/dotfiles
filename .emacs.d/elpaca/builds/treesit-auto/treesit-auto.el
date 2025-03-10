@@ -1,0 +1,1 @@
+/home/tides/.emacs.d/elpaca/repos/treesit-auto/treesit-auto.el

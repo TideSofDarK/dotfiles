@@ -1,0 +1,1 @@
+/home/tides/.emacs.d/elpaca/repos/glsl-mode/glsl-mode.el

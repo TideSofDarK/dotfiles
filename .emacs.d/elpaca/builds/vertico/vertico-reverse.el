@@ -1,0 +1,1 @@
+/home/tides/.emacs.d/elpaca/repos/vertico/extensions/vertico-reverse.el
