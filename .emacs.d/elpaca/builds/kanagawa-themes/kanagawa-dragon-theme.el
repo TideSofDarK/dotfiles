@@ -1,1 +1,0 @@
-/home/tides/.emacs.d/elpaca/repos/kanagawa-emacs/kanagawa-dragon-theme.el

@@ -1,1 +1,0 @@
-/home/tides/.emacs.d/elpaca/repos/evil-collection/evil-collection.el

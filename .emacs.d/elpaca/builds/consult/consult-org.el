@@ -1,1 +1,0 @@
-/home/tides/.emacs.d/elpaca/repos/consult/consult-org.el
