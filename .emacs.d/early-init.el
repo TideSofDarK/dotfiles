@@ -137,6 +137,10 @@
 
     (truncate-lines t)
 
+    (text-mode-ispell-word-completion nil)
+    (read-extended-command-predicate
+        #'command-completion-default-include-p)
+
     (display-line-numbers-grow-only t)
     (display-line-numbers-type 'relative)
     (display-line-numbers-width-start t)
@@ -298,12 +302,13 @@
         . eglot-ensure)
     :custom
     (eglot-ignored-server-capabilities
-        '(:inlayHintProvider :documentHighlightProvider))
+        '(:hoverProvider :signatureHelpProvider :inlayHintProvider :documentHighlightProvider))
     (eglot-events-buffer-size 0)
     (eglot-autoshutdown t)
     (eglot-report-progress nil)
-    ;; (eglot-stay-out-of '(flymake eldoc))
+    (eglot-stay-out-of '(flymake eldoc))
     :config
+    (setq eldoc-idle-delay 0.1)
     ;; (add-to-list 'eglot-server-programs
     ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
     ;; (add-to-list 'eglot-server-programs
@@ -325,15 +330,6 @@
         'normal my-intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
     (evil-define-key
         'normal my-intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
-
-;; eldoc-box
-
-(use-package
-    eldoc-box
-    :ensure t
-    :config (setq eldoc-idle-delay 0.1)
-    (evil-define-key
-        'normal my-intercept-mode-map (kbd "K") 'eldoc-box-help-at-point))
 
 ;; Treesitter
 
@@ -378,11 +374,10 @@
 
 ;; Godot
 
-(elpaca
-    (gdscript-mode
-        :host github
-        :repo "godotengine/emacs-gdscript-mode"
-        :inherit nil))
+(elpaca (gdscript-mode
+            :host github
+            :repo "godotengine/emacs-gdscript-mode"
+            :inherit nil))
 
 ;; Completion
 
@@ -390,6 +385,8 @@
     company
     :ensure t
     :demand t
+    :custom
+    (company-selection-wrap-around t)
     :bind
     (:map
         company-active-map
@@ -438,12 +435,6 @@
         (cons input (apply-partially #'orderless--highlight input t)))
     (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
     (consult-customize affe-grep :preview-key "M-."))
-(use-package
-    emacs
-    :ensure nil
-    :custom (text-mode-ispell-word-completion nil)
-    (read-extended-command-predicate
-        #'command-completion-default-include-p))
 
 ;; Format ELisp
 
