@@ -263,6 +263,15 @@
     :ensure t
     :after evil
     :config
+    (evil-define-command +evil:cd (&optional path)
+        "Change `default-directory' with `cd'."
+        (interactive "<f>")
+        (let ((path (or path "~")))
+        (evil-ex-define-cmd "cd" #'+evil:cd)
+        (cd path)
+        (message "Changed directory to '%s'" (abbreviate-file-name (expand-file-name path)))))
+    (evil-ex-define-cmd "cd" #'+evil:cd)
+
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
         '(dired ibuffer magit vertico consult eldoc eglot company))
@@ -293,22 +302,16 @@
     eglot
     :ensure nil
     :hook
-    ((c-ts-mode
-         c++-ts-mode
-         ;; cmake-ts-mode
-         rust-ts-mode
-         ;; glsl-mode
-         gdscript-ts-mode)
-        . eglot-ensure)
+    ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
     :custom
     (eglot-ignored-server-capabilities
-        '(:hoverProvider :signatureHelpProvider :inlayHintProvider :documentHighlightProvider))
+        '(:inlayHintProvider :documentHighlightProvider))
     (eglot-events-buffer-size 0)
     (eglot-autoshutdown t)
     (eglot-report-progress nil)
-    (eglot-stay-out-of '(flymake eldoc))
+    ;; (eglot-stay-out-of '(flymake eldoc))
     :config
-    (setq eldoc-idle-delay 0.1)
+    ;; (setq eldoc-idle-delay 0.1)
     ;; (add-to-list 'eglot-server-programs
     ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
     ;; (add-to-list 'eglot-server-programs
@@ -352,8 +355,9 @@
             :ext "\\.gd\\'"))
     (add-to-list 'treesit-auto-recipe-list treesit-auto-gdscript-config)
     (setq treesit-auto-langs
-        '(c cpp cmake toml yaml commonlisp gdscript))
-    (treesit-auto-install-all) (global-treesit-auto-mode))
+        '(c cpp cmake toml yaml commonlisp gdscript lua))
+    (treesit-auto-install-all)
+    (global-treesit-auto-mode))
 (use-package
     cmake-ts-mode
     :ensure nil
