@@ -2,6 +2,10 @@
 
 (setq gc-cons-threshold (* 50 1000 1000))
 
+;; Maximize on launch
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+
 ;; Add Lisp Path
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
@@ -90,8 +94,8 @@
 
 ;; Set Font
 
-(let ((mono-spaced-font "Sarasa Fixed CL Nerd Font")
-         (proportionately-spaced-font "Sarasa UI CL Nerd Font"))
+(let ((mono-spaced-font "Sarasa Term CL Nerd Font")
+         (proportionately-spaced-font "Sarasa UI Nerd Font"))
     (set-face-attribute 'default nil
         :family mono-spaced-font
         :height 120)
@@ -181,13 +185,6 @@
 ;; (([escape] . keyboard-escape-quit)))
 ;;  ("C-g" . evil-normal-state)))
 
-;; mood-line
-
-(use-package mood-line
-    :ensure t
-    :config
-    (mood-line-mode))
-
 ;; undo-tree
 
 (use-package
@@ -267,14 +264,14 @@
         "Change `default-directory' with `cd'."
         (interactive "<f>")
         (let ((path (or path "~")))
-        (evil-ex-define-cmd "cd" #'+evil:cd)
-        (cd path)
-        (message "Changed directory to '%s'" (abbreviate-file-name (expand-file-name path)))))
+            (evil-ex-define-cmd "cd" #'+evil:cd)
+            (cd path)
+            (message "Changed directory to '%s'" (abbreviate-file-name (expand-file-name path)))))
     (evil-ex-define-cmd "cd" #'+evil:cd)
 
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc eglot corfu))
+        '(dired ibuffer magit vertico consult eldoc company))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -298,30 +295,81 @@
 
 ;; LSP
 
-(use-package
-    eglot
-    :ensure nil
-    :hook
-    ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
+(setenv "LSP_USE_PLISTS" "true")
+(use-package lsp-mode
+    :ensure t
     :custom
-    (eglot-ignored-server-capabilities
-        '(:inlayHintProvider :documentHighlightProvider))
-    (eglot-events-buffer-size 0)
-    (eglot-autoshutdown t)
-    (eglot-report-progress nil)
-    ;; (eglot-stay-out-of '(flymake eldoc))
+    ;; (lsp-completion-enable-additional-text-edit nil)
+    ;; (lsp-enable-xref nil)
+    (lsp-eldoc-enable-hover nil)
+    (lsp-eldoc-prefer-signature-help nil)
+    (lsp-enable-folding nil)
+    (lsp-enable-dap-auto-configure nil)
+    (lsp-display-inline-image nil)
+    (lsp-auto-execute-action nil)
+    (lsp-auto-guess-root t)
+    (lsp-headerline-breadcrumb-enable nil)
+    (lsp-lens-enable nil)
+    (lsp-semantic-tokens-enable t)
+    (lsp-semantic-tokens-apply-modifiers t)
+    (lsp-enable-symbol-highlighting nil)
+    (lsp-keymap-prefix nil)
+    :hook (
+              (c-ts-mode . lsp)
+              (c++-ts-mode . lsp)
+              (rust-ts-mode . lsp)
+              (gdscript-ts-mode . lsp))
+    :commands lsp
     :config
-    ;; (setq eldoc-idle-delay 0.1)
-    ;; (add-to-list 'eglot-server-programs
-    ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-    ;; (add-to-list 'eglot-server-programs
-    ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+    (setq lsp-semantic-token-modifier-faces
+        '(("readonly" . lsp-face-semhl-constant)
+             ("defaultLibrary" . lsp-face-semhl-default-library)
+             ;; ("declaration" . lsp-face-semhl-constant)
+             ;; ("definition" . lsp-face-semhl-constant)
+             ;; ("implementation" . lsp-face-semhl-constant)
+             ;; ("static" . lsp-face-semhl-static)
+             ;; ("deprecated" . lsp-face-semhl-deprecated)
+             ;; ("abstract" . lsp-face-semhl-keyword)
+             ;; ("async" . lsp-face-semhl-macro)
+             ("modification" . lsp-face-semhl-operator)
+             ;; ("documentation" . lsp-face-semhl-comment)
+             ;; ("classScope" . lsp-face-semhl-member)
+             ;; ("namespaceScope" . lsp-face-semhl-namespace-scope)
+             ("id0" . lsp-face-semhl-id0)
+             ("id1" . lsp-face-semhl-id1)
+             ("id2" . lsp-face-semhl-id2)
+             ("id3" . lsp-face-semhl-id3)
+             ("id4" . lsp-face-semhl-id4)))
     (evil-define-key
-        'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
+        'normal my-intercept-mode-map (kbd "grn") 'lsp-rename)
+    ;; (evil-define-key
+    ;;     'normal my-intercept-mode-map (kbd "gra") 'lsp-code-actions)
     (evil-define-key
-        'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
-    (evil-define-key
-        'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+        'normal my-intercept-mode-map (kbd "<leader>cf") 'lsp-format-buffer))
+;; (use-package
+;;     eglot
+;;     :ensure nil
+;;     :hook
+;;     ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
+;;     :custom
+;;     (eglot-ignored-server-capabilities
+;;         '(:inlayHintProvider :documentHighlightProvider))
+;;     (eglot-events-buffer-size 0)
+;;     (eglot-autoshutdown t)
+;;     (eglot-report-progress nil)
+;;     ;; (eglot-stay-out-of '(flymake eldoc))
+;;     :config
+;;     ;; (setq eldoc-idle-delay 0.1)
+;;     ;; (add-to-list 'eglot-server-programs
+;;     ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+;;     ;; (add-to-list 'eglot-server-programs
+;;     ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+;;     (evil-define-key
+;;         'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
+;;     (evil-define-key
+;;         'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
+;;     (evil-define-key
+;;         'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
 
 ;; flymake
 
@@ -385,29 +433,37 @@
 
 ;; Completion
 
-; (use-package
-;     company
-;     :ensure t
-;     :demand t
-;     :custom
-;     (company-selection-wrap-around t)
-;     :bind
-;     (:map
-;         company-active-map
-;         ("C-y" . company-complete-selection)
-;         ("RET" . nil)
-;         ("<return>" . nil))
-;     :config
-;     (setq company-frontends
-;         '(company-pseudo-tooltip-frontend
-;              company-echo-metadata-frontend))
-;     (global-company-mode))
+(use-package
+    company
+    :ensure t
+    :demand t
+    :custom
+    (company-selection-wrap-around t)
+    :bind
+    (:map
+        company-active-map
+        ("C-y" . company-complete-selection)
+        ("RET" . nil)
+        ("<return>" . nil))
+    :config
+    (setq company-frontends
+        '(company-pseudo-tooltip-frontend
+             company-echo-metadata-frontend))
+    (global-company-mode))
 (use-package
     consult
     :ensure t
     :config
     (define-key
         evil-normal-state-map (kbd "<leader>SPC") 'consult-buffer))
+(use-package
+    consult-lsp
+    :ensure t
+    :config
+    (define-key
+        evil-normal-state-map (kbd "gW") 'consult-lsp-symbols)
+    (define-key
+        evil-normal-state-map (kbd "gO") 'consult-lsp-file-symbols))
 (use-package
     vertico
     :ensure t
@@ -439,33 +495,33 @@
         (cons input (apply-partially #'orderless--highlight input t)))
     (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
     (consult-customize affe-grep :preview-key "M-."))
-(use-package corfu
-    :ensure t
-    :custom
-    (corfu-left-margin-width 0.0)
-    (corfu-right-margin-width 0.0)
-    (corfu-cycle t)
-    (corfu-auto t)
-    (corfu-auto-prefix 2)
-    (corfu-popupinfo-mode t)
-    (corfu-popupinfo-delay 0.5)
-    (corfu-preselect 'prompt)
-    ;; (corfu-on-exact-match nil)
-    (corfu-scroll-margin 1)
-    (completion-ignore-case t)
-    ;; (tab-always-indent 'complete)
-    :init
-    (global-corfu-mode)
-    :bind (:map corfu-map ("C-y" . corfu-complete)))
-(use-package cape
-    :ensure t
-    :after corfu
-    :init
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-dict)
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-    (add-to-list 'completion-at-point-functions #'cape-keyword))
+;; (use-package corfu
+;;     :ensure t
+;;     :custom
+;;     (corfu-left-margin-width 0.0)
+;;     (corfu-right-margin-width 0.0)
+;;     (corfu-cycle t)
+;;     (corfu-auto t)
+;;     (corfu-auto-prefix 2)
+;;     (corfu-popupinfo-mode t)
+;;     (corfu-popupinfo-delay 0.5)
+;;     (corfu-preselect 'prompt)
+;;     ;; (corfu-on-exact-match nil)
+;;     (corfu-scroll-margin 1)
+;;     (completion-ignore-case t)
+;;     ;; (tab-always-indent 'complete)
+;;     :init
+;;     (global-corfu-mode)
+;;     :bind (:map corfu-map ("C-y" . corfu-complete)))
+;; (use-package cape
+;;     :ensure t
+;;     :after corfu
+;;     :init
+;;     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+;;     (add-to-list 'completion-at-point-functions #'cape-dict)
+;;     (add-to-list 'completion-at-point-functions #'cape-file)
+;;     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+;;     (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 ;; Format ELisp
 
