@@ -115,6 +115,12 @@
     (require 'kanagawa-themes)
     (load-theme 'kanagawa-wave :no-confirm-loading))
 
+;; Cleaner mode-line
+
+(use-package minions
+    :ensure t
+    :config (minions-mode 1))
+
 ;; Basic Configuration
 
 (use-package
@@ -323,7 +329,7 @@
     :config
     (setq lsp-semantic-token-modifier-faces
         '(("readonly" . lsp-face-semhl-constant)
-             ("defaultLibrary" . lsp-face-semhl-default-library)
+             ;; ("defaultLibrary" . lsp-face-semhl-default-library)
              ;; ("declaration" . lsp-face-semhl-constant)
              ;; ("definition" . lsp-face-semhl-constant)
              ;; ("implementation" . lsp-face-semhl-constant)
