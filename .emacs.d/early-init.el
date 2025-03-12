@@ -441,7 +441,10 @@
 (elpaca (gdscript-mode
             :host github
             :repo "godotengine/emacs-gdscript-mode"
-            :inherit nil))
+            :inherit nil)
+            :config
+            (setq gdscript-indent-offset 4)
+            (setq gdscript-use-tab-indents nil))
 
 ;; Completion
 
