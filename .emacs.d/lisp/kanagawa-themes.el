@@ -543,6 +543,8 @@ names to which it refers are bound."
       (lsp-face-semhl-property (:foreground ,syn-identifier))
       (lsp-face-semhl-operator (:foreground ,syn-identifier))
       (lsp-face-semhl-member (:foreground ,syn-identifier))
+      (lsp-face-semhl-namespace (:foreground ,syn-type :weight normal))
+      (lsp-face-semhl-class (:foreground ,syn-type :weight normal))
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg-gutter))
       (line-number-current-line (:inherit line-number))

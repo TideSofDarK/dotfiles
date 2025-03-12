@@ -277,7 +277,7 @@
 
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc company))
+        '(dired ibuffer magit vertico consult eldoc company minibuffer))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -319,6 +319,8 @@
     (lsp-semantic-tokens-enable t)
     (lsp-semantic-tokens-apply-modifiers t)
     (lsp-enable-symbol-highlighting nil)
+    (lsp-modeline-code-actions-enable nil)
+    (lsp-modeline-diagnostics-enable nil)
     (lsp-keymap-prefix nil)
     :hook (
               (c-ts-mode . lsp)
@@ -452,14 +454,28 @@
         ("RET" . nil)
         ("<return>" . nil))
     :config
-    (setq company-frontends
-        '(company-pseudo-tooltip-frontend
-             company-echo-metadata-frontend))
+    ;; (setq company-frontends
+    ;;     '(company-pseudo-tooltip-frontend
+    ;;          company-echo-metadata-frontend))
     (global-company-mode))
 (use-package
     consult
     :ensure t
+    :custom
+    (consult-line-start-from-top t)
     :config
+    (defun consult-grep-file ()
+        "Search with 'grep' in current file."
+        (interactive)
+        (consult-grep (list (shell-quote-argument buffer-file-name))))
+    (defun consult-ripgrep-file ()
+        "Search with 'rg' in current file."
+        (interactive)
+        (let ((consult-project-function (lambda (x) nil)))
+            (consult-ripgrep (list (shell-quote-argument buffer-file-name)))))
+    (define-key evil-normal-state-map (kbd "<leader>/") 'consult-line)
+    (define-key evil-normal-state-map (kbd "<leader>sg") 'consult-ripgrep)
+    (define-key evil-normal-state-map (kbd "<leader>sf") 'project-find-file)
     (define-key
         evil-normal-state-map (kbd "<leader>SPC") 'consult-buffer))
 (use-package
@@ -477,30 +493,32 @@
     (setq vertico-cycle t)
     (setq vertico-resize nil)
     (vertico-mode 1))
+(use-package hotfuzz
+    :ensure (hotfuzz :host github :url "axelf4/hotfuzz"))
 (use-package
     orderless
+    :after hotfuzz
     :ensure t
     :custom
     ;; (orderless-style-dispatchers '(orderless-affix-dispatch))
     ;; (orderless-component-separator #'orderless-escapable-split-on-space)
-    (completion-styles '(orderless basic))
+    (completion-styles '(orderless hotfuzz basic))
     (completion-category-defaults nil)
     (completion-category-overrides
-        '((file (styles basic partial-completion))
-             (eglot (styles orderless)))))
+        '((file (styles basic partial-completion)))))
 (use-package marginalia :ensure t :init (marginalia-mode))
-(use-package
-    affe
-    :ensure t
-    :config
-    (define-key evil-normal-state-map (kbd "<leader>sg") 'affe-grep)
-    (define-key evil-normal-state-map (kbd "<leader>sf") 'affe-find)
-    (setq affe-find-command "fd --color=never --full-path")
-    (defun affe-orderless-regexp-compiler (input _type _ignorecase)
-        (setq input (cdr (orderless-compile input)))
-        (cons input (apply-partially #'orderless--highlight input t)))
-    (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
-    (consult-customize affe-grep :preview-key "M-."))
+;; (use-package
+;;     affe
+;;     :ensure t
+;;     :config
+;;     (define-key evil-normal-state-map (kbd "<leader>sg") 'affe-grep)
+;;     (define-key evil-normal-state-map (kbd "<leader>sf") 'affe-find)
+;;     (setq affe-find-command "fd --color=never --full-path"))
+;;     ; (defun affe-orderless-regexp-compiler (input _type _ignorecase)
+;;     ;     (setq input (cdr (orderless-compile input)))
+;;     ;     (cons input (apply-partially #'orderless--highlight input t)))
+;;     ; (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
+;;     ; (consult-customize affe-grep :preview-key "M-."))
 ;; (use-package corfu
 ;;     :ensure t
 ;;     :custom
@@ -519,15 +537,14 @@
 ;;     :init
 ;;     (global-corfu-mode)
 ;;     :bind (:map corfu-map ("C-y" . corfu-complete)))
-;; (use-package cape
-;;     :ensure t
-;;     :after corfu
-;;     :init
-;;     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-;;     (add-to-list 'completion-at-point-functions #'cape-dict)
-;;     (add-to-list 'completion-at-point-functions #'cape-file)
-;;     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-;;     (add-to-list 'completion-at-point-functions #'cape-keyword))
+(use-package cape
+    :ensure t
+    :init
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-dict)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+    (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 ;; Format ELisp
 
