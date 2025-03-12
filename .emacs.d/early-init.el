@@ -94,7 +94,7 @@
 
 ;; Set Font
 
-(let ((mono-spaced-font "Sarasa Term CL Nerd Font")
+(let ((mono-spaced-font "Sarasa Term Slab CL Nerd Font")
          (proportionately-spaced-font "Sarasa UI Nerd Font"))
     (set-face-attribute 'default nil
         :family mono-spaced-font
@@ -111,6 +111,9 @@
 (use-package
     autothemer
     :ensure t
+    :custom
+    (kanagawa-themes-keyword-italic nil)
+    (kanagawa-themes-comment-italic nil)
     :config
     (require 'kanagawa-themes)
     (load-theme 'kanagawa-wave :no-confirm-loading))
@@ -277,7 +280,7 @@
 
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc company minibuffer))
+        '(dired ibuffer magit vertico consult eldoc company))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -307,6 +310,7 @@
     :custom
     ;; (lsp-completion-enable-additional-text-edit nil)
     ;; (lsp-enable-xref nil)
+    (lsp-enable-links nil)
     (lsp-eldoc-enable-hover nil)
     (lsp-eldoc-prefer-signature-help nil)
     (lsp-enable-folding nil)

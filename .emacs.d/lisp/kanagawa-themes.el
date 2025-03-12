@@ -497,11 +497,14 @@ names to which it refers are bound."
       (tooltip (:foreground ,pmenu-fg :background ,pmenu-bg))
       (menu (:foreground ,fg :background ,bg))
       (region (:background ,bg-visual))
-      (separator-line (:background ,bg-m3))
-      (shadow (:inherit separator-line))
+      ;; (separator-line (:background ,bg-m3))
+      ;; (shadow (:inherit separator-line))
       (window-border (:background ,bg))
       (window-divider (:foreground ,bg-m1))
       (vertical-border (:foreground ,bg-m1))
+;;;;;;; mode-line
+      (mode-line (:foreground ,fg-dim :background ,bg-m3))
+      (mode-line-inactive (:foreground ,nontext :background ,bg-m3))
 ;;;;;;; dired
       (dired-mark (:foreground ,syn-perproc))
 ;;;;;;; font lock
@@ -570,9 +573,6 @@ names to which it refers are bound."
       (isearch-fail (:foreground ,fg :background ,diag-error))
       (lazy-highlight (:foreground ,fg :background ,bg-search))
       (minibuffer-prompt (:foreground ,fg :weight bold))
-;;;;;;; mode-line
-      (mode-line (:foreground ,fg-dim :background ,bg-m3))
-      (mode-line-inactive (:foreground ,nontext :background ,bg-m3))
 ;;;;;;; hl-line-mode
       (hl-line (:background ,bg-p2))
 ;;;;;;; message
