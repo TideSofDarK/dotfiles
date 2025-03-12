@@ -107,9 +107,8 @@
 (use-package
     autothemer
     :ensure t
-    :init
+    :config
     (require 'kanagawa-themes)
-    (require 'rose-pine-theme)
     (load-theme 'kanagawa-wave :no-confirm-loading))
 
 ;; Basic Configuration
@@ -162,8 +161,6 @@
     (auto-save-default nil)
 
     (enable-recursive-minibuffers t)
-    (read-extended-command-predicate
-        #'command-completion-default-include-p)
     (minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
 
@@ -214,11 +211,14 @@
     (evil-ex-previous-command nil)
     (evil-want-empty-ex-last-command t)
     (evil-want-C-u-scroll t)
+    (evil-want-C-d-scroll t)
     (evil-want-integration t)
     (evil-want-keybinding nil)
     :config
     (evil-set-leader 'normal (kbd "SPC"))
     (evil-set-leader 'normal "\\" t)
+
+    (evil-define-key 'insert 'global (kbd "\C-y") nil)
 
     (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
     (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
@@ -274,7 +274,7 @@
 
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc eglot company))
+        '(dired ibuffer magit vertico consult eldoc eglot corfu))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -282,10 +282,10 @@
     :after evil
     :config (evil-commentary-mode))
 
-(defun meain/evil-yank-advice (orig-fn beg end &rest args)
+(defun my/evil-yank-advice (orig-fn beg end &rest args)
     (pulse-momentary-highlight-region beg end)
     (apply orig-fn beg end args))
-(advice-add 'evil-yank :around 'meain/evil-yank-advice)
+(advice-add 'evil-yank :around 'my/evil-yank-advice)
 
 ;; magit
 
@@ -385,23 +385,23 @@
 
 ;; Completion
 
-(use-package
-    company
-    :ensure t
-    :demand t
-    :custom
-    (company-selection-wrap-around t)
-    :bind
-    (:map
-        company-active-map
-        ("C-y" . company-complete-selection)
-        ("RET" . nil)
-        ("<return>" . nil))
-    :config
-    (setq company-frontends
-        '(company-pseudo-tooltip-frontend
-             company-echo-metadata-frontend))
-    (global-company-mode))
+; (use-package
+;     company
+;     :ensure t
+;     :demand t
+;     :custom
+;     (company-selection-wrap-around t)
+;     :bind
+;     (:map
+;         company-active-map
+;         ("C-y" . company-complete-selection)
+;         ("RET" . nil)
+;         ("<return>" . nil))
+;     :config
+;     (setq company-frontends
+;         '(company-pseudo-tooltip-frontend
+;              company-echo-metadata-frontend))
+;     (global-company-mode))
 (use-package
     consult
     :ensure t
@@ -439,6 +439,33 @@
         (cons input (apply-partially #'orderless--highlight input t)))
     (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
     (consult-customize affe-grep :preview-key "M-."))
+(use-package corfu
+    :ensure t
+    :custom
+    (corfu-left-margin-width 0.0)
+    (corfu-right-margin-width 0.0)
+    (corfu-cycle t)
+    (corfu-auto t)
+    (corfu-auto-prefix 2)
+    (corfu-popupinfo-mode t)
+    (corfu-popupinfo-delay 0.5)
+    (corfu-preselect 'prompt)
+    ;; (corfu-on-exact-match nil)
+    (corfu-scroll-margin 1)
+    (completion-ignore-case t)
+    ;; (tab-always-indent 'complete)
+    :init
+    (global-corfu-mode)
+    :bind (:map corfu-map ("C-y" . corfu-complete)))
+(use-package cape
+    :ensure t
+    :after corfu
+    :init
+    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-dict)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+    (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 ;; Format ELisp
 

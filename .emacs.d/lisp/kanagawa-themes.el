@@ -505,24 +505,34 @@ names to which it refers are bound."
 ;;;;;;; dired
       (dired-mark (:foreground ,syn-perproc))
 ;;;;;;; font lock
+      (font-lock-bracket-face (:foreground ,syn-punct))
+      (font-lock-punctuation-face (:foreground ,syn-punct))
+      (font-lock-misc-punctuation-face (:foreground ,syn-punct))
       (font-lock-builtin-face (:foreground ,fg))
+      (font-lock-reference-face (:foreground ,syn-special-3))
       (font-lock-comment-face (:foreground ,syn-comment
                                            :slant ,(if kanagawa-themes-comment-italic 'italic 'normal)))
       (font-lock-comment-delimiter-face (:foreground ,syn-comment))
       (font-lock-constant-face (:foreground ,syn-constant))
       (font-lock-doc-face (:foreground ,syn-string))
+      (font-lock-doc-markup-face (:foreground ,syn-string))
       (font-lock-function-name-face (:foreground ,syn-fun))
-      (font-lock-keyword-face (:foreground ,syn-keyword :weight bold
+      (font-lock-function-call-face (:foreground ,syn-fun))
+      (font-lock-operator-face (:foreground ,syn-identifier))
+      (font-lock-keyword-face (:foreground ,syn-keyword :weight semi-bold
                                            :slant ,(if kanagawa-themes-keyword-italic 'italic 'normal)))
       (font-lock-negation-char-face (:inherit font-lock-keyword-face))
       (font-lock-preprocessor-face (:foreground ,syn-perproc))
       (font-lock-regexp-grouping-construct (:foreground ,syn-regex :weight bold))
       (font-lock-regexp-grouping-backslash (:foreground ,syn-regex :weight bold))
       (font-lock-string-face (:foreground ,syn-string))
+      (font-lock-number-face (:foreground ,syn-number))
       (font-lock-type-face (:foreground ,syn-type))
-      (font-lock-variable-name-face (:foreground ,syn-identifier))
+      (font-lock-variable-name-face (:foreground ,fg))
+      (font-lock-property-name-face (:foreground ,syn-identifier))
       (font-lock-warning-face (:foreground ,diag-warning))
       (c-annotation-face (:inherit font-lock-constant-face))
+      (elisp-shorthand-font-lock-face (:foreground ,fg))
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg-gutter))
       (line-number-current-line (:inherit line-number))
@@ -827,6 +837,13 @@ names to which it refers are bound."
       (company-preview-common (:foreground ,extend-color-2 :weight bold))
       (company-preview-search (:inherit company-tooltip-search))
       (company-template-field (:inherit match))
+;;;;;;; corfu
+      (corfu-default :background ,bg-m1 :foreground ,fg)
+      (corfu-current :background ,bg-p1 :foreground ,fg)
+      (corfu-bar :background ,fg)
+      (corfu-border :background nil)
+      ;; (corfu-annotations :inherit font-lock-comment-face)
+      ;; (corfu-deprecated :strike-through t)
 ;;;;;;; ace
       (ace-jump-face-background (:foreground ,bright-blue))
       (ace-jump-face-foreground (:foreground ,extend-color-2 :background ,bg-m3 :weight bold))
