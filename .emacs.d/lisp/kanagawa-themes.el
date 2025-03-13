@@ -517,6 +517,7 @@ names to which it refers are bound."
       (font-lock-comment-face (:foreground ,syn-comment
                                            :slant ,(if kanagawa-themes-comment-italic 'italic 'normal)))
       (font-lock-comment-delimiter-face (:foreground ,syn-comment))
+      (font-lock-variable-name-face (:foreground ,fg))
       (font-lock-constant-face (:foreground ,syn-constant))
       (font-lock-doc-face (:foreground ,syn-string))
       (font-lock-doc-markup-face (:foreground ,syn-string))
@@ -532,7 +533,6 @@ names to which it refers are bound."
       (font-lock-string-face (:foreground ,syn-string))
       (font-lock-number-face (:foreground ,syn-number))
       (font-lock-type-face (:foreground ,syn-type))
-      (font-lock-variable-name-face (:foreground ,fg))
       (font-lock-property-name-face (:foreground ,syn-identifier))
       (font-lock-warning-face (:foreground ,diag-warning))
       (c-annotation-face (:inherit font-lock-constant-face))
@@ -542,7 +542,7 @@ names to which it refers are bound."
       (lsp-face-semhl-interface (:foreground ,syn-fun :weight normal))
       (lsp-face-semhl-default-library (:foreground ,syn-special-1 :weight normal))
       (lsp-face-semhl-parameter (:foreground ,syn-parameter))
-      (lsp-face-semhl-type-parameter (:foreground ,syn-parameter))
+      (lsp-face-semhl-type-parameter (:foreground ,syn-type))
       (lsp-face-semhl-read (:foreground ,syn-identifier))
       (lsp-face-semhl-property (:foreground ,syn-identifier))
       (lsp-face-semhl-operator (:foreground ,syn-identifier))
@@ -923,6 +923,17 @@ names to which it refers are bound."
       (flycheck-inline-info (:foreground ,blue :background ,diff-change :slant italic :weight bold :height 138))
       (flycheck-inline-warning (:foreground ,diff-text
                                             :background ,bright-yellow :slant italic :weight bold :height 138))
+;;;;;; flymake
+      ;; (flymake-end-of-line-diagnostics-face ((,c :inherit modus-themes-slant :height 0.85 :box ,border)))
+      (flymake-error :underline (:style wave :color ,diag-error))
+      ;; (flymake-error-echo ((,c :inherit error)))
+      ;; (flymake-error-echo-at-eol ((,c :inherit flymake-end-of-line-diagnostics-face :foreground ,err)))
+      (flymake-note :underline (:style wave :color ,diag-info))
+      ;; (flymake-note-echo ((,c :inherit success)))
+      ;; (flymake-note-echo-at-eol ((,c :inherit flymake-end-of-line-diagnostics-face :foreground ,info)))
+      (flymake-warning :underline (:style wave :color ,diag-warning))
+      ;; (flymake-warning-echo :inherit warning)
+      ;; (flymake-warning-echo-at-eol ((,c :inherit flymake-end-of-line-diagnostics-face :foreground ,warning)))
 ;;;;;;; emacs-dashboard
       (dashboard-heading (:foreground ,syn-punct :weight bold))
       (dashboard-items-face (:foreground ,fg))

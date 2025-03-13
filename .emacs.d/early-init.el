@@ -351,6 +351,7 @@
     :config
     (setq lsp-semantic-token-faces
         '(
+             ("bracket" . font-lock-punctuation-face)
              ("comment" . lsp-face-semhl-comment)
              ;; ("keyword" . lsp-face-semhl-keyword)
              ("string" . lsp-face-semhl-string)
@@ -370,7 +371,7 @@
              ("property" . lsp-face-semhl-property)
              ("event" . lsp-face-semhl-event)
              ("macro" . lsp-face-semhl-macro)
-             ("variable" . lsp-face-semhl-variable)
+             ;; ("variable" . lsp-face-semhl-variable)
              ("parameter" . lsp-face-semhl-parameter)
              ("label" . lsp-face-semhl-label)
              ("enumConstant" . lsp-face-semhl-constant)
@@ -379,7 +380,8 @@
              ("concept" . lsp-face-semhl-interface)))
     (setq lsp-semantic-token-modifier-faces
         '(
-             ("readonly" . lsp-face-semhl-constant)
+             ;; ("readonly" . lsp-face-semhl-constant)
+             ("method.defaultLibrary" . lsp-face-semhl-default-library)
              ;; ("defaultLibrary" . lsp-face-semhl-default-library)
              ;; ("declaration" . lsp-face-semhl-constant)
              ;; ("definition" . lsp-face-semhl-constant)
@@ -491,7 +493,6 @@
 (use-package
     company
     :ensure t
-    :demand t
     :custom
     (company-icon-margin 3)
     (company-tooltip-align-annotations t)

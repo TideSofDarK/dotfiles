@@ -1,5 +1,4 @@
 {
-    "workbench.colorTheme": "Kanagawa Wave",
     "vim.easymotion": true,
     "vim.incsearch": true,
     "vim.useSystemClipboard": true,
@@ -164,12 +163,22 @@
         "[Kanagawa Wave]": {
             "textMateRules": [
                 {
+                    "name": "Constants and enums",
+                    "scope": [
+                        "variable.other.constant",
+                        "variable.other.enummember"
+                    ],
+                    "settings": {
+                        "foreground": "#f89860"
+                    }
+                },
+                {
                     "name": "Keyword",
                     "scope": "keyword",
                     "settings": {
                         "foreground": "#957fb8"
                     }
-                },
+                }
             ]
         }
     },
@@ -185,4 +194,5 @@
     "workbench.editor.showTabs": "single",
     "editor.minimap.enabled": false,
     "editor.scrollbar.verticalScrollbarSize": 0,
+    "workbench.colorTheme": "Kanagawa Wave",
 }
