@@ -108,15 +108,10 @@
 
 ;; Themes
 
-(use-package
-    autothemer
-    :ensure t
-    :custom
-    (kanagawa-themes-keyword-italic nil)
-    (kanagawa-themes-comment-italic nil)
-    :config
-    (require 'kanagawa-themes)
-    (load-theme 'kanagawa-wave :no-confirm-loading))
+(setq kanagawa-themes-keyword-italic t)
+(setq kanagawa-themes-comment-italic nil)
+(require 'kanagawa-themes)
+(load-theme 'kanagawa-wave :no-confirm-loading)
 
 ;; Cleaner mode-line
 
@@ -225,6 +220,8 @@
     (evil-set-leader 'normal (kbd "SPC"))
     (evil-set-leader 'normal "\\" t)
 
+    (evil-define-key 'normal 'global (kbd "K") 'eldoc)
+
     (evil-define-key 'insert 'global (kbd "\C-y") nil)
 
     (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
@@ -281,7 +278,7 @@
 
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc company))
+        '(dired ibuffer magit vertico consult eldoc company help))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -499,7 +496,7 @@
         (interactive)
         (let ((consult-project-function (lambda (x) nil)))
             (consult-ripgrep (list (shell-quote-argument buffer-file-name)))))
-    (define-key evil-normal-state-map (kbd "<leader>/") 'consult-line)
+    (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
     (define-key evil-normal-state-map (kbd "<leader>sg") 'consult-ripgrep)
     (define-key evil-normal-state-map (kbd "<leader>sf") 'project-find-file)
     (define-key
