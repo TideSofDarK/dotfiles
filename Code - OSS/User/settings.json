@@ -1,0 +1,188 @@
+{
+    "workbench.colorTheme": "Kanagawa Wave",
+    "vim.easymotion": true,
+    "vim.incsearch": true,
+    "vim.useSystemClipboard": true,
+    "vim.useCtrlKeys": true,
+    "vim.hlsearch": true,
+    "vim.insertModeKeyBindings": [
+        {
+            "before": [
+                "j",
+                "j"
+            ],
+            "after": [
+                "<Esc>"
+            ]
+        }
+    ],
+    "vim.operatorPendingModeKeyBindings": [
+        {
+            "before": [
+                "H",
+            ],
+            "after": [
+                "^",
+            ]
+        },
+        {
+            "before": [
+                "L",
+            ],
+            "after": [
+                "$",
+            ]
+        },
+    ],
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "H",
+            ],
+            "after": [
+                "^",
+            ]
+        },
+        {
+            "before": [
+                "L",
+            ],
+            "after": [
+                "$",
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "q"
+            ],
+            "after": [
+                "<C-w>",
+                "q"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "w"
+            ],
+            "commands": [
+                ":w"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "a"
+            ],
+            "commands": [
+                ":wa"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "d"
+            ],
+            "commands": [
+                ":bdelete"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "s",
+                "f",
+            ],
+            "commands": [
+                "workbench.action.quickOpen"
+            ]
+        },
+        {
+            "before": [
+                "g",
+                "r",
+                "n",
+            ],
+            "commands": [
+                "editor.action.rename"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "c",
+                "f",
+            ],
+            "commands": [
+                "editor.action.format"
+            ]
+        },
+        {
+            "before": [
+                "]",
+                "d",
+            ],
+            "commands": [
+                "editor.action.marker.next"
+            ]
+        },
+        {
+            "before": [
+                "[",
+                "d",
+            ],
+            "commands": [
+                "editor.action.marker.prev"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "<leader>",
+            ],
+            "commands": [
+                "workbench.action.showAllEditors"
+            ]
+        },
+        {
+            "before": [
+                "<leader>",
+                "t",
+                "t",
+            ],
+            "commands": [
+                "workbench.view.explorer"
+            ]
+        },
+    ],
+    "vim.leader": "<space>",
+    "extensions.experimental.affinity": {
+        "vscodevim.vim": 1
+    },
+    "editor.tokenColorCustomizations": {
+        "[Kanagawa Wave]": {
+            "textMateRules": [
+                {
+                    "name": "Keyword",
+                    "scope": "keyword",
+                    "settings": {
+                        "foreground": "#957fb8"
+                    }
+                },
+            ]
+        }
+    },
+    "editor.fontFamily": "'Sarasa Fixed CL Nerd Font', 'monospace', monospace",
+    "editor.fontSize": 16,
+    "editor.lineNumbers": "relative",
+    "editor.scrollbar.vertical": "hidden",
+    "editor.scrollbar.horizontal": "hidden",
+    "breadcrumbs.enabled": false,
+    "editor.inlayHints.enabled": "off",
+    "editor.codeLens": false,
+    "editor.stickyScroll.enabled": false,
+    "workbench.editor.showTabs": "single",
+    "editor.minimap.enabled": false,
+    "editor.scrollbar.verticalScrollbarSize": 0,
+}

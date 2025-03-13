@@ -503,8 +503,9 @@ names to which it refers are bound."
       (window-divider (:foreground ,bg-m1))
       (vertical-border (:foreground ,bg-m1))
 ;;;;;;; mode-line
-      (mode-line (:foreground ,fg-dim :background ,bg-m3))
-      (mode-line-inactive (:foreground ,nontext :background ,bg-m3))
+      (mode-line (:foreground ,fg-dim :background ,bg-m3 :box ,bg-p1))
+      (mode-line-inactive (:foreground ,nontext :background ,bg-m1 :box ,bg-p1))
+      (mode-line-highlight (:foreground ,fg-dim))
 ;;;;;;; dired
       (dired-mark (:foreground ,syn-perproc))
 ;;;;;;; font lock
@@ -548,6 +549,7 @@ names to which it refers are bound."
       (lsp-face-semhl-member (:foreground ,syn-identifier))
       (lsp-face-semhl-namespace (:foreground ,syn-type :weight normal))
       (lsp-face-semhl-class (:foreground ,syn-type :weight normal))
+      (lsp-face-semhl-label (:foreground ,syn-keyword :weight semi-bold))
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg-gutter))
       (line-number-current-line (:inherit line-number))

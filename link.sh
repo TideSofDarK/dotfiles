@@ -4,6 +4,7 @@ cd "$(dirname "$0")"
 CONFIG_FOLDERS=(
     "nvim"
     "alacritty"
+    "Code - OSS"
 )
 
 for folder in "${CONFIG_FOLDERS[@]}";do

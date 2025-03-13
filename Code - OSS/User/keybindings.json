@@ -1,0 +1,46 @@
+[
+    {
+        "key": "alt+l",
+        "command": "vim.remap",
+        "when": "inputFocus && vim.mode == 'Normal'",
+        "args": {
+            "after": [
+                "<C-w>",
+                "<C-l>"
+            ]
+        }
+    },
+    {
+        "key": "alt+h",
+        "command": "vim.remap",
+        "when": "inputFocus && vim.mode == 'Normal'",
+        "args": {
+            "after": [
+                "<C-w>",
+                "<C-h>"
+            ]
+        }
+    },
+    {
+        "key": "alt+j",
+        "command": "vim.remap",
+        "when": "inputFocus && vim.mode == 'Normal'",
+        "args": {
+            "after": [
+                "<C-w>",
+                "<C-j>"
+            ]
+        }
+    },
+    {
+        "key": "alt+k",
+        "command": "vim.remap",
+        "when": "inputFocus && vim.mode == 'Normal'",
+        "args": {
+            "after": [
+                "<C-w>",
+                "<C-k>"
+            ]
+        }
+    },
+]

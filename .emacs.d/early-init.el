@@ -179,6 +179,7 @@
 
     :hook (prog-mode . (lambda () (hs-minor-mode t)))
     :config
+    (set-display-table-slot standard-display-table 0 ?\ )
     (setq eldoc-echo-area-use-multiline-p nil)
     (fset 'display-startup-echo-area-message 'ignore)
     (set-fringe-mode 0)
@@ -293,6 +294,15 @@
     (apply orig-fn beg end args))
 (advice-add 'evil-yank :around 'my/evil-yank-advice)
 
+;; drag-stuff
+
+(use-package drag-stuff
+    :ensure t
+    :after evil
+    :config
+    (define-key evil-visual-state-map (kbd "J") 'drag-stuff-down)
+    (define-key evil-visual-state-map (kbd "K") 'drag-stuff-up))
+
 ;; magit
 
 (elpaca transient)
@@ -310,19 +320,28 @@
     :custom
     ;; (lsp-completion-enable-additional-text-edit nil)
     ;; (lsp-enable-xref nil)
+    (lsp-auto-guess-root t)
+    (lsp-keep-workspace-alive nil)
+    (lsp-inlay-hint-enable nil)
+    (lsp-update-inlay-hints-on-scroll nil)
+    (lsp-enable-folding nil)
+    (lsp-signature-auto-activate t)
+    (lsp-signature-doc-lines 1)
     (lsp-enable-links nil)
-    (lsp-eldoc-enable-hover nil)
-    (lsp-eldoc-prefer-signature-help nil)
+    (lsp-eldoc-enable-hover t)
+    (lsp-eldoc-prefer-signature-help t)
+    (lsp-eldoc-render-all t)
     (lsp-enable-folding nil)
     (lsp-enable-dap-auto-configure nil)
     (lsp-display-inline-image nil)
     (lsp-auto-execute-action nil)
-    (lsp-auto-guess-root t)
     (lsp-headerline-breadcrumb-enable nil)
     (lsp-lens-enable nil)
     (lsp-semantic-tokens-enable t)
     (lsp-semantic-tokens-apply-modifiers t)
     (lsp-enable-symbol-highlighting nil)
+    (lsp-enable-text-document-color nil)
+    (lsp-enable-on-type-formatting nil)
     (lsp-modeline-code-actions-enable nil)
     (lsp-modeline-diagnostics-enable nil)
     (lsp-keymap-prefix nil)
@@ -453,6 +472,8 @@
     :ensure t
     :demand t
     :custom
+    (company-icon-margin 3)
+    (company-tooltip-align-annotations t)
     (company-selection-wrap-around t)
     :bind
     (:map
@@ -461,9 +482,7 @@
         ("RET" . nil)
         ("<return>" . nil))
     :config
-    ;; (setq company-frontends
-    ;;     '(company-pseudo-tooltip-frontend
-    ;;          company-echo-metadata-frontend))
+    (setq company-frontends '(company-pseudo-tooltip-frontend))
     (global-company-mode))
 (use-package
     consult
@@ -544,14 +563,14 @@
 ;;     :init
 ;;     (global-corfu-mode)
 ;;     :bind (:map corfu-map ("C-y" . corfu-complete)))
-(use-package cape
-    :ensure t
-    :init
-    (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-    (add-to-list 'completion-at-point-functions #'cape-dict)
-    (add-to-list 'completion-at-point-functions #'cape-file)
-    (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-    (add-to-list 'completion-at-point-functions #'cape-keyword))
+;; (use-package cape
+;;     :ensure t
+;;     :init
+;;     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+;;     (add-to-list 'completion-at-point-functions #'cape-dict)
+;;     (add-to-list 'completion-at-point-functions #'cape-file)
+;;     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
+;;     (add-to-list 'completion-at-point-functions #'cape-keyword))
 
 ;; Format ELisp
 
