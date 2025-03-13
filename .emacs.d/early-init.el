@@ -349,8 +349,37 @@
               (gdscript-ts-mode . lsp))
     :commands lsp
     :config
+    (setq lsp-semantic-token-faces
+        '(
+             ("comment" . lsp-face-semhl-comment)
+             ;; ("keyword" . lsp-face-semhl-keyword)
+             ("string" . lsp-face-semhl-string)
+             ("number" . lsp-face-semhl-number)
+             ("regexp" . lsp-face-semhl-regexp)
+             ;; ("operator" . lsp-face-semhl-operator)
+             ("namespace" . lsp-face-semhl-namespace)
+             ;; ("type" . lsp-face-semhl-type)
+             ("struct" . lsp-face-semhl-struct)
+             ("class" . lsp-face-semhl-class)
+             ("interface" . lsp-face-semhl-interface)
+             ("enum" . lsp-face-semhl-enum)
+             ("typeParameter" . lsp-face-semhl-type-parameter)
+             ("function" . lsp-face-semhl-function)
+             ("method" . lsp-face-semhl-method)
+             ("member" . lsp-face-semhl-member)
+             ("property" . lsp-face-semhl-property)
+             ("event" . lsp-face-semhl-event)
+             ("macro" . lsp-face-semhl-macro)
+             ("variable" . lsp-face-semhl-variable)
+             ("parameter" . lsp-face-semhl-parameter)
+             ("label" . lsp-face-semhl-label)
+             ("enumConstant" . lsp-face-semhl-constant)
+             ("enumMember" . lsp-face-semhl-constant)
+             ("dependent" . lsp-face-semhl-type)
+             ("concept" . lsp-face-semhl-interface)))
     (setq lsp-semantic-token-modifier-faces
-        '(("readonly" . lsp-face-semhl-constant)
+        '(
+             ("readonly" . lsp-face-semhl-constant)
              ;; ("defaultLibrary" . lsp-face-semhl-default-library)
              ;; ("declaration" . lsp-face-semhl-constant)
              ;; ("definition" . lsp-face-semhl-constant)
@@ -359,15 +388,10 @@
              ;; ("deprecated" . lsp-face-semhl-deprecated)
              ;; ("abstract" . lsp-face-semhl-keyword)
              ;; ("async" . lsp-face-semhl-macro)
-             ("modification" . lsp-face-semhl-operator)
-             ;; ("documentation" . lsp-face-semhl-comment)
+             ("documentation" . lsp-face-semhl-comment)
              ;; ("classScope" . lsp-face-semhl-member)
              ;; ("namespaceScope" . lsp-face-semhl-namespace-scope)
-             ("id0" . lsp-face-semhl-id0)
-             ("id1" . lsp-face-semhl-id1)
-             ("id2" . lsp-face-semhl-id2)
-             ("id3" . lsp-face-semhl-id3)
-             ("id4" . lsp-face-semhl-id4)))
+             ("modification" . lsp-face-semhl-operator)))
     (evil-define-key
         'normal my-intercept-mode-map (kbd "grn") 'lsp-rename)
     ;; (evil-define-key
@@ -458,9 +482,9 @@
             :host github
             :repo "godotengine/emacs-gdscript-mode"
             :inherit nil)
-            :config
-            (setq gdscript-indent-offset 4)
-            (setq gdscript-use-tab-indents nil))
+    :config
+    (setq gdscript-indent-offset 4)
+    (setq gdscript-use-tab-indents nil))
 
 ;; Completion
 
@@ -528,7 +552,11 @@
     (completion-styles '(orderless hotfuzz basic))
     (completion-category-defaults nil)
     (completion-category-overrides
-        '((file (styles basic partial-completion)))))
+        '(
+             (file (styles basic partial-completion))
+             (buffer (styles orderless))
+             (project-file (styles hotfuzz))
+             (command (styles orderless)))))
 (use-package marginalia :ensure t :init (marginalia-mode))
 ;; (use-package
 ;;     affe
@@ -568,14 +596,6 @@
 ;;     (add-to-list 'completion-at-point-functions #'cape-file)
 ;;     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
 ;;     (add-to-list 'completion-at-point-functions #'cape-keyword))
-
-;; Format ELisp
-
-(use-package
-    elisp-autofmt
-    :ensure t
-    :commands (elisp-autofmt-mode elisp-autofmt-buffer)
-    :hook (emacs-lisp-mode . elisp-autofmt-mode))
 
 ;; Runtime GC
 
