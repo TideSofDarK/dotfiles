@@ -108,7 +108,7 @@
 
 ;; Themes
 
-(setq kanagawa-themes-keyword-italic t)
+(setq kanagawa-themes-keyword-italic nil)
 (setq kanagawa-themes-comment-italic nil)
 (require 'kanagawa-themes)
 (load-theme 'kanagawa-wave :no-confirm-loading)
@@ -125,6 +125,7 @@
     emacs
     :ensure nil
     :custom
+    (tab-always-indent t)
     (menu-bar-mode nil)
     (scroll-bar-mode nil)
     (tool-bar-mode nil)
@@ -175,16 +176,9 @@
     ("<C-wheel-up>" . text-scale-increase)
     ("<C-wheel-down>" . text-scale-decrease))
 
-;; undo-tree
+;; undo-fu
 
-(use-package
-    undo-tree
-    :ensure t
-    :custom (undo-tree-mode-lighter "")
-    :custom
-    (undo-tree-history-directory-alist
-        `((".*" . ,(expand-file-name "undo-tree/" user-emacs-directory))))
-    :config (global-undo-tree-mode))
+(use-package undo-fu :ensure t)
 
 ;; evil-mode
 
@@ -194,9 +188,8 @@
     :ensure t
     :init (evil-mode)
     :custom
-    (evil-undo-system 'undo-tree)
-    (evil-ex-previous-command nil)
-    (evil-want-empty-ex-last-command t)
+    (evil-undo-system 'undo-fu)
+    (evil-want-empty-ex-last-command nil)
     (evil-want-C-u-scroll t)
     (evil-want-C-d-scroll t)
     (evil-want-integration t)
@@ -208,40 +201,29 @@
     (evil-define-key 'normal 'global (kbd "K") 'eldoc)
 
     (evil-define-key 'insert 'global (kbd "\C-y") nil)
+    (evil-define-key 'insert 'global (kbd "TAB") 'tab-to-tab-stop)
 
-    (define-key evil-normal-state-map (kbd "M-h") 'evil-window-left)
-    (define-key evil-normal-state-map (kbd "M-l") 'evil-window-right)
-    (define-key evil-normal-state-map (kbd "M-k") 'evil-window-up)
-    (define-key evil-normal-state-map (kbd "M-j") 'evil-window-down)
+    (evil-define-key 'normal 'global (kbd "M-h") 'evil-window-left)
+    (evil-define-key 'normal 'global (kbd "M-l") 'evil-window-right)
+    (evil-define-key 'normal 'global (kbd "M-k") 'evil-window-up)
+    (evil-define-key 'normal 'global (kbd "M-j") 'evil-window-down)
 
-    (evil-define-key
-        '(normal motion visual)
-        'global
-        (kbd "H")
-        'evil-beginning-of-line
-        (kbd "L")
-        'evil-end-of-line)
+    (evil-define-key '(normal motion visual) 'global (kbd "H") 'evil-first-non-blank)
+    (evil-define-key '(normal motion visual) 'global (kbd "L") 'evil-end-of-line)
 
-    (define-key
-        evil-normal-state-map
-        (kbd "<leader>tn")
-        'global-display-line-numbers-mode)
+    (evil-define-key 'normal 'global (kbd "<leader>tn") 'global-display-line-numbers-mode)
 
-    (define-key evil-normal-state-map (kbd "<leader>w") 'evil-write)
-    (define-key evil-normal-state-map (kbd "<leader>a") 'evil-write-all)
-    (define-key
-        evil-normal-state-map (kbd "<leader>d") 'evil-delete-buffer)
-    (define-key
-        evil-normal-state-map (kbd "<leader>q") 'evil-window-delete)
+    (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
+    (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
+    (evil-define-key 'normal 'global (kbd "<leader>d") 'evil-delete-buffer)
+    (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
+
     (defvar my-intercept-mode-map (make-sparse-keymap)
         "High precedence keymap.")
-
     (define-minor-mode my-intercept-mode
         "Global minor mode for higher precedence evil keybindings."
         :global t)
-
     (my-intercept-mode)
-
     (dolist (state '(normal))
         (evil-make-intercept-map
             (evil-get-auxiliary-keymap
@@ -302,8 +284,7 @@
     :hook
     ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
     :custom
-    (eglot-ignored-server-capabilities
-        '(:inlayHintProvider :documentHighlightProvider))
+    (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
     (eglot-events-buffer-size 0)
     (eglot-autoshutdown t)
     (eglot-report-progress nil)
@@ -320,12 +301,6 @@
         'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
     (evil-define-key
         'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
-(use-package
-    eglot-semantic-tokens
-    :ensure nil
-    :after eglot
-    :config
-    (setq eglot-enable-semantic-tokens t))
 
 ;; flymake
 
@@ -370,12 +345,9 @@
     :ensure nil
     :preface
     (defun my--c-ts-indent-style()
-        `(;; do not indent preprocessor statements
-          ((node-is "preproc") column-0 0)
-          ;; do not indent namespace children
-          ;; ((n-p-gp nil nil "namespace_definition") grand-parent 0)
-          ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
-          ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+        `(((node-is "preproc") column-0 0)
+             ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
+             ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
     :config
     (setq c-ts-mode-indent-offset 4)
     (setq c-ts-mode-indent-style #'my--c-ts-indent-style))
@@ -414,11 +386,13 @@
     (company-tooltip-align-annotations t)
     (company-selection-wrap-around t)
     :bind
-    (:map
-        company-active-map
+    (:map company-active-map
         ("C-y" . company-complete-selection)
         ("RET" . nil)
-        ("<return>" . nil))
+        ("<return>" . nil)
+        ("TAB" . nil)
+        ("<tab>" . nil)
+        ("<backtab>" . nil))
     :config
     (setq company-frontends '(company-pseudo-tooltip-frontend))
     (global-company-mode))
@@ -428,20 +402,10 @@
     :custom
     (consult-line-start-from-top t)
     :config
-    (defun consult-grep-file ()
-        "Search with 'grep' in current file."
-        (interactive)
-        (consult-grep (list (shell-quote-argument buffer-file-name))))
-    (defun consult-ripgrep-file ()
-        "Search with 'rg' in current file."
-        (interactive)
-        (let ((consult-project-function (lambda (x) nil)))
-            (consult-ripgrep (list (shell-quote-argument buffer-file-name)))))
     (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
-    (define-key evil-normal-state-map (kbd "<leader>sg") 'consult-ripgrep)
-    (define-key evil-normal-state-map (kbd "<leader>sf") 'project-find-file)
-    (define-key
-        evil-normal-state-map (kbd "<leader>SPC") 'consult-buffer))
+    (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
+    (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
+    (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
 (use-package
     vertico
     :ensure t

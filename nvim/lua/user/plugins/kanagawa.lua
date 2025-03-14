@@ -3,6 +3,15 @@ return {
   lazy = false,
   priority = 1337,
   opts = {
+    colors = {
+      theme = {
+        all = {
+          ui = {
+            bg_gutter = "none"
+          }
+        }
+      }
+    },
     overrides = function(colors)
       local theme = colors.theme
       return {

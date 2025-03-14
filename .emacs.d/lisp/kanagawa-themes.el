@@ -541,11 +541,6 @@ names to which it refers are bound."
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))
       (eglot-mode-line (:inherit font-lock-constant-face :weight normal))
-;;;;;;; eglot-semantic-tokens
-      (eglot-semantic-tokens-parameter-face (:foreground ,syn-parameter))
-      (eglot-semantic-tokens-field-face (:foreground ,syn-identifier))
-      (eglot-semantic-tokens-member-face (:foreground ,syn-identifier))
-      (eglot-semantic-tokens-property-face (:foreground ,syn-identifier))
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg))
       (line-number-current-line (:inherit line-number))
