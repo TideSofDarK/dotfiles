@@ -131,51 +131,38 @@
     (inhibit-startup-screen t)
     (inhibit-splash-screen t)
     (initial-scratch-message nil)
-
     (delete-selection-mode t)
-    (electric-indent-mode nil)
+    (electric-indent-mode t)
     (electric-pair-mode t)
-
     (blink-cursor-mode nil)
     (global-auto-revert-mode t)
-
     (dired-kill-when-opening-new-dired-buffer t)
     (recentf-mode t)
-
     (truncate-lines t)
-
     (text-mode-ispell-word-completion nil)
     (read-extended-command-predicate
         #'command-completion-default-include-p)
-
     (display-line-numbers-grow-only t)
     (display-line-numbers-type 'relative)
     (display-line-numbers-width-start t)
     (global-display-line-numbers-mode t)
-
     (mouse-wheel-progressive-speed nil)
-    (scroll-conservatively 10)
+    (scroll-conservatively 8)
     (scroll-margin 8)
-
     (indent-tabs-mode nil)
     (tab-width 4)
-    (sgml-basic-offset 4)
-
+    (c-basic-offset 4)
+    (c-set-offset 'substatement-open 0)
     (use-dialog-box nil)
     (confirm-kill-processes nil)
     (set-buffer-modified-p nil)
-
     (make-backup-files nil)
     (auto-save-default nil)
-
     (enable-recursive-minibuffers t)
     (minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
-
-    :hook (prog-mode . (lambda () (hs-minor-mode t)))
+    (eldoc-echo-area-use-multiline-p nil)
     :config
-    (set-display-table-slot standard-display-table 0 ?\ )
-    (setq eldoc-echo-area-use-multiline-p nil)
     (fset 'display-startup-echo-area-message 'ignore)
     (set-fringe-mode 0)
     (savehist-mode 1)
@@ -187,15 +174,12 @@
     ("C--" . text-scale-decrease)
     ("<C-wheel-up>" . text-scale-increase)
     ("<C-wheel-down>" . text-scale-decrease))
-;; (([escape] . keyboard-escape-quit)))
-;;  ("C-g" . evil-normal-state)))
 
 ;; undo-tree
 
 (use-package
     undo-tree
     :ensure t
-    :demand t
     :custom (undo-tree-mode-lighter "")
     :custom
     (undo-tree-history-directory-alist
@@ -311,126 +295,38 @@
 
 ;; LSP
 
-(setenv "LSP_USE_PLISTS" "true")
-(use-package lsp-mode
+(use-package
+    eglot
     :ensure t
+    :hook
+    ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
     :custom
-    ;; (lsp-completion-enable-additional-text-edit nil)
-    ;; (lsp-enable-xref nil)
-    (lsp-auto-guess-root t)
-    (lsp-keep-workspace-alive nil)
-    (lsp-inlay-hint-enable nil)
-    (lsp-update-inlay-hints-on-scroll nil)
-    (lsp-enable-folding nil)
-    (lsp-signature-auto-activate t)
-    (lsp-signature-doc-lines 1)
-    (lsp-enable-links nil)
-    (lsp-eldoc-enable-hover t)
-    (lsp-eldoc-prefer-signature-help t)
-    (lsp-eldoc-render-all t)
-    (lsp-enable-folding nil)
-    (lsp-enable-dap-auto-configure nil)
-    (lsp-display-inline-image nil)
-    (lsp-auto-execute-action nil)
-    (lsp-headerline-breadcrumb-enable nil)
-    (lsp-lens-enable nil)
-    (lsp-semantic-tokens-enable t)
-    (lsp-semantic-tokens-apply-modifiers t)
-    (lsp-enable-symbol-highlighting nil)
-    (lsp-enable-text-document-color nil)
-    (lsp-enable-on-type-formatting nil)
-    (lsp-modeline-code-actions-enable nil)
-    (lsp-modeline-diagnostics-enable nil)
-    (lsp-keymap-prefix nil)
-    :hook (
-              (c-ts-mode . lsp)
-              (c++-ts-mode . lsp)
-              (rust-ts-mode . lsp)
-              (gdscript-ts-mode . lsp))
-    :commands lsp
+    (eglot-ignored-server-capabilities
+        '(:inlayHintProvider :documentHighlightProvider))
+    (eglot-events-buffer-size 0)
+    (eglot-autoshutdown t)
+    (eglot-report-progress nil)
+    ;; (eglot-stay-out-of '(flymake eldoc))
     :config
-    (setq lsp-semantic-token-faces
-        '(
-             ("bracket" . font-lock-punctuation-face)
-             ("comment" . lsp-face-semhl-comment)
-             ;; ("keyword" . lsp-face-semhl-keyword)
-             ("string" . lsp-face-semhl-string)
-             ("number" . lsp-face-semhl-number)
-             ("regexp" . lsp-face-semhl-regexp)
-             ;; ("operator" . lsp-face-semhl-operator)
-             ("namespace" . lsp-face-semhl-namespace)
-             ;; ("type" . lsp-face-semhl-type)
-             ("struct" . lsp-face-semhl-struct)
-             ("class" . lsp-face-semhl-class)
-             ("interface" . lsp-face-semhl-interface)
-             ("enum" . lsp-face-semhl-enum)
-             ("typeParameter" . lsp-face-semhl-type-parameter)
-             ("function" . lsp-face-semhl-function)
-             ("method" . lsp-face-semhl-method)
-             ("member" . lsp-face-semhl-member)
-             ("property" . lsp-face-semhl-property)
-             ("event" . lsp-face-semhl-event)
-             ("macro" . lsp-face-semhl-macro)
-             ;; ("variable" . lsp-face-semhl-variable)
-             ("parameter" . lsp-face-semhl-parameter)
-             ("label" . lsp-face-semhl-label)
-             ("enumConstant" . lsp-face-semhl-constant)
-             ("enumMember" . lsp-face-semhl-constant)
-             ("dependent" . lsp-face-semhl-type)
-             ("concept" . lsp-face-semhl-interface)))
-    (setq lsp-semantic-token-modifier-faces
-        '(
-             ;; ("readonly" . lsp-face-semhl-constant)
-             ("method.defaultLibrary" . lsp-face-semhl-default-library)
-             ;; ("defaultLibrary" . lsp-face-semhl-default-library)
-             ;; ("declaration" . lsp-face-semhl-constant)
-             ;; ("definition" . lsp-face-semhl-constant)
-             ;; ("implementation" . lsp-face-semhl-constant)
-             ;; ("static" . lsp-face-semhl-static)
-             ;; ("deprecated" . lsp-face-semhl-deprecated)
-             ;; ("abstract" . lsp-face-semhl-keyword)
-             ;; ("async" . lsp-face-semhl-macro)
-             ("documentation" . lsp-face-semhl-comment)
-             ;; ("classScope" . lsp-face-semhl-member)
-             ;; ("namespaceScope" . lsp-face-semhl-namespace-scope)
-             ("modification" . lsp-face-semhl-operator)))
+    ;; (setq eldoc-idle-delay 0.1)
+    ;; (add-to-list 'eglot-server-programs
+    ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+    ;; (add-to-list 'eglot-server-programs
+    ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
     (evil-define-key
-        'normal my-intercept-mode-map (kbd "grn") 'lsp-rename)
-    ;; (evil-define-key
-    ;;     'normal my-intercept-mode-map (kbd "gra") 'lsp-code-actions)
+        'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
     (evil-define-key
-        'normal my-intercept-mode-map (kbd "<leader>cf") 'lsp-format-buffer))
-;; (use-package
-;;     eglot
-;;     :ensure nil
-;;     :hook
-;;     ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
-;;     :custom
-;;     (eglot-ignored-server-capabilities
-;;         '(:inlayHintProvider :documentHighlightProvider))
-;;     (eglot-events-buffer-size 0)
-;;     (eglot-autoshutdown t)
-;;     (eglot-report-progress nil)
-;;     ;; (eglot-stay-out-of '(flymake eldoc))
-;;     :config
-;;     ;; (setq eldoc-idle-delay 0.1)
-;;     ;; (add-to-list 'eglot-server-programs
-;;     ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-;;     ;; (add-to-list 'eglot-server-programs
-;;     ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
-;;     (evil-define-key
-;;         'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
-;;     (evil-define-key
-;;         'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
-;;     (evil-define-key
-;;         'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+        'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
+    (evil-define-key
+        'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
 
 ;; flymake
 
 (use-package
     flymake
-    :ensure nil
-    :config (setq flymake-indicator-type 'fringes)
+    :ensure t
+    :config
+    (setq flymake-indicator-type 'fringes)
     (evil-define-key
         'normal my-intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
     (evil-define-key
@@ -440,12 +336,11 @@
 
 (use-package
     treesit
-    :ensure nil
-    :config (setq treesit-font-lock-level 4))
+    :config
+    (setq treesit-font-lock-level 4))
 (use-package
     treesit-auto
     :ensure t
-    :demand t
     :custom (treesit-auto-install 't)
     :config
     (setq treesit-auto-gdscript-config
@@ -457,13 +352,54 @@
             :ext "\\.gd\\'"))
     (add-to-list 'treesit-auto-recipe-list treesit-auto-gdscript-config)
     (setq treesit-auto-langs
-        '(c cpp cmake toml yaml commonlisp gdscript lua))
+        '(c cpp cmake toml yaml gdscript lua))
     (treesit-auto-install-all)
     (global-treesit-auto-mode))
 (use-package
     cmake-ts-mode
     :ensure nil
     :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+(use-package c-ts-mode
+    :ensure nil
+    :preface
+    (defun my--c-ts-indent-style()
+        `(;; do not indent preprocessor statements
+          ((node-is "preproc") column-0 0)
+          ;; do not indent namespace children
+          ;; ((n-p-gp nil nil "namespace_definition") grand-parent 0)
+          ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
+          ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+    :config
+    (add-hook 'c++-ts-mode-hook
+    (lambda()
+        (add-to-list 'treesit-font-lock-settings
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'namespace
+                   '(
+                     (namespace_identifier) @font-lock-type-face
+                     (destructor_name) @font-lock-type-face
+
+                     ))) t)
+        (add-to-list 'treesit-font-lock-settings
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'enum
+                   '((enumerator) @font-lock-constant-face
+                     (preproc_def
+                      name: (identifier) @font-lock-constant-face)
+                                  ))) t)
+            ;; You also have to mention the new "feature" in one of
+            ;; the sublists of this thing defining "font lock
+            ;; verbosity levels". Here I'm adding it to level 2
+            ;; (treesit-font-lock-level counts from 1).
+            (push 'namespace (nth 3 treesit-font-lock-feature-list))
+            (push 'enum (nth 3 treesit-font-lock-feature-list))
+            ))
+    (setq c-ts-mode-indent-offset 4)
+    (setq c-ts-mode-indent-style #'my--c-ts-indent-style))
 
 ;; Markdown
 
@@ -493,6 +429,7 @@
 (use-package
     company
     :ensure t
+    :demand t
     :custom
     (company-icon-margin 3)
     (company-tooltip-align-annotations t)
@@ -526,14 +463,6 @@
     (define-key evil-normal-state-map (kbd "<leader>sf") 'project-find-file)
     (define-key
         evil-normal-state-map (kbd "<leader>SPC") 'consult-buffer))
-(use-package
-    consult-lsp
-    :ensure t
-    :config
-    (define-key
-        evil-normal-state-map (kbd "gW") 'consult-lsp-symbols)
-    (define-key
-        evil-normal-state-map (kbd "gO") 'consult-lsp-file-symbols))
 (use-package
     vertico
     :ensure t
