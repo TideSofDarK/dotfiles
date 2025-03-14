@@ -512,7 +512,7 @@ names to which it refers are bound."
       (font-lock-bracket-face (:foreground ,syn-punct))
       (font-lock-punctuation-face (:foreground ,syn-punct))
       (font-lock-misc-punctuation-face (:foreground ,syn-punct))
-      (font-lock-builtin-face (:foreground ,fg))
+      (font-lock-builtin-face (:foreground ,syn-special-1))
       (font-lock-reference-face (:foreground ,syn-special-3))
       (font-lock-comment-face (:foreground ,syn-comment
                                            :slant ,(if kanagawa-themes-comment-italic 'italic 'normal)))
@@ -541,6 +541,11 @@ names to which it refers are bound."
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))
       (eglot-mode-line (:inherit font-lock-constant-face :weight normal))
+;;;;;;; eglot-semantic-tokens
+      (eglot-semantic-tokens-parameter-face (:foreground ,syn-parameter))
+      (eglot-semantic-tokens-field-face (:foreground ,syn-identifier))
+      (eglot-semantic-tokens-member-face (:foreground ,syn-identifier))
+      (eglot-semantic-tokens-property-face (:foreground ,syn-identifier))
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg))
       (line-number-current-line (:inherit line-number))

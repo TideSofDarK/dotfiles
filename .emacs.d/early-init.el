@@ -188,6 +188,7 @@
 
 ;; evil-mode
 
+(setq evil-want-empty-ex-last-command t)
 (use-package
     evil
     :ensure t
@@ -319,6 +320,12 @@
         'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
     (evil-define-key
         'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+(use-package
+    eglot-semantic-tokens
+    :ensure nil
+    :after eglot
+    :config
+    (setq eglot-enable-semantic-tokens t))
 
 ;; flymake
 
@@ -370,34 +377,6 @@
           ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
           ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
     :config
-    (add-hook 'c++-ts-mode-hook
-    (lambda()
-        (add-to-list 'treesit-font-lock-settings
-            (car (treesit-font-lock-rules
-                   :language 'cpp
-                   :override t
-                   :feature 'namespace
-                   '(
-                     (namespace_identifier) @font-lock-type-face
-                     (destructor_name) @font-lock-type-face
-
-                     ))) t)
-        (add-to-list 'treesit-font-lock-settings
-            (car (treesit-font-lock-rules
-                   :language 'cpp
-                   :override t
-                   :feature 'enum
-                   '((enumerator) @font-lock-constant-face
-                     (preproc_def
-                      name: (identifier) @font-lock-constant-face)
-                                  ))) t)
-            ;; You also have to mention the new "feature" in one of
-            ;; the sublists of this thing defining "font lock
-            ;; verbosity levels". Here I'm adding it to level 2
-            ;; (treesit-font-lock-level counts from 1).
-            (push 'namespace (nth 3 treesit-font-lock-feature-list))
-            (push 'enum (nth 3 treesit-font-lock-feature-list))
-            ))
     (setq c-ts-mode-indent-offset 4)
     (setq c-ts-mode-indent-style #'my--c-ts-indent-style))
 
