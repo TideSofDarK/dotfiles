@@ -537,8 +537,6 @@ names to which it refers are bound."
       (font-lock-warning-face (:foreground ,diag-warning))
       (c-annotation-face (:inherit font-lock-constant-face))
       (elisp-shorthand-font-lock-face (:foreground ,fg))
-;;;;;;; treesit-custom
-      (treesit-custom-parameter-face (:foreground ,syn-parameter))
 ;;;;;;; eglot
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))
@@ -865,7 +863,10 @@ names to which it refers are bound."
       (magit-reflog-reset (:foreground ,red))
       (magit-section-heading (:foreground ,syn-keyword :inherit bold :extend t))
       (magit-section-highlight (:background ,bg-m2 :extend t))
-      (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold)))))
+      (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold))
+;;;;;;; treesit-custom
+      (treesit-custom-parameter-face (:foreground ,syn-parameter))
+      (treesit-custom-return-face (:foreground ,syn-special-3)))))
 
 (defmacro kanagawa-themes--with-variant-colors (variant &rest body)
   "Execute BODY with the color palette of a specified theme VARIANT."
