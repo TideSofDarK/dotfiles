@@ -169,7 +169,7 @@
     (set-fringe-mode 0)
     (savehist-mode 1)
     (fset 'yes-or-no-p 'y-or-n-p)
-    (setq custom-file (locate-user-emacs-file "custom-vars.el"))
+    (setq custom-file (locate-user-emacs-file "custom.el"))
     (load custom-file 'noerror 'nomessage)
     :bind
     ("C-=" . text-scale-increase)
@@ -358,6 +358,16 @@
     "Custom 'defined' face for C/C++ tree-sitter."
     :group 'font-lock-faces)
 
+(defface treesit-custom-new-face
+    '((t :inherit font-lock-operator-face :weight semibold))
+    "Custom 'new' face for C/C++ tree-sitter."
+    :group 'font-lock-faces)
+
+(defface treesit-custom-label-face
+    '((t :inherit font-lock-keyword-face :weight semibold :slant normal))
+    "Custom label face for C/C++ tree-sitter."
+    :group 'font-lock-faces)
+
 (use-package
     treesit
     :config
@@ -405,6 +415,10 @@
     (setq c-ts-mode--preproc-keywords '("#include"))
     (defvar my-c-ts-mode-common-overrides
         '(
+             (parameter_list (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face))
+             (parameter_list (parameter_declaration declarator: (pointer_declarator declarator: (_) @treesit-custom-parameter-face)))
+             (labeled_statement label: (_) @treesit-custom-label-face)
+             (goto_statement label: (_) @treesit-custom-label-face)
              (return_statement "return" @treesit-custom-return-face)
              (sized_type_specifier) @font-lock-builtin-face
              (preproc_call directive: (_) @font-lock-keyword-face)
@@ -440,6 +454,7 @@
                          :feature 'overrides
                          (append my-c-ts-mode-common-overrides
                              '(
+                                  (new_expression "new" @treesit-custom-new-face)
                                   (namespace_identifier) @font-lock-type-face
                                   (namespace_definition name: (_) @font-lock-type-face)
                                   (template_parameter_list

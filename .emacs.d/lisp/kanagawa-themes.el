@@ -865,6 +865,7 @@ names to which it refers are bound."
       (magit-section-highlight (:background ,bg-m2 :extend t))
       (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold))
 ;;;;;;; treesit-custom
+      ; (treesit-custom-new-face (:foreground ,syn-operator :weight bold))
       (treesit-custom-parameter-face (:foreground ,syn-parameter))
       (treesit-custom-return-face (:foreground ,syn-special-3)))))
 
