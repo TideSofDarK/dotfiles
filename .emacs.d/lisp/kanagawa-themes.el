@@ -540,7 +540,7 @@ names to which it refers are bound."
 ;;;;;;; eglot
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))
-      (eglot-mode-line :inherit mode-line-buffer-id)
+      (eglot-mode-line (:inherit mode-line-buffer-id :weight normal))
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg))
       (line-number-current-line (:inherit line-number))

@@ -264,16 +264,16 @@
     :after evil
     :config (evil-commentary-mode))
 
-(defun my/evil-yank-advice (orig-fn beg end &rest args)
+(defun my-evil-yank-advice (orig-fn beg end &rest args)
     (pulse-momentary-highlight-region beg end)
     (apply orig-fn beg end args))
-(advice-add 'evil-yank :around 'my/evil-yank-advice)
+(advice-add 'evil-yank :around 'my-evil-yank-advice)
 
 ;; drag-stuff
 
 (use-package drag-stuff
     :ensure t
-    :after evil
+    :after evil-collection
     :config
     (define-key evil-visual-state-map (kbd "J") 'drag-stuff-down)
     (define-key evil-visual-state-map (kbd "K") 'drag-stuff-up))
@@ -403,11 +403,11 @@
 (use-package c-ts-mode
     :ensure nil
     :preface
-    (defun my--c-ts-indent-style()
+    (defun my-c-ts-indent-style()
         `(((node-is "preproc") column-0 0)
              ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
              ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
-    (defun my--c-ts-keywords (orig-fun &rest args)
+    (defun my-c-ts-keywords (orig-fun &rest args)
         (let ((c-keywords (apply orig-fun args)))
             (add-to-list 'c-keywords "#if")
             (add-to-list 'c-keywords "#ifdef")
@@ -442,7 +442,7 @@
              (primitive_type) @font-lock-builtin-face
              (enumerator
                  name: (identifier) @treesit-custom-enumerator-face)))
-    (advice-add 'c-ts-mode--keywords :around #'my--c-ts-keywords)
+    (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
     (add-hook 'c-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
@@ -480,7 +480,7 @@
                                           name: (_) @font-lock-function-call-face)))))) t)
             (push 'overrides (nth 1 treesit-font-lock-feature-list))))
     (setq c-ts-mode-indent-offset 4)
-    (setq c-ts-mode-indent-style #'my--c-ts-indent-style))
+    (setq c-ts-mode-indent-style #'my-c-ts-indent-style))
 
 ;; Markdown
 
@@ -510,14 +510,18 @@
     :after gdscript-mode
     :config
     (defvar my-gdscript-ts-mode-punctuation '("[" "]" "(" ")" "{" "}" "," ":"))
-    (defvar my-gdscript-ts-mode-operators '("%" "%=" "->" "." "!=" "+=" "-=" "/=" "*=" "==" ">>" "<<" "~" "&" "|" "&=" "|=" "-" ">=" "<=" "||" "&&" "not" "in"))
+    (defvar my-gdscript-ts-mode-operators
+        '("%" "%=" "->" "." "!=" "+=" "-="
+             "/=" "*=" "==" ">>" "<<" "~"
+             "&" "|" "&=" "|=" "-" ">="
+             "<=" "||" "&&" "not" "in"))
     (defvar my-gdscript-ts-mode-overrides
         `(
-            (true) @font-lock-constant-face
-            (false) @font-lock-constant-face
-            (null) @font-lock-constant-face
-            ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
-            ([,@my-gdscript-ts-mode-operators] @font-lock-operator-face)
+             (true) @font-lock-constant-face
+             (false) @font-lock-constant-face
+             (null) @font-lock-constant-face
+             ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
+             ([,@my-gdscript-ts-mode-operators] @font-lock-operator-face)
              (enum_definition name: (_) @font-lock-type-face)
              (enumerator left: (identifier) @treesit-custom-enumerator-face)
              (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)
@@ -559,10 +563,16 @@
     :custom
     (consult-line-start-from-top t)
     :config
+    (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
     (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
     (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
     (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
     (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
+(use-package
+    consult-eglot
+    :ensure t
+    :config
+    (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
 (use-package
     vertico
     :ensure t
