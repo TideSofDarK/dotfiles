@@ -537,6 +537,8 @@ names to which it refers are bound."
       (font-lock-warning-face (:foreground ,diag-warning))
       (c-annotation-face (:inherit font-lock-constant-face))
       (elisp-shorthand-font-lock-face (:foreground ,fg))
+;;;;;;; treesit-custom
+      (treesit-custom-parameter-face (:foreground ,syn-parameter))
 ;;;;;;; eglot
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))

@@ -125,6 +125,7 @@
     emacs
     :ensure nil
     :custom
+    (help-window-select t)
     (tab-always-indent t)
     (menu-bar-mode nil)
     (scroll-bar-mode nil)
@@ -175,6 +176,16 @@
     ("C--" . text-scale-decrease)
     ("<C-wheel-up>" . text-scale-increase)
     ("<C-wheel-down>" . text-scale-decrease))
+
+;; Focus eldoc buffer
+
+(use-package shackle
+    :ensure t
+    :hook (after-init . shackle-mode)
+    :config
+    (setq shackle-default-size 0.4
+        shackle-rules
+        `(("\\*eldoc.*" :align t :select t :regexp t))))
 
 ;; undo-fu
 
@@ -316,6 +327,26 @@
 
 ;; Treesitter
 
+(defface treesit-custom-enumerator-face
+  '((t :inherit font-lock-constant-face))
+  "Font Lock mode face used to highlight enumerators."
+  :group 'font-lock-faces)
+
+(defface treesit-custom-field-face
+  '((t :inherit font-lock-property-name-face))
+  "Font Lock mode face used to highlight fields."
+  :group 'font-lock-faces)
+
+(defface treesit-custom-defined-face
+  '((t :inherit font-lock-function-call-face))
+  "Font Lock mode face used to highlight defined."
+  :group 'font-lock-faces)
+
+(defface treesit-custom-parameter-face
+  '((t :inherit font-lock-variable-name-face))
+  "Font Lock mode face used to highlight parameters."
+  :group 'font-lock-faces)
+
 (use-package
     treesit
     :config
@@ -349,6 +380,79 @@
              ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
              ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
     :config
+    ;; (setq c-ts-mode--type-keywords '("#include"))
+    (setq c-ts-mode--preproc-keywords '("#include"))
+(defun my--c-ts-keywords (orig-fun &rest args)
+  (let ((c-keywords (apply orig-fun args)))
+    (add-to-list 'c-keywords "#if")
+    (add-to-list 'c-keywords "#ifdef")
+    (add-to-list 'c-keywords "#ifndef")
+    (add-to-list 'c-keywords "#elif")
+    (add-to-list 'c-keywords "#else")
+    (add-to-list 'c-keywords "#endif")
+    (add-to-list 'c-keywords "#define")
+    c-keywords))
+(advice-add 'c-ts-mode--keywords :around #'my--c-ts-keywords)
+
+    (add-hook 'c-ts-mode-hook
+        (lambda()
+            (add-to-list 'treesit-font-lock-settings
+                 (car (treesit-font-lock-rules
+                    :language 'c
+                    :override t
+                    :feature 'overrides
+                    '(
+                      (sized_type_specifier) @font-lock-builtin-face
+                      (preproc_call directive: (_) @font-lock-keyword-face)
+                     (preproc_defined
+                     "defined" @treesit-custom-defined-face
+                     "(" @font-lock-punctuation-face
+                     (identifier) @font-lock-preprocessor-face
+                     ")" @font-lock-punctuation-face )
+                      (preproc_def name: (_) @font-lock-preprocessor-face)
+                      (preproc_function_def name: (_) @font-lock-preprocessor-face)
+                      (preproc_ifdef name: (_) @font-lock-preprocessor-face)
+                      (preproc_params) @treesit-custom-parameter-face
+                      (field_declaration declarator: (_) @treesit-custom-field-face)
+                      (primitive_type) @font-lock-builtin-face
+                      (enumerator
+                       name: (identifier) @treesit-custom-enumerator-face)))) t)
+            (push 'overrides (nth 1 treesit-font-lock-feature-list))))
+    (add-hook 'c++-ts-mode-hook
+        (lambda()
+            (add-to-list 'treesit-font-lock-settings
+                 (car (treesit-font-lock-rules
+                    :language 'cpp
+                    :override t
+                    :feature 'overrides
+                    '(
+                    (template_argument_list
+                    "<" @font-lock-punctuation-face
+                    ">" @font-lock-punctuation-face)
+                    (call_expression
+                    function:
+                    (template_function name: (_) @font-lock-function-call-face))
+                    (call_expression
+                    function:
+                    (qualified_identifier
+                      "::" @font-lock-punctuation-face
+                      name: (_) @font-lock-function-call-face))
+                      (sized_type_specifier) @font-lock-builtin-face
+                      (preproc_call directive: (_) @font-lock-keyword-face)
+                     (preproc_defined
+                     "defined" @treesit-custom-defined-face
+                     "(" @font-lock-punctuation-face
+                     (identifier) @font-lock-preprocessor-face
+                     ")" @font-lock-punctuation-face )
+                      (preproc_def name: (_) @font-lock-preprocessor-face)
+                      (preproc_function_def name: (_) @font-lock-preprocessor-face)
+                      (preproc_params) @treesit-custom-parameter-face
+                      (field_declaration declarator: (_) @treesit-custom-field-face)
+                      (primitive_type) @font-lock-builtin-face
+                      (enumerator
+                        name: (identifier) @treesit-custom-enumerator-face)
+                      (namespace_identifier) @font-lock-type-face))) t)
+            (push 'overrides (nth 1 treesit-font-lock-feature-list))))
     (setq c-ts-mode-indent-offset 4)
     (setq c-ts-mode-indent-style #'my--c-ts-indent-style))
 
