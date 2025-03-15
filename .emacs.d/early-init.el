@@ -500,10 +500,37 @@
 (elpaca (gdscript-mode
             :host github
             :repo "godotengine/emacs-gdscript-mode"
-            :inherit nil)
+            :inherit nil
+            :after treesit)
     :config
     (setq gdscript-indent-offset 4)
     (setq gdscript-use-tab-indents nil))
+(use-package gdscript-ts-mode
+    :ensure nil
+    :after gdscript-mode
+    :config
+    (defvar my-gdscript-ts-mode-punctuation '("[" "]" "(" ")" "{" "}" "," ":"))
+    (defvar my-gdscript-ts-mode-operators '("%" "%=" "->" "." "!=" "+=" "-=" "/=" "*=" "==" ">>" "<<" "~" "&" "|" "&=" "|=" "-" ">=" "<=" "||" "&&" "not" "in"))
+    (defvar my-gdscript-ts-mode-overrides
+        `(
+            (true) @font-lock-constant-face
+            (false) @font-lock-constant-face
+            (null) @font-lock-constant-face
+            ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
+            ([,@my-gdscript-ts-mode-operators] @font-lock-operator-face)
+             (enum_definition name: (_) @font-lock-type-face)
+             (enumerator left: (identifier) @treesit-custom-enumerator-face)
+             (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)
+             ))
+    (add-hook 'gdscript-ts-mode-hook
+        (lambda()
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'gdscript
+                         :override t
+                         :feature 'overrides
+                         my-gdscript-ts-mode-overrides)) t)
+            (push 'overrides (nth 1 treesit-font-lock-feature-list)))))
 
 ;; Completion
 
