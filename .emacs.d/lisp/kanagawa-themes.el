@@ -540,7 +540,7 @@ names to which it refers are bound."
 ;;;;;;; eglot
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))
-      (eglot-mode-line (:inherit font-lock-constant-face :weight normal))
+      (eglot-mode-line :inherit mode-line-buffer-id)
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg))
       (line-number-current-line (:inherit line-number))
@@ -865,7 +865,7 @@ names to which it refers are bound."
       (magit-section-highlight (:background ,bg-m2 :extend t))
       (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold))
 ;;;;;;; treesit-custom
-      ; (treesit-custom-new-face (:foreground ,syn-operator :weight bold))
+      ;; (treesit-custom-new-face (:foreground ,syn-operator :weight bold))
       (treesit-custom-parameter-face (:foreground ,syn-parameter))
       (treesit-custom-return-face (:foreground ,syn-special-3)))))
 

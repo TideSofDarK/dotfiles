@@ -295,6 +295,7 @@
     :hook
     ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
     :custom
+    (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
     (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
     (eglot-events-buffer-size 0)
     (eglot-autoshutdown t)
@@ -312,6 +313,12 @@
         'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
     (evil-define-key
         'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+(use-package eglot-inactive-regions
+    :ensure t
+    :custom
+    (eglot-inactive-regions-style 'shadow-face)
+    :config
+    (eglot-inactive-regions-mode 1))
 
 ;; flymake
 
