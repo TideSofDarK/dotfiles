@@ -365,8 +365,8 @@
     "Custom 'defined' face for C/C++ tree-sitter."
     :group 'font-lock-faces)
 
-(defface treesit-custom-new-face
-    '((t :inherit font-lock-operator-face :weight semibold))
+(defface treesit-custom-named-operator-face
+    '((t :inherit font-lock-operator-face :weight bold))
     "Custom 'new' face for C/C++ tree-sitter."
     :group 'font-lock-faces)
 
@@ -408,64 +408,67 @@
              ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
              ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
     (defun my-c-ts-keywords (orig-fun &rest args)
-        (let ((c-keywords (apply orig-fun args)))
-            (add-to-list 'c-keywords "#if")
-            (add-to-list 'c-keywords "#ifdef")
-            (add-to-list 'c-keywords "#ifndef")
-            (add-to-list 'c-keywords "#elif")
-            (add-to-list 'c-keywords "#else")
-            (add-to-list 'c-keywords "#endif")
-            (add-to-list 'c-keywords "#define")
-            c-keywords))
+        `("#if" "#ifdef" "#ifndef" "#elif" "#else" "#endif" "#define",@(apply orig-fun args)))
     :config
     (setq c-ts-mode-enable-doxygen t)
     (setq c-ts-mode--preproc-keywords '("#include"))
-    (defvar my-c-ts-mode-common-overrides
+    (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
+    (defvar my-c-ts-mode-constants
         '(
+          ((field_identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
+          ((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
+          ))
+    (defvar my-c-ts-mode-common-overrides
+        `(
+          ,@my-c-ts-mode-constants
+            (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
+            (preproc_call directive: (_) @font-lock-keyword-face)
+            (preproc_defined
+             "defined" @font-lock-function-call-face
+             "(" @font-lock-punctuation-face
+             (identifier) @font-lock-constant-face
+             ")" @font-lock-punctuation-face)
+            (preproc_def name: (_) @font-lock-constant-face)
+            (preproc_function_def name: (_) @font-lock-function-name-face)
+            (preproc_ifdef name: (_) @font-lock-constant-face)
+            (preproc_params) @treesit-custom-parameter-face
              (parameter_list (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face))
              (parameter_list (parameter_declaration declarator: (pointer_declarator declarator: (_) @treesit-custom-parameter-face)))
              (labeled_statement label: (_) @treesit-custom-label-face)
              (goto_statement label: (_) @treesit-custom-label-face)
              (return_statement "return" @treesit-custom-return-face)
              (sized_type_specifier) @font-lock-builtin-face
-             (preproc_call directive: (_) @font-lock-keyword-face)
-             (preproc_defined
-                 "defined" @treesit-custom-defined-face
-                 "(" @font-lock-punctuation-face
-                 (identifier) @font-lock-preprocessor-face
-                 ")" @font-lock-punctuation-face )
-             (preproc_def name: (_) @font-lock-preprocessor-face)
-             (preproc_function_def name: (_) @font-lock-preprocessor-face)
-             (preproc_ifdef name: (_) @font-lock-preprocessor-face)
-             (preproc_params) @treesit-custom-parameter-face
              (field_declaration declarator: (_) @treesit-custom-field-face)
              (primitive_type) @font-lock-builtin-face
              (enumerator
                  name: (identifier) @treesit-custom-enumerator-face)))
-    (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
     (add-hook 'c-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'c
                          :override t
-                         :feature 'overrides
+                         :feature 'my-overrides
                          my-c-ts-mode-common-overrides)) t)
-            (push 'overrides (nth 1 treesit-font-lock-feature-list))))
+            (push 'my-overrides (nth 1 treesit-font-lock-feature-list))))
     (add-hook 'c++-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'cpp
                          :override t
-                         :feature 'overrides
+                         :feature 'my-overrides
                          (append my-c-ts-mode-common-overrides
                              '(
-                                  (new_expression "new" @treesit-custom-new-face)
+                                  (concept_definition name: (_) @font-lock-type-face)
+                                  (template_function name: (_) @font-lock-type-face)
+                                  (new_expression "new" @treesit-custom-named-operator-face)
+                                  (delete_expression "delete" @treesit-custom-named-operator-face)
                                   (namespace_identifier) @font-lock-type-face
                                   (namespace_definition name: (_) @font-lock-type-face)
                                   (template_parameter_list
                                       "<" @font-lock-punctuation-face
+                                      (parameter_declaration declarator: (_) @treesit-custom-parameter-face)
                                       ">" @font-lock-punctuation-face)
                                   (template_argument_list
                                       "<" @font-lock-punctuation-face
@@ -478,7 +481,7 @@
                                       function:
                                       (qualified_identifier
                                           name: (_) @font-lock-function-call-face)))))) t)
-            (push 'overrides (nth 1 treesit-font-lock-feature-list))))
+            (push 'my-overrides (nth 1 treesit-font-lock-feature-list))))
     (setq c-ts-mode-indent-offset 4)
     (setq c-ts-mode-indent-style #'my-c-ts-indent-style))
 
@@ -515,17 +518,21 @@
              "/=" "*=" "==" ">>" "<<" "~"
              "&" "|" "&=" "|=" "-" ">="
              "<=" "||" "&&" "not" "in"))
+    (defvar my-gdscript-ts-mode-constants
+        '((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face)))
+    (defvar my-gdscript-ts-mode-builtin-classes
+        '((identifier) @font-lock-type-face (:match "\$?<![^.]\\.|:\$\\b\\|Vector2\\|Vector2i\\|Vector3\\|Vector3i\\|Vector4\\|Vector4i\\|Color\\|Rect2\\|Rect2i\\|Array\\|Basis\\|Dictionary\\|Plane\\|Quat\\|RID\\|Rect3\\|Transform\\|Transform2D\\|Transform3D\\|AABB\\|String\\|NodePath\\|PoolByteArray\\|PoolIntArray\\|PoolRealArray\\|PoolStringArray\\|PoolVector2Array\\|PoolVector3Array\\|PoolColorArray\\|bool\\|int\\|float\\|Signal\\|Callable\\|StringName\\|Quaternion\\|Projection\\|PackedByteArray\\|PackedInt32Array\\|PackedInt64Array\\|PackedFloat32Array\\|PackedFloat64Array\\|PackedStringArray\\|PackedVector2Array\\|PackedVector2iArray\\|PackedVector3Array\\|PackedVector3iArray\\|PackedVector4Array\\|PackedColorArray\\|JSON\\|UPNP\\|OS\\|IP\\|JSONRPC\\|XRVRS\$\\b" @font-lock-type-face)))
     (defvar my-gdscript-ts-mode-overrides
         `(
-             (true) @font-lock-constant-face
-             (false) @font-lock-constant-face
-             (null) @font-lock-constant-face
+             ,my-gdscript-ts-mode-constants
+             ,my-gdscript-ts-mode-builtin-classes
+             (signal_statement (name) @font-lock-function-call-face)
+             [(true) (false) (null)] @font-lock-constant-face
              ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
              ([,@my-gdscript-ts-mode-operators] @font-lock-operator-face)
              (enum_definition name: (_) @font-lock-type-face)
              (enumerator left: (identifier) @treesit-custom-enumerator-face)
-             (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)
-             ))
+             (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)))
     (add-hook 'gdscript-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
@@ -533,7 +540,8 @@
                          :language 'gdscript
                          :override t
                          :feature 'overrides
-                         my-gdscript-ts-mode-overrides)) t)
+                         my-gdscript-ts-mode-overrides
+                         )) t)
             (push 'overrides (nth 1 treesit-font-lock-feature-list)))))
 
 ;; Completion

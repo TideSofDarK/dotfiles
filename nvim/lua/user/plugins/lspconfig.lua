@@ -47,7 +47,7 @@ return {
           map('gra', vim.lsp.buf.code_action, 'Code action')
 
           if client and client.name == 'clangd' then
-            -- client.server_capabilities.semanticTokensProvider = nil
+            client.server_capabilities.semanticTokensProvider = nil
 
             map('<leader>to', [[<cmd>ClangdSwitchSourceHeader<cr>]], 'Toggle source/header (C/C++)')
             map('<leader>tp', function()

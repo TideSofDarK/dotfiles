@@ -182,8 +182,8 @@
             ]
         }
     },
-    "editor.fontFamily": "'Sarasa Fixed CL Nerd Font', 'monospace', monospace",
-    "editor.fontSize": 16,
+    "editor.fontFamily": "'Sarasa Term Slab CL Nerd Font', 'monospace', monospace",
+    "editor.fontSize": 14,
     "editor.lineNumbers": "relative",
     "editor.scrollbar.vertical": "hidden",
     "editor.scrollbar.horizontal": "hidden",
@@ -194,5 +194,8 @@
     "workbench.editor.showTabs": "single",
     "editor.minimap.enabled": false,
     "editor.scrollbar.verticalScrollbarSize": 0,
+    "editor.cursorSurroundingLines": 5,
     "workbench.colorTheme": "Kanagawa Wave",
+    "workbench.activityBar.location": "top",
+    "chat.commandCenter.enabled": false,
 }

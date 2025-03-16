@@ -524,7 +524,7 @@ names to which it refers are bound."
       (font-lock-doc-markup-face (:foreground ,syn-string))
       (font-lock-function-name-face (:foreground ,syn-fun))
       (font-lock-function-call-face (:foreground ,syn-fun))
-      (font-lock-operator-face (:foreground ,syn-identifier))
+      (font-lock-operator-face (:foreground ,syn-operator))
       (font-lock-keyword-face (:foreground ,syn-keyword
                                            :slant ,(if kanagawa-themes-keyword-italic 'italic 'normal)))
       (font-lock-negation-char-face (:inherit font-lock-keyword-face))
