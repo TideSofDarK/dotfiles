@@ -193,18 +193,17 @@
 
 ;; evil-mode
 
-(setq evil-want-empty-ex-last-command t)
+(setq evil-want-empty-ex-last-command nil)
+(setq evil-want-keybinding nil)
+(setq evil-want-C-u-scroll t)
+(setq evil-want-C-d-scroll t)
+(setq evil-want-integration t)
 (use-package
     evil
     :ensure t
     :init (evil-mode)
     :custom
     (evil-undo-system 'undo-fu)
-    (evil-want-empty-ex-last-command nil)
-    (evil-want-C-u-scroll t)
-    (evil-want-C-d-scroll t)
-    (evil-want-integration t)
-    (evil-want-keybinding nil)
     :config
     (evil-set-leader 'normal (kbd "SPC"))
     (evil-set-leader 'normal "\\" t)
@@ -229,6 +228,30 @@
     (evil-define-key 'normal 'global (kbd "<leader>d") 'evil-delete-buffer)
     (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
 
+    (defmacro evil-map (state key seq)
+        "Map for a given STATE a KEY to a sequence SEQ of keys.
+
+        Can handle recursive definition only if KEY is the first key of
+        SEQ, and if KEY's binding in STATE is defined as a symbol in
+        `evil-normal-state-map'.
+        Example: (evil-map visual \"<\" \"<gv\")"
+        (let ((map (intern (format "evil-%S-state-map" state)))
+                 (key-cmd (lookup-key evil-normal-state-map key)))
+            `(define-key ,map ,key
+                 (lambda ()
+                     (interactive)
+                     ,(if (string-equal key (substring seq 0 1))
+                          `(let ((orig-this-command this-command))
+                               (setq this-command ',key-cmd)
+                               (call-interactively ',key-cmd)
+                               (run-hooks 'post-command-hook)
+                               (setq this-command orig-this-command)
+                               (execute-kbd-macro ,(substring seq 1)))
+                          (execute-kbd-macro ,seq))))))
+
+    (evil-map visual "<" "<gv")
+    (evil-map visual ">" ">gv")
+
     (defvar my-intercept-mode-map (make-sparse-keymap)
         "High precedence keymap.")
     (define-minor-mode my-intercept-mode
@@ -239,12 +262,8 @@
         (evil-make-intercept-map
             (evil-get-auxiliary-keymap
                 my-intercept-mode-map state t t)
-            state)))
-(use-package
-    evil-collection
-    :ensure t
-    :after evil
-    :config
+            state))
+
     (evil-define-command +evil:cd (&optional path)
         "Change `default-directory' with `cd'."
         (interactive "<f>")
@@ -254,6 +273,15 @@
             (message "Changed directory to '%s'" (abbreviate-file-name (expand-file-name path)))))
     (evil-ex-define-cmd "cd" #'+evil:cd)
 
+    (defun my-evil-yank-advice (orig-fn beg end &rest args)
+        (pulse-momentary-highlight-region beg end)
+        (apply orig-fn beg end args))
+    (advice-add 'evil-yank :around 'my-evil-yank-advice))
+(use-package
+    evil-collection
+    :ensure t
+    :after evil
+    :config
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
         '(dired ibuffer magit vertico consult eldoc company help))
@@ -261,19 +289,12 @@
 (use-package
     evil-commentary
     :ensure t
-    :after evil
     :config (evil-commentary-mode))
-
-(defun my-evil-yank-advice (orig-fn beg end &rest args)
-    (pulse-momentary-highlight-region beg end)
-    (apply orig-fn beg end args))
-(advice-add 'evil-yank :around 'my-evil-yank-advice)
 
 ;; drag-stuff
 
 (use-package drag-stuff
     :ensure t
-    :after evil-collection
     :config
     (define-key evil-visual-state-map (kbd "J") 'drag-stuff-down)
     (define-key evil-visual-state-map (kbd "K") 'drag-stuff-up))
@@ -410,80 +431,102 @@
     (defun my-c-ts-keywords (orig-fun &rest args)
         `("#if" "#ifdef" "#ifndef" "#elif" "#else" "#endif" "#define",@(apply orig-fun args)))
     :config
+    (setq c-ts-mode-indent-offset 4)
+    (setq c-ts-mode-indent-style #'my-c-ts-indent-style)
     (setq c-ts-mode-enable-doxygen t)
     (setq c-ts-mode--preproc-keywords '("#include"))
     (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
     (defvar my-c-ts-mode-constants
         '(
-          ((field_identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
-          ((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
-          ))
+             ((field_identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
+             ((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))))
     (defvar my-c-ts-mode-common-overrides
         `(
-          ,@my-c-ts-mode-constants
-            (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
-            (preproc_call directive: (_) @font-lock-keyword-face)
-            (preproc_defined
-             "defined" @font-lock-function-call-face
-             "(" @font-lock-punctuation-face
-             (identifier) @font-lock-constant-face
-             ")" @font-lock-punctuation-face)
-            (preproc_def name: (_) @font-lock-constant-face)
-            (preproc_function_def name: (_) @font-lock-function-name-face)
-            (preproc_ifdef name: (_) @font-lock-constant-face)
-            (preproc_params) @treesit-custom-parameter-face
+             ,@my-c-ts-mode-constants
+             (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
              (parameter_list (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face))
              (parameter_list (parameter_declaration declarator: (pointer_declarator declarator: (_) @treesit-custom-parameter-face)))
              (labeled_statement label: (_) @treesit-custom-label-face)
              (goto_statement label: (_) @treesit-custom-label-face)
              (return_statement "return" @treesit-custom-return-face)
              (sized_type_specifier) @font-lock-builtin-face
-             (field_declaration declarator: (_) @treesit-custom-field-face)
+             (field_declaration declarator: (field_identifier) @treesit-custom-field-face)
+             (function_declarator declarator: (field_identifier) @font-lock-function-name-face)
+             ;; ((field_identifier !parameters) @treesit-custom-field-face)
              (primitive_type) @font-lock-builtin-face
              (enumerator
                  name: (identifier) @treesit-custom-enumerator-face)))
+    (defvar my-c-ts-mode-preprocessor-overrides
+        `(
+             (preproc_call directive: (_) @font-lock-keyword-face)
+             (preproc_defined
+                 "defined" @font-lock-function-call-face
+                 "(" @font-lock-punctuation-face
+                 (identifier) @font-lock-constant-face
+                 ")" @font-lock-punctuation-face)
+             (preproc_def name: (_) @font-lock-constant-face)
+             (preproc_function_def name: (_) @font-lock-function-name-face)
+             (preproc_ifdef name: (_) @font-lock-constant-face)
+             (preproc_params
+                 "(" @font-lock-punctuation-face
+                 (identifier) @treesit-custom-parameter-face
+                 ")" @font-lock-punctuation-face)))
     (add-hook 'c-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'c
                          :override t
-                         :feature 'my-overrides
+                         :feature 'common-overrides
                          my-c-ts-mode-common-overrides)) t)
-            (push 'my-overrides (nth 1 treesit-font-lock-feature-list))))
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'c
+                         :override t
+                         :feature 'preprocessor-overrides
+                         my-c-ts-mode-preprocessor-overrides)) t)))
     (add-hook 'c++-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'cpp
                          :override t
-                         :feature 'my-overrides
-                         (append my-c-ts-mode-common-overrides
-                             '(
-                                  (concept_definition name: (_) @font-lock-type-face)
-                                  (template_function name: (_) @font-lock-type-face)
-                                  (new_expression "new" @treesit-custom-named-operator-face)
-                                  (delete_expression "delete" @treesit-custom-named-operator-face)
-                                  (namespace_identifier) @font-lock-type-face
-                                  (namespace_definition name: (_) @font-lock-type-face)
-                                  (template_parameter_list
-                                      "<" @font-lock-punctuation-face
-                                      (parameter_declaration declarator: (_) @treesit-custom-parameter-face)
-                                      ">" @font-lock-punctuation-face)
-                                  (template_argument_list
-                                      "<" @font-lock-punctuation-face
-                                      ">" @font-lock-punctuation-face)
-                                  (call_expression
-                                      function:
-                                      (template_function name: (_) @font-lock-function-call-face))
-                                  ("::" @font-lock-punctuation-face)
-                                  (call_expression
-                                      function:
-                                      (qualified_identifier
-                                          name: (_) @font-lock-function-call-face)))))) t)
-            (push 'my-overrides (nth 1 treesit-font-lock-feature-list))))
-    (setq c-ts-mode-indent-offset 4)
-    (setq c-ts-mode-indent-style #'my-c-ts-indent-style))
+                         :feature 'common-overrides
+                         my-c-ts-mode-common-overrides)) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'cpp
+                         :override t
+                         :feature 'preprocessor-overrides
+                         my-c-ts-mode-preprocessor-overrides)) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'cpp
+                         :override t
+                         :feature 'cpp-overrides
+                         '(
+                              (concept_definition name: (_) @font-lock-type-face)
+                              (template_function name: (_) @font-lock-type-face)
+                              (new_expression "new" @treesit-custom-named-operator-face)
+                              (delete_expression "delete" @treesit-custom-named-operator-face)
+                              (function_definition type: (type_identifier) @font-lock-keyword-face (:match "\\`compl\\'" @font-lock-keyword-face))
+                              (namespace_identifier) @font-lock-type-face
+                              (namespace_definition name: (_) @font-lock-type-face)
+                              (template_parameter_list
+                                  "<" @font-lock-punctuation-face
+                                  (parameter_declaration declarator: (_) @treesit-custom-parameter-face)
+                                  ">" @font-lock-punctuation-face)
+                              (template_argument_list
+                                  "<" @font-lock-punctuation-face
+                                  ">" @font-lock-punctuation-face)
+                              (call_expression
+                                  function:
+                                  (template_function name: (_) @font-lock-function-call-face))
+                              ("::" @font-lock-punctuation-face)
+                              (call_expression
+                                  function:
+                                  (qualified_identifier
+                                      name: (_) @font-lock-function-call-face)))))) t)))
 
 ;; Markdown
 
@@ -520,12 +563,12 @@
              "<=" "||" "&&" "not" "in"))
     (defvar my-gdscript-ts-mode-constants
         '((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face)))
-    (defvar my-gdscript-ts-mode-builtin-classes
-        '((identifier) @font-lock-type-face (:match "\$?<![^.]\\.|:\$\\b\\|Vector2\\|Vector2i\\|Vector3\\|Vector3i\\|Vector4\\|Vector4i\\|Color\\|Rect2\\|Rect2i\\|Array\\|Basis\\|Dictionary\\|Plane\\|Quat\\|RID\\|Rect3\\|Transform\\|Transform2D\\|Transform3D\\|AABB\\|String\\|NodePath\\|PoolByteArray\\|PoolIntArray\\|PoolRealArray\\|PoolStringArray\\|PoolVector2Array\\|PoolVector3Array\\|PoolColorArray\\|bool\\|int\\|float\\|Signal\\|Callable\\|StringName\\|Quaternion\\|Projection\\|PackedByteArray\\|PackedInt32Array\\|PackedInt64Array\\|PackedFloat32Array\\|PackedFloat64Array\\|PackedStringArray\\|PackedVector2Array\\|PackedVector2iArray\\|PackedVector3Array\\|PackedVector3iArray\\|PackedVector4Array\\|PackedColorArray\\|JSON\\|UPNP\\|OS\\|IP\\|JSONRPC\\|XRVRS\$\\b" @font-lock-type-face)))
+    (defvar my-gdscript-ts-mode-builtin-classes-regex
+        (rx (| "Vector2" "Vector2i" "Vector3" "Vector3i" "Vector4" "Vector4i" "Color" "Rect2" "Rect2i" "Array" "Basis" "Dictionary" "Plane" "Quat" "RID" "Rect3" "Transform" "Transform2D" "Transform3D" "AABB" "String" "NodePath" "PoolByteArray" "PoolIntArray" "PoolRealArray" "PoolStringArray" "PoolVector2Array" "PoolVector3Array" "PoolColorArray" "Signal" "Callable" "StringName" "Quaternion" "Projection" "PackedByteArray" "PackedInt32Array" "PackedInt64Array" "PackedFloat32Array" "PackedFloat64Array" "PackedStringArray" "PackedVector2Array" "PackedVector2iArray" "PackedVector3Array" "PackedVector3iArray" "PackedVector4Array" "PackedColorArray" "JSON" "UPNP" "OS" "IP" "JSONRPC" "XRVRS")))
     (defvar my-gdscript-ts-mode-overrides
         `(
              ,my-gdscript-ts-mode-constants
-             ,my-gdscript-ts-mode-builtin-classes
+             ((identifier) @font-lock-type-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-type-face))
              (signal_statement (name) @font-lock-function-call-face)
              [(true) (false) (null)] @font-lock-constant-face
              ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
@@ -540,8 +583,7 @@
                          :language 'gdscript
                          :override t
                          :feature 'overrides
-                         my-gdscript-ts-mode-overrides
-                         )) t)
+                         my-gdscript-ts-mode-overrides)) t)
             (push 'overrides (nth 1 treesit-font-lock-feature-list)))))
 
 ;; Completion
