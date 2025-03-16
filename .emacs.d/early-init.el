@@ -443,6 +443,7 @@
     (defvar my-c-ts-mode-common-overrides
         `(
              ,@my-c-ts-mode-constants
+             (case_statement value: (identifier) @font-lock-constant-face)
              (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
              (parameter_list (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face))
              (parameter_list (parameter_declaration declarator: (pointer_declarator declarator: (_) @treesit-custom-parameter-face)))
@@ -458,6 +459,7 @@
                  name: (identifier) @treesit-custom-enumerator-face)))
     (defvar my-c-ts-mode-preprocessor-overrides
         `(
+             (call_expression function: (identifier) @font-lock-function-call-face)
              (preproc_call directive: (_) @font-lock-keyword-face)
              (preproc_defined
                  "defined" @font-lock-function-call-face
