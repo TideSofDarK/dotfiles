@@ -865,9 +865,12 @@ names to which it refers are bound."
       (magit-section-highlight (:background ,bg-m2 :extend t))
       (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold))
 ;;;;;;; treesit-custom
-      ;; (treesit-custom-new-face (:foreground ,syn-operator :weight bold))
       (treesit-custom-parameter-face (:foreground ,syn-parameter))
-      (treesit-custom-return-face (:foreground ,syn-special-3)))))
+      (treesit-custom-boolean-face (:foreground ,syn-special-2 :weight bold))
+      (treesit-custom-null-face (:foreground ,syn-special-2))
+      (treesit-custom-special-keyword-1-face (:inherit font-lock-keyword-face :foreground ,syn-special-2))
+      (treesit-custom-special-keyword-2-face (:inherit font-lock-keyword-face :foreground ,syn-special-3))
+      )))
 
 (defmacro kanagawa-themes--with-variant-colors (variant &rest body)
   "Execute BODY with the color palette of a specified theme VARIANT."

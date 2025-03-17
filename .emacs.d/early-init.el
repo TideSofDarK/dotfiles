@@ -308,39 +308,6 @@
 
 (use-package editorconfig :ensure t :config (editorconfig-mode 1))
 
-;; LSP
-
-(use-package
-    eglot
-    :ensure t
-    :hook
-    ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
-    :custom
-    (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
-    (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
-    (eglot-events-buffer-size 0)
-    (eglot-autoshutdown t)
-    (eglot-report-progress nil)
-    ;; (eglot-stay-out-of '(flymake eldoc))
-    :config
-    ;; (setq eldoc-idle-delay 0.1)
-    ;; (add-to-list 'eglot-server-programs
-    ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-    ;; (add-to-list 'eglot-server-programs
-    ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
-    (evil-define-key
-        'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
-    (evil-define-key
-        'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
-    (evil-define-key
-        'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
-(use-package eglot-inactive-regions
-    :ensure t
-    :custom
-    (eglot-inactive-regions-style 'shadow-face)
-    :config
-    (eglot-inactive-regions-mode 1))
-
 ;; flymake
 
 (use-package
@@ -353,17 +320,50 @@
     (evil-define-key
         'normal my-intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
 
-;; clang-format
+;; Markdown
 
-;; (use-package
-;;     clang-format
-;;     :ensure t)
+(use-package
+    markdown-mode
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown")
+    :bind (:map markdown-mode-map ("C-c C-e" . markdown-do)))
+
+;; GLSL
+
+(use-package glsl-mode :ensure t :mode ("\\.shader\\'" "\\.glsl\\'"))
+
+;; Godot
+
+(elpaca (gdscript-mode
+            :host github
+            :repo "godotengine/emacs-gdscript-mode"
+            :inherit nil
+            :after treesit)
+    :config
+    (setq gdscript-indent-offset 4)
+    (setq gdscript-use-tab-indents nil))
 
 ;; Treesitter
 
-(defface treesit-custom-return-face
+(defface treesit-custom-boolean-face
+    '((t :inherit font-lock-constant-face :weight bold))
+    "Custom face for tree-sitter. Sometimes used with 'true', 'false' keywords."
+    :group 'font-lock-faces)
+
+(defface treesit-custom-null-face
+    '((t :inherit font-lock-builtin-face))
+    "Custom face for tree-sitter. Sometimes used with 'NULL' or 'nullptr'."
+    :group 'font-lock-faces)
+
+(defface treesit-custom-special-keyword-1-face
     '((t :inherit font-lock-keyword-face))
-    "Custom 'return' face for tree-sitter."
+    "Custom face for tree-sitter. Sometimes used with 'this' keywords."
+    :group 'font-lock-faces)
+
+(defface treesit-custom-special-keyword-2-face
+    '((t :inherit font-lock-keyword-face))
+    "Custom face for tree-sitter. Sometimes used with 'return' keywords."
     :group 'font-lock-faces)
 
 (defface treesit-custom-enumerator-face
@@ -379,11 +379,6 @@
 (defface treesit-custom-parameter-face
     '((t :inherit font-lock-variable-name-face))
     "Custom parameter face for tree-sitter."
-    :group 'font-lock-faces)
-
-(defface treesit-custom-defined-face
-    '((t :inherit font-lock-function-call-face))
-    "Custom 'defined' face for C/C++ tree-sitter."
     :group 'font-lock-faces)
 
 (defface treesit-custom-named-operator-face
@@ -436,24 +431,24 @@
     (setq c-ts-mode-enable-doxygen t)
     (setq c-ts-mode--preproc-keywords '("#include"))
     (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
-    (defvar my-c-ts-mode-constants
+    (defvar my-c-ts-mode-regex-overrides
         '(
              ((field_identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
              ((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))))
     (defvar my-c-ts-mode-common-overrides
         `(
-             ,@my-c-ts-mode-constants
+             (conditional_expression (["?" ":"]) @font-lock-operator-face)
+             [(true) (false)] @treesit-custom-boolean-face
+             (null) @treesit-custom-null-face
+             ,@my-c-ts-mode-regex-overrides
              (case_statement value: (identifier) @font-lock-constant-face)
              (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
              (parameter_list (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face))
              (parameter_list (parameter_declaration declarator: (pointer_declarator declarator: (_) @treesit-custom-parameter-face)))
              (labeled_statement label: (_) @treesit-custom-label-face)
              (goto_statement label: (_) @treesit-custom-label-face)
-             (return_statement "return" @treesit-custom-return-face)
+             ("return" @treesit-custom-special-keyword-2-face)
              (sized_type_specifier) @font-lock-builtin-face
-             (field_declaration declarator: (field_identifier) @treesit-custom-field-face)
-             (function_declarator declarator: (field_identifier) @font-lock-function-name-face)
-             ;; ((field_identifier !parameters) @treesit-custom-field-face)
              (primitive_type) @font-lock-builtin-face
              (enumerator
                  name: (identifier) @treesit-custom-enumerator-face)))
@@ -473,8 +468,22 @@
                  "(" @font-lock-punctuation-face
                  (identifier) @treesit-custom-parameter-face
                  ")" @font-lock-punctuation-face)))
+    (defun my-c-ts-mode-field-overrides (mode)
+        (let ((field-overrides
+            `(
+                 (field_declaration declarator: (field_identifier) @treesit-custom-field-face)
+                 (field_declaration declarator: (pointer_declarator declarator: (field_identifier) @treesit-custom-field-face))
+                 (function_declarator declarator: (field_identifier) @font-lock-function-name-face)
+                 ,@(when (eq mode 'cpp)
+                     '((field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))))) field-overrides))
     (add-hook 'c-ts-mode-hook
         (lambda()
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'c
+                         :override t
+                         :feature 'field-overrides
+                         (my-c-ts-mode-field-overrides 'c))) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'c
@@ -493,6 +502,12 @@
                 (car (treesit-font-lock-rules
                          :language 'cpp
                          :override t
+                         :feature 'field-overrides
+                         (my-c-ts-mode-field-overrides 'cpp))) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'cpp
+                         :override t
                          :feature 'common-overrides
                          my-c-ts-mode-common-overrides)) t)
             (add-to-list 'treesit-font-lock-settings
@@ -507,6 +522,7 @@
                          :override t
                          :feature 'cpp-overrides
                          '(
+                              ((this) @treesit-custom-special-keyword-1-face)
                               (concept_definition name: (_) @font-lock-type-face)
                               (template_function name: (_) @font-lock-type-face)
                               (new_expression "new" @treesit-custom-named-operator-face)
@@ -529,30 +545,6 @@
                                   function:
                                   (qualified_identifier
                                       name: (_) @font-lock-function-call-face)))))) t)))
-
-;; Markdown
-
-(use-package
-    markdown-mode
-    :ensure t
-    :mode ("README\\.md\\'" . gfm-mode)
-    :init (setq markdown-command "multimarkdown")
-    :bind (:map markdown-mode-map ("C-c C-e" . markdown-do)))
-
-;; GLSL
-
-(use-package glsl-mode :ensure t :mode ("\\.shader\\'" "\\.glsl\\'"))
-
-;; Godot
-
-(elpaca (gdscript-mode
-            :host github
-            :repo "godotengine/emacs-gdscript-mode"
-            :inherit nil
-            :after treesit)
-    :config
-    (setq gdscript-indent-offset 4)
-    (setq gdscript-use-tab-indents nil))
 (use-package gdscript-ts-mode
     :ensure nil
     :after gdscript-mode
@@ -578,9 +570,10 @@
              ;; ((identifier) @font-lock-builtin-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-builtin-face))
              ((identifier) @font-lock-type-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-type-face))
              (signal_statement (name) @font-lock-function-call-face)
-             [(true) (false) (null)] @font-lock-constant-face
-             (attribute (identifier) @treesit-custom-return-face (:match ,(rx (| "self")) @treesit-custom-return-face))
-             (return_statement "return" @treesit-custom-return-face)
+             [(true) (false)] @treesit-custom-boolean-face
+             (null) @treesit-custom-null-face
+             (attribute (identifier) @treesit-custom-special-keyword-1-face (:match ,(rx (| "self")) @treesit-custom-special-keyword-1-face))
+             (return_statement "return" @treesit-custom-special-keyword-2-face)
              ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
              ([,@my-gdscript-ts-mode-operators] @font-lock-operator-face)
              ([,@my-gdscript-ts-mode-named-operators] @treesit-custom-named-operator-face)
@@ -601,6 +594,39 @@
                          :override t
                          :feature 'overrides
                          my-gdscript-ts-mode-overrides)) t))))
+
+;; LSP
+
+(use-package
+    eglot
+    :ensure t
+    :hook
+    ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
+    :custom
+    (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
+    (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
+    (eglot-events-buffer-size 0)
+    (eglot-autoshutdown t)
+    (eglot-report-progress nil)
+    ;; (eglot-stay-out-of '(flymake eldoc))
+    :config
+    ;; (setq eldoc-idle-delay 0.1)
+    ;; (add-to-list 'eglot-server-programs
+    ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+    ;; (add-to-list 'eglot-server-programs
+    ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+    (evil-define-key
+        'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
+    (evil-define-key
+        'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
+    (evil-define-key
+        'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+(use-package eglot-inactive-regions
+    :ensure t
+    :custom
+    (eglot-inactive-regions-style 'shadow-face)
+    :config
+    (eglot-inactive-regions-mode 1))
 
 ;; Completion
 
