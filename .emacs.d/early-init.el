@@ -225,7 +225,7 @@
 
     (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
     (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
-    (evil-define-key 'normal 'global (kbd "<leader>d") 'evil-delete-buffer)
+    (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
     (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
 
     (defmacro evil-map (state key seq)
