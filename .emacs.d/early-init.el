@@ -581,6 +581,7 @@
     (defvar my-gdscript-ts-mode-overrides
         `(
              ;; ((identifier) @font-lock-builtin-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-builtin-face))
+             (escape_sequence) @treesit-custom-named-operator-face
              ((identifier) @font-lock-type-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-type-face))
              (signal_statement (name) @font-lock-function-call-face)
              [(true) (false)] @treesit-custom-boolean-face
