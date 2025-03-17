@@ -284,7 +284,7 @@
     :config
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc company help))
+        '(dired ibuffer magit vertico consult eldoc company help elpaca))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -471,15 +471,14 @@
              (preproc_params
                  "(" @font-lock-punctuation-face
                  (identifier) @treesit-custom-parameter-face
-                 ")" @font-lock-punctuation-face)
-             (macro_type_specifier name: (identifier) @font-lock-preprocessor-face)))
+                 ")" @font-lock-punctuation-face)))
     ;; (defun my-c-ts-mode-field-overrides (mode)
     ;;     (let ((field-overrides
     ;;         `(
-    ;;              ,@(when (eq mode 'cpp)
-    ;;                  '(
+    ;; ,@(when (eq mode 'cpp)
+    ;;     '(
     ;;
-    ;;                    ))))) field-overrides))
+    ;;       ))))) field-overrides))
     (add-hook 'c-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
@@ -493,7 +492,13 @@
                          :language 'c
                          :override t
                          :feature 'preprocessor-overrides
-                         my-c-ts-mode-preprocessor-overrides)) t)))
+                         my-c-ts-mode-preprocessor-overrides)) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'c
+                         :override t
+                         :feature 'c-only-overrides
+                         `((macro_type_specifier name: (identifier) @font-lock-function-call-face)))) t)))
     (add-hook 'c++-ts-mode-hook
         (lambda()
             (add-to-list 'treesit-font-lock-settings
@@ -514,7 +519,7 @@
                          :override t
                          :feature 'field-overrides
                          `(
-                              (function_declarator declarator: (field_identifier) @font-lock-function-name-face)
+                              (function_declarator declarator: (_) @font-lock-function-name-face)
                               (field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
@@ -522,6 +527,7 @@
                          :override t
                          :feature 'cpp-overrides
                          '(
+                              (declaration declarator: (function_declarator declarator: (identifier) @font-lock-function-name-face))
                               (parameter_declaration declarator: (_ (identifier) @treesit-custom-parameter-face))
                               ((this) @treesit-custom-special-keyword-1-face)
                               (concept_definition name: (_) @font-lock-type-face)
