@@ -446,6 +446,8 @@
              (conditional_expression (["?" ":"]) @font-lock-operator-face)
              [(true) (false)] @treesit-custom-boolean-face
              (null) @treesit-custom-null-face
+             (char_literal "'" @font-lock-string-face)
+             (escape_sequence) @treesit-custom-named-operator-face
              ,@my-c-ts-mode-regex-overrides
              (case_statement value: (identifier) @font-lock-constant-face)
              (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
@@ -459,6 +461,7 @@
     (defvar my-c-ts-mode-preprocessor-overrides
         `(
              (call_expression function: (identifier) @font-lock-function-call-face)
+             (call_expression function: (field_expression field: (field_identifier) @font-lock-function-call-face))
              (preproc_call directive: (_) @font-lock-keyword-face)
              (preproc_defined
                  "defined" @font-lock-function-call-face
@@ -519,7 +522,7 @@
                          :override t
                          :feature 'field-overrides
                          `(
-                              (function_declarator declarator: (_) @font-lock-function-name-face)
+                              (function_declarator declarator: ([(field_identifier) (identifier)]) @font-lock-function-name-face)
                               (field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
