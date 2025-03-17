@@ -562,19 +562,28 @@
         '("%" "%=" "->" "." "!=" "+=" "-="
              "/=" "*=" "==" ">>" "<<" "~"
              "&" "|" "&=" "|=" "-" ">="
-             "<=" "||" "&&" "not" "in"))
+             "<=" "||" "&&"))
+    (defvar my-gdscript-ts-mode-named-operators
+        '("not" "in" "and" "is"))
     (defvar my-gdscript-ts-mode-constants
         '((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face)))
+    (defvar my-gdscript-ts-mode-types
+        '((identifier) @font-lock-type-face (:match "\\`[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\'" @font-lock-type-face)))
     (defvar my-gdscript-ts-mode-builtin-classes-regex
-        (rx (| "Vector2" "Vector2i" "Vector3" "Vector3i" "Vector4" "Vector4i" "Color" "Rect2" "Rect2i" "Array" "Basis" "Dictionary" "Plane" "Quat" "RID" "Rect3" "Transform" "Transform2D" "Transform3D" "AABB" "String" "NodePath" "PoolByteArray" "PoolIntArray" "PoolRealArray" "PoolStringArray" "PoolVector2Array" "PoolVector3Array" "PoolColorArray" "Signal" "Callable" "StringName" "Quaternion" "Projection" "PackedByteArray" "PackedInt32Array" "PackedInt64Array" "PackedFloat32Array" "PackedFloat64Array" "PackedStringArray" "PackedVector2Array" "PackedVector2iArray" "PackedVector3Array" "PackedVector3iArray" "PackedVector4Array" "PackedColorArray" "JSON" "UPNP" "OS" "IP" "JSONRPC" "XRVRS")))
+        (rx (| "Camera2D" "Camera3D" "Control" "Node2D" "Node3D" "Vector2" "Vector2i" "Vector3" "Vector3i" "Vector4" "Vector4i" "Color" "Rect2" "Rect2i" "Array" "Basis" "Dictionary" "Plane" "Quat" "RID" "Rect3" "Transform" "Transform2D" "Transform3D" "AABB" "String" "NodePath" "PoolByteArray" "PoolIntArray" "PoolRealArray" "PoolStringArray" "PoolVector2Array" "PoolVector3Array" "PoolColorArray" "Signal" "Callable" "StringName" "Quaternion" "Projection" "PackedByteArray" "PackedInt32Array" "PackedInt64Array" "PackedFloat32Array" "PackedFloat64Array" "PackedStringArray" "PackedVector2Array" "PackedVector2iArray" "PackedVector3Array" "PackedVector3iArray" "PackedVector4Array" "PackedColorArray" "JSON" "UPNP" "OS" "IP" "JSONRPC" "XRVRS")))
+    (defvar my-gdscript-ts-mode-regex-overrides
+        `(,my-gdscript-ts-mode-constants ,my-gdscript-ts-mode-types))
     (defvar my-gdscript-ts-mode-overrides
         `(
-             ,my-gdscript-ts-mode-constants
+             ;; ((identifier) @font-lock-builtin-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-builtin-face))
              ((identifier) @font-lock-type-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-type-face))
              (signal_statement (name) @font-lock-function-call-face)
              [(true) (false) (null)] @font-lock-constant-face
+             (attribute (identifier) @treesit-custom-return-face (:match ,(rx (| "self")) @treesit-custom-return-face))
+             (return_statement "return" @treesit-custom-return-face)
              ([,@my-gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
              ([,@my-gdscript-ts-mode-operators] @font-lock-operator-face)
+             ([,@my-gdscript-ts-mode-named-operators] @treesit-custom-named-operator-face)
              (enum_definition name: (_) @font-lock-type-face)
              (enumerator left: (identifier) @treesit-custom-enumerator-face)
              (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)))
@@ -584,9 +593,14 @@
                 (car (treesit-font-lock-rules
                          :language 'gdscript
                          :override t
+                         :feature 'regex-overrides
+                         my-gdscript-ts-mode-regex-overrides)) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'gdscript
+                         :override t
                          :feature 'overrides
-                         my-gdscript-ts-mode-overrides)) t)
-            (push 'overrides (nth 1 treesit-font-lock-feature-list)))))
+                         my-gdscript-ts-mode-overrides)) t))))
 
 ;; Completion
 
