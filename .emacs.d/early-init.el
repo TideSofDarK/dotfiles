@@ -645,6 +645,7 @@
     ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
     ;; (add-to-list 'eglot-server-programs
     ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+    (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
     (evil-define-key
         'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
     (evil-define-key
