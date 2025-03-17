@@ -391,6 +391,8 @@
     "Custom label face for C/C++ tree-sitter."
     :group 'font-lock-faces)
 
+(defvar treesit-custom-constant-regex "\\`[A-Z_][A-Z0-9_]*\\'" "")
+
 (use-package
     treesit
     :config
@@ -563,17 +565,19 @@
         '("%" "%=" "->" "." "!=" "+=" "-="
              "/=" "*=" "==" ">>" "<<" "~"
              "&" "|" "&=" "|=" "-" ">="
-             "<=" "||" "&&"))
+             "<=" "||" "&&" ">>=" "<<="
+             "^="))
     (defvar my-gdscript-ts-mode-named-operators
         '("not" "in" "and" "is"))
-    (defvar my-gdscript-ts-mode-constants
-        '((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face)))
     (defvar my-gdscript-ts-mode-types
-        '((identifier) @font-lock-type-face (:match "\\`[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\'" @font-lock-type-face)))
+        `((identifier) @font-lock-type-face (:match "\\`[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\'" @font-lock-type-face)))
     (defvar my-gdscript-ts-mode-builtin-classes-regex
         (rx (| "Camera2D" "Camera3D" "Control" "Node2D" "Node3D" "Vector2" "Vector2i" "Vector3" "Vector3i" "Vector4" "Vector4i" "Color" "Rect2" "Rect2i" "Array" "Basis" "Dictionary" "Plane" "Quat" "RID" "Rect3" "Transform" "Transform2D" "Transform3D" "AABB" "String" "NodePath" "PoolByteArray" "PoolIntArray" "PoolRealArray" "PoolStringArray" "PoolVector2Array" "PoolVector3Array" "PoolColorArray" "Signal" "Callable" "StringName" "Quaternion" "Projection" "PackedByteArray" "PackedInt32Array" "PackedInt64Array" "PackedFloat32Array" "PackedFloat64Array" "PackedStringArray" "PackedVector2Array" "PackedVector2iArray" "PackedVector3Array" "PackedVector3iArray" "PackedVector4Array" "PackedColorArray" "JSON" "UPNP" "OS" "IP" "JSONRPC" "XRVRS")))
-    (defvar my-gdscript-ts-mode-regex-overrides
-        `(,my-gdscript-ts-mode-constants ,my-gdscript-ts-mode-types))
+    (defvar my-gdscript-ts-mode-constants
+        `(
+             (const_statement name: (name) @font-lock-constant-face)
+             ((identifier) @font-lock-constant-face (:match ,treesit-custom-constant-regex @font-lock-constant-face))
+             (variable_statement name: (name) @font-lock-constant-face (:match ,treesit-custom-constant-regex @font-lock-constant-face))))
     (defvar my-gdscript-ts-mode-overrides
         `(
              ;; ((identifier) @font-lock-builtin-face (:match ,my-gdscript-ts-mode-builtin-classes-regex @font-lock-builtin-face))
@@ -595,8 +599,14 @@
                 (car (treesit-font-lock-rules
                          :language 'gdscript
                          :override t
-                         :feature 'regex-overrides
-                         my-gdscript-ts-mode-regex-overrides)) t)
+                         :feature 'better-types
+                         `(,my-gdscript-ts-mode-types))) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'gdscript
+                         :override t
+                         :feature 'better-constants
+                         my-gdscript-ts-mode-constants)) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'gdscript
