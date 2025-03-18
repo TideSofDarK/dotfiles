@@ -286,7 +286,7 @@
     :config
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc company help elpaca))
+        '(dired ibuffer magit vertico consult eldoc company help elpaca compile))
     (evil-collection-init))
 (use-package
     evil-commentary
