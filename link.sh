@@ -2,6 +2,7 @@
 cd "$(dirname "$0")"
 
 CONFIG_FOLDERS=(
+    "foot"
     "kitty"
     "nvim"
     "alacritty"

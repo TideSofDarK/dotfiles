@@ -23,6 +23,7 @@ decorations = "Full"
 dynamic_padding = true
 dynamic_title = false
 resize_increments = true
+startup_mode = "Maximized"
 
 [keyboard]
 bindings = [
