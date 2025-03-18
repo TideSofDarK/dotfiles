@@ -125,6 +125,8 @@
     emacs
     :ensure nil
     :custom
+    (warning-suppress-log-types '((native-compiler)))
+    (ring-bell-function 'ignore)
     (help-window-select t)
     (tab-always-indent t)
     (menu-bar-mode nil)
@@ -335,14 +337,32 @@
 
 ;; Godot
 
-(elpaca (gdscript-mode
-            :host github
-            :repo "godotengine/emacs-gdscript-mode"
-            :inherit nil
-            :after treesit)
+(use-package gdscript-mode
+    :ensure (gdscript-mode
+                :host github
+                :repo "godotengine/emacs-gdscript-mode"
+                :inherit nil
+                :after treesit)
     :config
     (setq gdscript-indent-offset 4)
     (setq gdscript-use-tab-indents nil))
+(use-package gdshader-mode
+    :ensure (gdshader-mode
+                :host github
+                :repo "bbbscarter/gdshader-mode"
+                :inherit nil
+                :after glsl-mode)
+    :init
+    (defvar my-gdshader-keywords (regexp-opt '("instance" "varying") 'symbols))
+    (defun gdshader-config()
+        (interactive)
+        (font-lock-add-keywords nil `((,my-gdshader-keywords . glsl-keyword-face)))
+        (setq-local company-dabbrev-downcase nil)
+        (setq-local company-backends
+            '((company-keywords company-dabbrev))))
+    :hook (gdshader-mode . gdshader-config)
+    :config
+    (add-to-list 'company-keywords-alist (append '(gdshader-mode) gdshader-all-keywords)))
 
 ;; Treesitter
 
