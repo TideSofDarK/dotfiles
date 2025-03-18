@@ -1,6 +1,14 @@
-;; Init GC
+;; Disable GC
 
-(setq gc-cons-threshold (* 50 1000 1000))
+(put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
+(put 'gc-cons-percentage 'value-during-init 0.6)
+(defun restore-gc-cons-percentage-after-init ()
+    (let ((expected-value (get 'gc-cons-percentage 'value-during-init))
+             (value-to-restore (get 'gc-cons-percentage 'original-value-before-init)))
+        (when (and value-to-restore (equal gc-cons-percentage expected-value))
+            (setq gc-cons-percentage value-to-restore))))
+(add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
+(setq gc-cons-percentage (get 'gc-cons-percentage 'value-during-init))
 
 ;; Maximize on launch
 
@@ -9,6 +17,15 @@
 ;; Add Lisp Path
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
+
+;; Native Compilation
+
+(when (and (fboundp 'native-comp-available-p)
+          (native-comp-available-p))
+    (progn
+        (setq native-comp-async-report-warnings-errors nil)
+        (setq comp-deferred-compilation t)
+        (setq package-native-compile t)))
 
 ;; Elpaca Package Manager
 
@@ -90,7 +107,10 @@
         (load "./elpaca-autoloads")))
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
-(elpaca elpaca-use-package (elpaca-use-package-mode))
+(elpaca elpaca-use-package
+    (elpaca-use-package-mode)
+    (setq elpaca-use-package-by-default t))
+(elpaca-wait)
 
 ;; Set Font
 
@@ -125,6 +145,10 @@
     emacs
     :ensure nil
     :custom
+    (use-short-answers t)
+    (frame-inhibit-implied-resize t)
+    (frame-resize-pixelwise t)
+    (auto-mode-case-fold nil)
     (warning-suppress-log-types '((native-compiler)))
     (ring-bell-function 'ignore)
     (help-window-select t)
@@ -170,7 +194,6 @@
     (fset 'display-startup-echo-area-message 'ignore)
     (set-fringe-mode 0)
     (savehist-mode 1)
-    (fset 'yes-or-no-p 'y-or-n-p)
     (setq custom-file (locate-user-emacs-file "custom.el"))
     (load custom-file 'noerror 'nomessage)
     :bind
@@ -415,6 +438,7 @@
 
 (use-package
     treesit
+    :ensure nil
     :config
     (setq treesit-font-lock-level 4))
 (use-package
@@ -778,8 +802,3 @@
 ;;     (add-to-list 'completion-at-point-functions #'cape-file)
 ;;     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
 ;;     (add-to-list 'completion-at-point-functions #'cape-keyword))
-
-;; Runtime GC
-
-(setq gc-cons-threshold (* 2 1000 1000))
-(setq read-process-output-max (* 1024 1024))
