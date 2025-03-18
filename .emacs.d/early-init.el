@@ -286,7 +286,7 @@
     :config
     ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
     (setq evil-collection-mode-list
-        '(dired ibuffer magit vertico consult eldoc company help elpaca compile))
+        '(dired ibuffer imenu magit vertico consult eglot eldoc company help elpaca compile eshell help))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -411,7 +411,7 @@
     "Custom label face for C/C++ tree-sitter."
     :group 'font-lock-faces)
 
-(defvar treesit-custom-constant-regex "\\`[A-Z_][A-Z0-9_]*\\'" "")
+(defvar treesit-custom-constant-regex "\\`[A-Z_][A-Z0-9_]+\\'" "")
 
 (use-package
     treesit
@@ -454,9 +454,9 @@
     (setq c-ts-mode--preproc-keywords '("#include"))
     (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
     (defvar my-c-ts-mode-regex-overrides
-        '(
-             ((field_identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))
-             ((identifier) @font-lock-constant-face (:match "\\`[A-Z_][A-Z0-9_]*\\'" @font-lock-constant-face))))
+        `(
+             ((field_identifier) @font-lock-constant-face (:match ,treesit-custom-constant-regex @font-lock-constant-face))
+             ((identifier) @font-lock-constant-face (:match ,treesit-custom-constant-regex @font-lock-constant-face))))
     (defvar my-c-ts-mode-common-overrides
         `(
              (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face)
