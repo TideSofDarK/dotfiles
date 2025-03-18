@@ -1,4 +1,4 @@
-;; Disable GC
+;; Disable GC During Init
 
 (put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
 (put 'gc-cons-percentage 'value-during-init 0.6)
@@ -10,7 +10,7 @@
 (add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
 (setq gc-cons-percentage (get 'gc-cons-percentage 'value-during-init))
 
-;; Maximize on launch
+;; Maximize On Launch
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -27,7 +27,7 @@
         (setq comp-deferred-compilation t)
         (setq package-native-compile t)))
 
-;; Elpaca Package Manager
+;; elpaca
 
 (setq package-enable-at-startup nil)
 (defvar elpaca-installer-version 0.10)
@@ -112,7 +112,7 @@
     (setq elpaca-use-package-by-default t))
 (elpaca-wait)
 
-;; Set Font
+;; Fonts
 
 (let ((mono-spaced-font "Sarasa Fixed Slab CL Nerd Font")
          (proportionately-spaced-font "Sarasa UI Nerd Font"))
@@ -126,25 +126,26 @@
         :family proportionately-spaced-font
         :height 1.0))
 
-;; Themes
+;; Theme
 
 (setq kanagawa-themes-keyword-italic t)
 (setq kanagawa-themes-comment-italic t)
 (require 'kanagawa-themes)
 (load-theme 'kanagawa-wave :no-confirm-loading)
 
-;; Cleaner mode-line
+;; minions
 
 (use-package minions
     :ensure t
     :config (minions-mode 1))
 
-;; Basic Configuration
+;; emacs
 
 (use-package
     emacs
     :ensure nil
     :custom
+    (delete-by-moving-to-trash t)
     (use-short-answers t)
     (frame-inhibit-implied-resize t)
     (frame-resize-pixelwise t)
@@ -184,13 +185,24 @@
     (use-dialog-box nil)
     (confirm-kill-processes nil)
     (set-buffer-modified-p nil)
+    (create-lockfiles nil)
     (make-backup-files nil)
     (auto-save-default nil)
     (enable-recursive-minibuffers t)
     (minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
     (eldoc-echo-area-use-multiline-p nil)
+    (switch-to-buffer-obey-display-actions t)
+    ;; (pixel-scroll-precision-mode t)
+    ;; (pixel-scroll-precision-use-momentum nil)
+    ;; (global-hl-line-mode 1)
     :config
+    ;; (defun skip-these-buffers (_window buffer _bury-or-kill)
+    ;;     "Function for `switch-to-prev-buffer-skip'."
+    ;;     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
+    ;; (setq switch-to-prev-buffer-skip 'skip-these-buffers)
+    (modify-coding-system-alist 'file "" 'utf-8)
+    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
     (fset 'display-startup-echo-area-message 'ignore)
     (set-fringe-mode 0)
     (savehist-mode 1)
@@ -202,15 +214,54 @@
     ("<C-wheel-up>" . text-scale-increase)
     ("<C-wheel-down>" . text-scale-decrease))
 
-;; Focus eldoc buffer
+;; window
 
-;; (use-package shackle
-;;     :ensure t
-;;     :hook (after-init . shackle-mode)
-;;     :config
-;;     (setq shackle-default-size 0.4
-;;         shackle-rules
-;;         `(("\\*eldoc.*" :align t :select t :regexp t))))
+(use-package window
+    :ensure nil
+    :custom
+    (display-buffer-alist
+        '(
+             ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
+                 (display-buffer-in-side-window)
+                 (window-height . 0.25)
+                 (side . bottom)
+                 (slot . 0))
+             ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\)"
+                 (display-buffer-in-side-window)
+                 (window-height . 0.25)
+                 (side . bottom)
+                 (slot . 1)))))
+
+;; dired
+
+(use-package dired
+    :ensure nil
+    :custom
+    (dired-listing-switches "-lah --group-directories-first")
+    (dired-dwim-target t)
+    (dired-guess-shell-alist-user
+        '(("\\.\\(png\\|jpe?g\\|tiff\\)" "feh" "xdg-open" "open")
+             ("\\.\\(mp[34]\\|m4a\\|ogg\\|flac\\|webm\\|mkv\\)" "mpv" "xdg-open" "open")
+             (".*" "open" "xdg-open")))
+    (dired-kill-when-opening-new-dired-buffer t)
+    :config
+    (when (eq system-type 'darwin)
+        (let ((gls (executable-find "gls")))
+            (when gls
+                (setq insert-directory-program gls)))))
+
+;; eldoc
+
+(use-package eldoc
+    :ensure nil
+    :init
+    (global-eldoc-mode))
+
+;; org
+
+(use-package org
+    :ensure nil
+    :defer t)
 
 ;; undo-fu
 
@@ -226,14 +277,15 @@
 (use-package
     evil
     :ensure t
+    :defer t
     :init (evil-mode)
     :custom
+    (evil-leader/in-all-states t)
+    (evil-want-fine-undo t)
     (evil-undo-system 'undo-fu)
     :config
     (evil-set-leader 'normal (kbd "SPC"))
     (evil-set-leader 'normal "\\" t)
-
-    (evil-define-key 'normal 'global (kbd "K") 'eldoc)
 
     (evil-define-key 'insert 'global (kbd "\C-y") nil)
     (evil-define-key 'insert 'global (kbd "TAB") 'tab-to-tab-stop)
@@ -289,6 +341,16 @@
                 my-intercept-mode-map state t t)
             state))
 
+    (defun eldoc-and-switch ()
+        "Show hover documentation and jump to *eldoc* buffer."
+        (interactive)
+        (eldoc t)
+        (let ((help-buffer "*eldoc*"))
+            (when (get-buffer help-buffer)
+                (switch-to-buffer-other-window help-buffer))))
+    (evil-define-key
+        'normal my-intercept-mode-map (kbd "K") 'eldoc-and-switch)
+
     (evil-define-command +evil:cd (&optional path)
         "Change `default-directory' with `cd'."
         (interactive "<f>")
@@ -306,10 +368,11 @@
     evil-collection
     :ensure t
     :after evil
+    :custom
+    (evil-collection-want-find-usages-bindings t)
     :config
-    ;; (setq evil-collection-mode-list '(dired ibuffer magit corfu vertico consult vterm))
-    (setq evil-collection-mode-list
-        '(dired ibuffer imenu magit vertico consult eglot eldoc company help elpaca compile eshell help))
+    ;; (setq evil-collection-mode-list
+    ;;     '(dired ibuffer imenu magit vertico consult eglot eldoc company help elpaca compile eshell help))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -338,6 +401,7 @@
 (use-package
     flymake
     :ensure t
+    :defer t
     :config
     (setq flymake-indicator-type 'fringes)
     (evil-define-key
@@ -350,9 +414,9 @@
 (use-package
     markdown-mode
     :ensure t
+    :defer t
     :mode ("README\\.md\\'" . gfm-mode)
-    :init (setq markdown-command "multimarkdown")
-    :bind (:map markdown-mode-map ("C-c C-e" . markdown-do)))
+    :init (setq markdown-command "multimarkdown"))
 
 ;; GLSL
 
@@ -689,6 +753,7 @@
     ;; (add-to-list 'eglot-server-programs
     ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
     (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
+
     (evil-define-key
         'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
     (evil-define-key
@@ -712,6 +777,7 @@
     (company-icon-margin 3)
     (company-tooltip-align-annotations t)
     (company-selection-wrap-around t)
+    (company-idle-delay 0.2)
     :bind
     (:map company-active-map
         ("C-y" . company-complete-selection)
