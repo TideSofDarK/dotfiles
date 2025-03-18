@@ -546,8 +546,8 @@
                          :feature 'namespace-types
                          `(
                               (using_declaration (identifier) @font-lock-type-face)
+                              (using_declaration (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-type-face))
                               (namespace_identifier) @font-lock-type-face
-                              (namespace_definition name: (_) @font-lock-type-face)
                               (qualified_identifier scope: (namespace_identifier) name: (qualified_identifier scope: (namespace_identifier) name: (identifier)  @font-lock-type-face))))) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
@@ -556,8 +556,7 @@
                          :feature 'namespace-functions
                          `(
                               (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
-                              (function_declarator declarator: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-name-face))
-                              ))) t)
+                              (function_declarator declarator: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-name-face))))) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'cpp
