@@ -12,3 +12,4 @@ projects
 undo-tree
 elpaca
 *.elc
+*.eld

@@ -637,7 +637,7 @@ names to which it refers are bound."
 ;;;;;; tab-line
       (tab-line (:background ,bg-m3))
 ;;;;;; comint
-      (comint-highlight-prompt (:background ,syn-punct :foreground ,bg-dim))
+      (comint-highlight-prompt (:foreground ,syn-special-1))
 ;;;;;; completions
       (completions-annotations (:background unspecified :foreground ,diag-info :slant italic))
 
