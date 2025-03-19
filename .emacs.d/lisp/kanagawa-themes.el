@@ -732,12 +732,12 @@ names to which it refers are bound."
       (company-preview-search (:foreground ,syn-fun))
       ;; (company-template-field (:inherit match))
 ;;;;;;; corfu
-      (corfu-default :background ,bg-m1 :foreground ,fg)
-      (corfu-current :background ,bg-p1 :foreground ,fg)
-      (corfu-bar :background ,fg)
-      (corfu-border :background nil)
-      ;; (corfu-annotations :inherit font-lock-comment-face)
-      ;; (corfu-deprecated :strike-through t)
+      (corfu-default :foreground ,fg :background ,bg-p1)
+      (corfu-current :foreground ,fg :background ,bg-p2)
+      (corfu-bar :background ,syn-fun :foreground ,syn-constant)
+      (corfu-border :foreground ,bg-m2)
+      (corfu-annotations (:foreground ,syn-punct :distant-foreground ,bg-dim))
+      (corfu-deprecated :strike-through t)
 ;;;;;;; ace
       (ace-jump-face-background (:foreground ,bright-blue))
       (ace-jump-face-foreground (:foreground ,extend-color-2 :background ,bg-m3 :weight bold))

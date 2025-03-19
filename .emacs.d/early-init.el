@@ -175,9 +175,9 @@
     (scroll-down-aggressively 0.01)
     (scroll-preserve-screen-position t)
     (auto-window-vscroll nil)
-(scroll-step 1)
-(scroll-conservatively 10000)
-(auto-window-vscroll nil)
+    (scroll-step 1)
+    (scroll-conservatively 10000)
+    (auto-window-vscroll nil)
     (indent-tabs-mode nil)
     (tab-width 4)
     (use-dialog-box nil)
@@ -831,46 +831,35 @@
     (completion-category-defaults nil)
     (completion-category-overrides
         '(
+             (eglot (styles orderless))
+             (eglot-capf (styles orderless))
              (file (styles basic partial-completion))
              (buffer (styles orderless))
              (project-file (styles hotfuzz))
              (command (styles orderless)))))
 (use-package marginalia :ensure t :init (marginalia-mode))
-;; (use-package
-;;     affe
-;;     :ensure t
-;;     :config
-;;     (define-key evil-normal-state-map (kbd "<leader>sg") 'affe-grep)
-;;     (define-key evil-normal-state-map (kbd "<leader>sf") 'affe-find)
-;;     (setq affe-find-command "fd --color=never --full-path"))
-;;     ; (defun affe-orderless-regexp-compiler (input _type _ignorecase)
-;;     ;     (setq input (cdr (orderless-compile input)))
-;;     ;     (cons input (apply-partially #'orderless--highlight input t)))
-;;     ; (setq affe-regexp-compiler #'affe-orderless-regexp-compiler)
-;;     ; (consult-customize affe-grep :preview-key "M-."))
 ;; (use-package corfu
 ;;     :ensure t
 ;;     :custom
 ;;     (corfu-left-margin-width 0.0)
 ;;     (corfu-right-margin-width 0.0)
+;;     (corfu-bar-width 0.0)
 ;;     (corfu-cycle t)
 ;;     (corfu-auto t)
+;;     (corfu-auto-delay 0.15)
 ;;     (corfu-auto-prefix 2)
 ;;     (corfu-popupinfo-mode t)
-;;     (corfu-popupinfo-delay 0.5)
-;;     (corfu-preselect 'prompt)
-;;     ;; (corfu-on-exact-match nil)
-;;     (corfu-scroll-margin 1)
-;;     (completion-ignore-case t)
-;;     ;; (tab-always-indent 'complete)
-;;     :init
+;;     (corfu-popupinfo-delay 0.0)
+;;     :config
+;;     (add-hook 'eshell-mode-hook
+;;         (lambda ()
+;;             (setq-local corfu-auto nil)
+;;             (corfu-mode)))
 ;;     (global-corfu-mode)
 ;;     :bind (:map corfu-map ("C-y" . corfu-complete)))
-;; (use-package cape
-;;     :ensure t
-;;     :init
-;;     (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-;;     (add-to-list 'completion-at-point-functions #'cape-dict)
-;;     (add-to-list 'completion-at-point-functions #'cape-file)
-;;     (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-;;     (add-to-list 'completion-at-point-functions #'cape-keyword))
+(use-package cape
+    :ensure t
+    :config
+    ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    (add-to-list 'completion-at-point-functions #'cape-elisp-block))
