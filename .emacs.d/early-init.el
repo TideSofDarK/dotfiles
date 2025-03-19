@@ -18,15 +18,6 @@
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
-;; Native Compilation
-
-(when (and (fboundp 'native-comp-available-p)
-          (native-comp-available-p))
-    (progn
-        (setq native-comp-async-report-warnings-errors nil)
-        (setq comp-deferred-compilation t)
-        (setq package-native-compile t)))
-
 ;; elpaca
 
 (setq package-enable-at-startup nil)
@@ -145,6 +136,9 @@
     emacs
     :ensure nil
     :custom
+    (frame-title-format '("GNU Emacs"))
+    (fringe-mode 0)
+    (savehist-mode 1)
     (delete-by-moving-to-trash t)
     (use-short-answers t)
     (frame-inhibit-implied-resize t)
@@ -165,7 +159,6 @@
     (electric-pair-mode t)
     (blink-cursor-mode nil)
     (global-auto-revert-mode t)
-    (dired-kill-when-opening-new-dired-buffer t)
     (recentf-mode t)
     (truncate-lines t)
     (text-mode-ispell-word-completion nil)
@@ -176,12 +169,17 @@
     (display-line-numbers-width-start t)
     (global-display-line-numbers-mode t)
     (mouse-wheel-progressive-speed nil)
-    (scroll-conservatively 8)
-    (scroll-margin 8)
+    (scroll-margin 6)
+    (scroll-conservatively 101)
+    (scroll-up-aggressively 0.01)
+    (scroll-down-aggressively 0.01)
+    (scroll-preserve-screen-position t)
+    (auto-window-vscroll nil)
+(scroll-step 1)
+(scroll-conservatively 10000)
+(auto-window-vscroll nil)
     (indent-tabs-mode nil)
     (tab-width 4)
-    (c-basic-offset 4)
-    (c-set-offset 'substatement-open 0)
     (use-dialog-box nil)
     (confirm-kill-processes nil)
     (set-buffer-modified-p nil)
@@ -202,10 +200,7 @@
     ;;     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
     ;; (setq switch-to-prev-buffer-skip 'skip-these-buffers)
     (modify-coding-system-alist 'file "" 'utf-8)
-    (set-display-table-slot standard-display-table 'vertical-border (make-glyph-code ?│))
     (fset 'display-startup-echo-area-message 'ignore)
-    (set-fringe-mode 0)
-    (savehist-mode 1)
     (setq custom-file (locate-user-emacs-file "custom.el"))
     (load custom-file 'noerror 'nomessage)
     :bind
@@ -223,12 +218,12 @@
         '(
              ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
                  (display-buffer-in-side-window)
-                 (window-height . 0.25)
+                 (window-height . 0.3)
                  (side . bottom)
                  (slot . 0))
              ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\)"
                  (display-buffer-in-side-window)
-                 (window-height . 0.25)
+                 (window-height . 0.3)
                  (side . bottom)
                  (slot . 1)))))
 
@@ -237,6 +232,7 @@
 (use-package dired
     :ensure nil
     :custom
+    (dired-kill-when-opening-new-dired-buffer t)
     (dired-listing-switches "-lah --group-directories-first")
     (dired-dwim-target t)
     (dired-guess-shell-alist-user
@@ -254,14 +250,14 @@
 
 (use-package eldoc
     :ensure nil
-    :init
+    :custom
+    (eldoc-idle-delay 0.1)
+    :config
     (global-eldoc-mode))
 
 ;; org
 
-(use-package org
-    :ensure nil
-    :defer t)
+(use-package org :ensure nil)
 
 ;; undo-fu
 
@@ -274,14 +270,15 @@
 (setq evil-want-C-u-scroll t)
 (setq evil-want-C-d-scroll t)
 (setq evil-want-integration t)
+(setq evil-want-fine-undo t)
+(setq evil-vsplit-window-right t)
+(setq evil-auto-balance-windows nil)
 (use-package
     evil
     :ensure t
-    :defer t
     :init (evil-mode)
     :custom
     (evil-leader/in-all-states t)
-    (evil-want-fine-undo t)
     (evil-undo-system 'undo-fu)
     :config
     (evil-set-leader 'normal (kbd "SPC"))
@@ -400,8 +397,7 @@
 
 (use-package
     flymake
-    :ensure t
-    :defer t
+    :ensure nil
     :config
     (setq flymake-indicator-type 'fringes)
     (evil-define-key
@@ -414,7 +410,6 @@
 (use-package
     markdown-mode
     :ensure t
-    :defer t
     :mode ("README\\.md\\'" . gfm-mode)
     :init (setq markdown-command "multimarkdown"))
 
@@ -541,11 +536,11 @@
     (setq c-ts-mode-enable-doxygen t)
     (setq c-ts-mode--preproc-keywords '("#include"))
     (advice-add 'c-ts-mode--keywords :around #'my-c-ts-keywords)
-    (defvar my-c-ts-mode-regex-overrides
+    (defvar my-c-ts-mode-constants
         `(
              ((field_identifier) @font-lock-constant-face (:match ,treesit-custom-constant-regex @font-lock-constant-face))
              ((identifier) @font-lock-constant-face (:match ,treesit-custom-constant-regex @font-lock-constant-face))))
-    (defvar my-c-ts-mode-common-overrides
+    (defvar my-c-ts-mode-common
         `(
              (parameter_declaration declarator: (identifier) @treesit-custom-parameter-face)
              (parameter_declaration declarator: (pointer_declarator declarator: (identifier) @treesit-custom-parameter-face))
@@ -558,7 +553,6 @@
              (null) @treesit-custom-null-face
              (char_literal "'" @font-lock-string-face)
              (escape_sequence) @treesit-custom-named-operator-face
-             ,@my-c-ts-mode-regex-overrides
              (case_statement value: (identifier) @font-lock-constant-face)
              (sizeof_expression "sizeof" @treesit-custom-named-operator-face)
              (labeled_statement label: (_) @treesit-custom-label-face)
@@ -568,7 +562,7 @@
              (primitive_type) @font-lock-builtin-face
              (enumerator
                  name: (identifier) @treesit-custom-enumerator-face)))
-    (defvar my-c-ts-mode-preprocessor-overrides
+    (defvar my-c-ts-mode-preprocessor
         `(
              (call_expression function: (identifier) @font-lock-function-call-face)
              (call_expression function: (field_expression field: (field_identifier) @font-lock-function-call-face))
@@ -591,14 +585,20 @@
                 (car (treesit-font-lock-rules
                          :language 'c
                          :override t
-                         :feature 'common-overrides
-                         my-c-ts-mode-common-overrides)) t)
+                         :feature 'constants
+                         my-c-ts-mode-constants)) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'c
                          :override t
-                         :feature 'preprocessor-overrides
-                         my-c-ts-mode-preprocessor-overrides)) t)
+                         :feature 'common
+                         my-c-ts-mode-common)) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'c
+                         :override t
+                         :feature 'preprocessor
+                         my-c-ts-mode-preprocessor)) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'c
@@ -611,22 +611,28 @@
                 (car (treesit-font-lock-rules
                          :language 'cpp
                          :override t
-                         :feature 'common-overrides
-                         my-c-ts-mode-common-overrides)) t)
+                         :feature 'common
+                         my-c-ts-mode-common)) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'cpp
                          :override t
-                         :feature 'preprocessor-overrides
-                         my-c-ts-mode-preprocessor-overrides)) t)
-            (add-to-list 'treesit-font-lock-settings
-                (car (treesit-font-lock-rules
-                         :language 'cpp
-                         :override t
-                         :feature 'field-overrides
+                         :feature 'fields
                          `(
                               (function_declarator declarator: ([(field_identifier) (identifier)]) @font-lock-function-name-face)
                               (field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'cpp
+                         :override t
+                         :feature 'constants
+                         my-c-ts-mode-constants)) t)
+            (add-to-list 'treesit-font-lock-settings
+                (car (treesit-font-lock-rules
+                         :language 'cpp
+                         :override t
+                         :feature 'preprocessor
+                         my-c-ts-mode-preprocessor)) t)
             (add-to-list 'treesit-font-lock-settings
                 (car (treesit-font-lock-rules
                          :language 'cpp
