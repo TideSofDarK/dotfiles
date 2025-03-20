@@ -137,12 +137,13 @@
     :ensure nil
     :custom
     (frame-title-format '("GNU Emacs"))
+    ;; (icon-title-format '("GNU Emacs"))
     (fringe-mode 0)
     (savehist-mode 1)
     (delete-by-moving-to-trash t)
     (use-short-answers t)
     (frame-inhibit-implied-resize t)
-    (frame-resize-pixelwise t)
+    ;; (frame-resize-pixelwise t)
     (auto-mode-case-fold nil)
     (warning-suppress-log-types '((native-compiler)))
     (ring-bell-function 'ignore)
@@ -151,6 +152,7 @@
     (menu-bar-mode nil)
     (scroll-bar-mode nil)
     (tool-bar-mode nil)
+    (tooltip-mode -1)
     (inhibit-startup-screen t)
     (inhibit-splash-screen t)
     (initial-scratch-message nil)
@@ -158,17 +160,24 @@
     (electric-indent-mode t)
     (electric-pair-mode t)
     (blink-cursor-mode nil)
+    (revert-without-query (list "."))
+    (auto-revert-stop-on-user-input nil)
+    (auto-revert-verbose t)
+    (global-auto-revert-non-file-buffers t)
+    (global-auto-revert-ignore-modes '(Buffer-menu-mode))
     (global-auto-revert-mode t)
     (recentf-mode t)
     (truncate-lines t)
     (text-mode-ispell-word-completion nil)
     (read-extended-command-predicate
         #'command-completion-default-include-p)
-    (display-line-numbers-grow-only t)
     (display-line-numbers-type 'relative)
+    (display-line-numbers-grow-only t)
+    (display-line-numbers-width 3)
     (display-line-numbers-width-start t)
     (global-display-line-numbers-mode t)
     (mouse-wheel-progressive-speed nil)
+    (scroll-error-top-bottom t)
     (scroll-margin 6)
     (scroll-conservatively 101)
     (scroll-up-aggressively 0.01)
@@ -181,6 +190,7 @@
     (indent-tabs-mode nil)
     (tab-width 4)
     (use-dialog-box nil)
+    (use-file-dialog nil)
     (confirm-kill-processes nil)
     (set-buffer-modified-p nil)
     (create-lockfiles nil)
@@ -194,13 +204,26 @@
     ;; (pixel-scroll-precision-mode t)
     ;; (pixel-scroll-precision-use-momentum nil)
     ;; (global-hl-line-mode 1)
+    (bidi-display-reordering 'left-to-right)
+    (bidi-paragraph-direction 'left-to-right)
+    (bidi-inhibit-bpa t)
+    (initial-major-mode 'fundamental-mode)
+    (redisplay-skip-fontification-on-input t)
+    (fast-but-imprecise-scrolling t)
+    (window-divider-default-bottom-width 1)
+    (window-divider-default-places t)
+    (window-divider-default-right-width 1)
+    (mouse-yank-at-point nil)
+    (indicate-buffer-boundaries nil)
+    (indicate-empty-lines nil)
     :config
     ;; (defun skip-these-buffers (_window buffer _bury-or-kill)
     ;;     "Function for `switch-to-prev-buffer-skip'."
     ;;     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
     ;; (setq switch-to-prev-buffer-skip 'skip-these-buffers)
     (modify-coding-system-alist 'file "" 'utf-8)
-    (fset 'display-startup-echo-area-message 'ignore)
+    (advice-add 'display-startup-echo-area-message :override #'ignore)
+    (advice-add 'display-startup-screen :override #'ignore)
     (setq custom-file (locate-user-emacs-file "custom.el"))
     (load custom-file 'noerror 'nomessage)
     :bind
@@ -235,11 +258,6 @@
     (dired-kill-when-opening-new-dired-buffer t)
     (dired-listing-switches "-lah --group-directories-first")
     (dired-dwim-target t)
-    (dired-guess-shell-alist-user
-        '(("\\.\\(png\\|jpe?g\\|tiff\\)" "feh" "xdg-open" "open")
-             ("\\.\\(mp[34]\\|m4a\\|ogg\\|flac\\|webm\\|mkv\\)" "mpv" "xdg-open" "open")
-             (".*" "open" "xdg-open")))
-    (dired-kill-when-opening-new-dired-buffer t)
     :config
     (when (eq system-type 'darwin)
         (let ((gls (executable-find "gls")))
@@ -251,6 +269,7 @@
 (use-package eldoc
     :ensure nil
     :custom
+    (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
     (eldoc-idle-delay 0.1)
     :config
     (global-eldoc-mode))
@@ -753,6 +772,8 @@
     (eglot-report-progress nil)
     ;; (eglot-stay-out-of '(flymake eldoc))
     :config
+    (setq jsonrpc-event-hook nil)
+    (setq eglot-events-buffer-config '(:size 0 :format full))
     ;; (setq eldoc-idle-delay 0.1)
     ;; (add-to-list 'eglot-server-programs
     ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
@@ -775,26 +796,26 @@
 
 ;; Completion
 
-(use-package
-    company
-    :ensure t
-    :demand t
-    :custom
-    (company-icon-margin 3)
-    (company-tooltip-align-annotations t)
-    (company-selection-wrap-around t)
-    (company-idle-delay 0.2)
-    :bind
-    (:map company-active-map
-        ("C-y" . company-complete-selection)
-        ("RET" . nil)
-        ("<return>" . nil)
-        ("TAB" . nil)
-        ("<tab>" . nil)
-        ("<backtab>" . nil))
-    :config
-    (setq company-frontends '(company-pseudo-tooltip-frontend))
-    (global-company-mode))
+;; (use-package
+;;     company
+;;     :ensure t
+;;     :demand t
+;;     :custom
+;;     (company-icon-margin 3)
+;;     (company-tooltip-align-annotations t)
+;;     (company-selection-wrap-around t)
+;;     (company-idle-delay 0.2)
+;;     :bind
+;;     (:map company-active-map
+;;         ("C-y" . company-complete-selection)
+;;         ("RET" . nil)
+;;         ("<return>" . nil)
+;;         ("TAB" . nil)
+;;         ("<tab>" . nil)
+;;         ("<backtab>" . nil))
+;;     :config
+;;     (setq company-frontends '(company-pseudo-tooltip-frontend))
+;;     (global-company-mode))
 (use-package
     consult
     :ensure t
@@ -838,28 +859,28 @@
              (project-file (styles hotfuzz))
              (command (styles orderless)))))
 (use-package marginalia :ensure t :init (marginalia-mode))
-;; (use-package corfu
-;;     :ensure t
-;;     :custom
-;;     (corfu-left-margin-width 0.0)
-;;     (corfu-right-margin-width 0.0)
-;;     (corfu-bar-width 0.0)
-;;     (corfu-cycle t)
-;;     (corfu-auto t)
-;;     (corfu-auto-delay 0.15)
-;;     (corfu-auto-prefix 2)
-;;     (corfu-popupinfo-mode t)
-;;     (corfu-popupinfo-delay 0.0)
-;;     :config
-;;     (add-hook 'eshell-mode-hook
-;;         (lambda ()
-;;             (setq-local corfu-auto nil)
-;;             (corfu-mode)))
-;;     (global-corfu-mode)
-;;     :bind (:map corfu-map ("C-y" . corfu-complete)))
+(use-package corfu
+    :ensure t
+    :custom
+    (corfu-left-margin-width 0.0)
+    (corfu-right-margin-width 0.0)
+    (corfu-bar-width 0.0)
+    (corfu-cycle t)
+    (corfu-auto t)
+    (corfu-auto-delay 0.15)
+    (corfu-auto-prefix 2)
+    (corfu-popupinfo-mode t)
+    (corfu-popupinfo-delay 0.0)
+    :config
+    (add-hook 'eshell-mode-hook
+        (lambda ()
+            (setq-local corfu-auto nil)
+            (corfu-mode)))
+    (global-corfu-mode)
+    :bind (:map corfu-map ("C-y" . corfu-complete)))
 (use-package cape
     :ensure t
     :config
-    ;; (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+    (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
     (add-to-list 'completion-at-point-functions #'cape-file)
     (add-to-list 'completion-at-point-functions #'cape-elisp-block))
