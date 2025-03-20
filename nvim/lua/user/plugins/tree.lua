@@ -58,7 +58,7 @@ return {
           show = {
             file = false,
             folder = false,
-            folder_arrow = true,
+            folder_arrow = false,
             git = false,
           },
         },
