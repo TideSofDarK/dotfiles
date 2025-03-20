@@ -10,6 +10,7 @@ custom.el
 recentf
 projects
 undo-tree
+undo-fu-session
 elpaca
 *.elc
 *.eld

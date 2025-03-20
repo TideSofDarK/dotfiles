@@ -281,6 +281,7 @@
 ;; undo-fu
 
 (use-package undo-fu :ensure t)
+(use-package undo-fu-session :ensure t :config (undo-fu-session-global-mode))
 
 ;; evil-mode
 
