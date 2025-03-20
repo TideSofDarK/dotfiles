@@ -12,7 +12,7 @@ style = "Block"
 [font]
 size = 12
 [font.normal]
-family = "Sarasa Fixed Slab CL Nerd Font"
+family = "Sarasa Fixed Slab CL"
 
 [selection]
 save_to_clipboard = true
