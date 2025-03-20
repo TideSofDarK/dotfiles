@@ -105,7 +105,7 @@
 
 ;; Fonts
 
-(let ((mono-spaced-font "Iosevka Term Slab Nerd Font")
+(let ((mono-spaced-font "Sarasa Term Slab CL")
          (proportionately-spaced-font "Sarasa UI CL"))
     (set-face-attribute 'default nil
         :family mono-spaced-font

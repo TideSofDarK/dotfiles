@@ -12,7 +12,7 @@ style = "Block"
 [font]
 size = 12
 [font.normal]
-family = "Iosevka Term Slab Nerd Font"
+family = "Sarasa Term Slab CL"
 
 [selection]
 save_to_clipboard = true

@@ -27,6 +27,7 @@ HOME_FILES=(
     ".fakevimrc"
     ".ideavimrc"
     ".zshrc"
+    ".clang-format"
 )
 
 for file in "${HOME_FILES[@]}";do

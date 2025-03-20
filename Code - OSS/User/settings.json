@@ -182,7 +182,7 @@
             ]
         }
     },
-    "editor.fontFamily": "'Iosevka Term Slab Nerd Font', 'monospace', monospace",
+    "editor.fontFamily": "'Sarasa Term Slab CL', 'monospace', monospace",
     "editor.fontSize": 14,
     "editor.lineNumbers": "relative",
     "editor.scrollbar.vertical": "hidden",
