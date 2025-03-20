@@ -105,8 +105,8 @@
 
 ;; Fonts
 
-(let ((mono-spaced-font "Sarasa Fixed Slab CL")
-         (proportionately-spaced-font "Sarasa UI"))
+(let ((mono-spaced-font "Iosevka Term Slab Nerd Font")
+         (proportionately-spaced-font "Sarasa UI CL"))
     (set-face-attribute 'default nil
         :family mono-spaced-font
         :height 120)
