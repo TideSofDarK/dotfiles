@@ -1,6 +1,5 @@
 return {
   'nvim-tree/nvim-tree.lua',
-  dependencies = { 'echasnovski/mini.icons' },
   config = function()
     require('nvim-tree').setup({
       filters = {
@@ -40,8 +39,7 @@ return {
           return vim.fn.fnamemodify(path, ":t")
         end,
         highlight_git = true,
-        highlight_opened_files = 'icon',
-
+        highlight_opened_files = 'name',
         indent_markers = {
           enable = true,
           inline_arrows = true,
@@ -53,11 +51,25 @@ return {
             none = " ",
           },
         },
-
         icons = {
+          glyphs =
+          {
+            default = "□",
+            modified = "■",
+            folder = {
+              arrow_closed = "⮞",
+              arrow_open = "⮟",
+              default = "●︎",
+              open = "○︎",
+              empty = "●︎",
+              empty_open = "○︎",
+              symlink = "●︎",
+              symlink_open = "○︎",
+            }
+          },
           show = {
             file = false,
-            folder = false,
+            folder = true,
             folder_arrow = false,
             git = false,
           },
