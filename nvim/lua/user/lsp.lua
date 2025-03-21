@@ -19,10 +19,22 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map('grn', vim.lsp.buf.rename, 'Rename')
     map('gra', vim.lsp.buf.code_action, 'Code action')
 
-    if client and client.name == 'clangd' then
+    if client and client.name == 'c' then
       -- client.server_capabilities.semanticTokensProvider = nil
 
-      map('<leader>to', [[<cmd>ClangdSwitchSourceHeader<cr>]], 'Toggle source/header (C/C++)')
+      map('<leader>to', function()
+        local params = { uri = vim.uri_from_bufnr(event.buf) }
+        client:request('textDocument/switchSourceHeader', params, function(err, result)
+          if err then
+            error(tostring(err))
+          end
+          if not result then
+            vim.notify('Corresponding file can’t be determined', vim.log.levels.ERROR, { title = 'LSP Error!' })
+            return
+          end
+          vim.cmd.edit(vim.uri_to_fname(result))
+        end)
+      end, 'Toggle source/header (C/C++)')
       map('<leader>tp', function()
         local params = { uri = vim.uri_from_bufnr(event.buf) }
         client:request('textDocument/switchSourceHeader', params, function(err, result)
