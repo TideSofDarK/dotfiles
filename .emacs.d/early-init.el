@@ -237,16 +237,11 @@
     :custom
     (display-buffer-alist
         '(
-             ("\\*\\(Backtrace\\|Warnings\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
+             ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\|Backtrace\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
                  (display-buffer-in-side-window)
                  (window-height . 0.3)
                  (side . bottom)
-                 (slot . 0))
-             ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\)"
-                 (display-buffer-in-side-window)
-                 (window-height . 0.3)
-                 (side . bottom)
-                 (slot . 1)))))
+                 (slot . 0)))))
 
 ;; dired
 
@@ -465,6 +460,19 @@
     :hook (gdshader-mode . gdshader-config)
     :config
     (with-eval-after-load 'cape-keyword (add-to-list 'cape-keyword-list (append '(gdshader-mode) gdshader-all-keywords))))
+
+;; CMake
+
+(use-package project-cmake
+    :ensure (project-cmake
+                :host github
+                :repo "juanjosegarciaripoll/project-cmake"
+                :inherit nil
+                :after eglot)
+    :config
+    (project-cmake-scan-kits)
+    (project-cmake-eglot-integration)
+    (setq project-cmake-build-directory-name "build/emacs"))
 
 ;; Treesitter
 
