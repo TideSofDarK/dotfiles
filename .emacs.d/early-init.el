@@ -184,14 +184,12 @@
     (scroll-down-aggressively 0.01)
     (scroll-preserve-screen-position t)
     (auto-window-vscroll nil)
-    (scroll-step 1)
-    (scroll-conservatively 10000)
-    (auto-window-vscroll nil)
     (indent-tabs-mode nil)
     (tab-width 4)
     (use-dialog-box nil)
     (use-file-dialog nil)
     (confirm-kill-processes nil)
+    (confirm-kill-emacs nil)
     (set-buffer-modified-p nil)
     (create-lockfiles nil)
     (make-backup-files nil)
@@ -389,7 +387,7 @@
     (evil-collection-want-find-usages-bindings t)
     :config
     ;; (setq evil-collection-mode-list
-    ;;     '(dired ibuffer imenu magit vertico consult eglot eldoc company help elpaca compile eshell help))
+    ;;     '(dired ibuffer imenu magit vertico consult eglot eldoc corfu help elpaca compile eshell help))
     (evil-collection-init))
 (use-package
     evil-commentary
@@ -435,7 +433,9 @@
 
 ;; GLSL
 
-(use-package glsl-mode :ensure t :mode ("\\.shader\\'" "\\.glsl\\'"))
+(use-package glsl-mode
+    :ensure t
+    :mode ("\\.shader\\'" "\\.glsl\\'"))
 
 ;; Godot
 
@@ -454,17 +454,16 @@
                 :repo "bbbscarter/gdshader-mode"
                 :inherit nil
                 :after glsl-mode)
+    :after cape
     :init
     (defvar my-gdshader-keywords (regexp-opt '("instance" "varying") 'symbols))
     (defun gdshader-config()
         (interactive)
         (font-lock-add-keywords nil `((,my-gdshader-keywords . glsl-keyword-face)))
-        (setq-local company-dabbrev-downcase nil)
-        (setq-local company-backends
-            '((company-keywords company-dabbrev))))
+        (setq-local completion-at-point-functions (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
     :hook (gdshader-mode . gdshader-config)
     :config
-    (add-to-list 'company-keywords-alist (append '(gdshader-mode) gdshader-all-keywords)))
+    (with-eval-after-load 'cape-keyword (add-to-list 'cape-keyword-list (append '(gdshader-mode) gdshader-all-keywords))))
 
 ;; Treesitter
 
@@ -797,26 +796,6 @@
 
 ;; Completion
 
-;; (use-package
-;;     company
-;;     :ensure t
-;;     :demand t
-;;     :custom
-;;     (company-icon-margin 3)
-;;     (company-tooltip-align-annotations t)
-;;     (company-selection-wrap-around t)
-;;     (company-idle-delay 0.2)
-;;     :bind
-;;     (:map company-active-map
-;;         ("C-y" . company-complete-selection)
-;;         ("RET" . nil)
-;;         ("<return>" . nil)
-;;         ("TAB" . nil)
-;;         ("<tab>" . nil)
-;;         ("<backtab>" . nil))
-;;     :config
-;;     (setq company-frontends '(company-pseudo-tooltip-frontend))
-;;     (global-company-mode))
 (use-package
     consult
     :ensure t
@@ -868,10 +847,10 @@
     (corfu-bar-width 0.0)
     (corfu-cycle t)
     (corfu-auto t)
-    (corfu-auto-delay 0.15)
+    (corfu-auto-delay 0.2)
     (corfu-auto-prefix 2)
     (corfu-popupinfo-mode t)
-    (corfu-popupinfo-delay 0.0)
+    (corfu-popupinfo-delay 0.25)
     :config
     (add-hook 'eshell-mode-hook
         (lambda ()
@@ -881,6 +860,8 @@
     :bind (:map corfu-map ("C-y" . corfu-complete)))
 (use-package cape
     :ensure t
+    :custom
+    (cape-dabbrev-check-other-buffers nil)
     :config
     (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
     (add-to-list 'completion-at-point-functions #'cape-file)
