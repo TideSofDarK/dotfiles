@@ -446,6 +446,7 @@
                 :inherit nil
                 :after treesit)
     :config
+    (setq gdscript-eglot-version "4.4")
     (setq gdscript-indent-offset 4)
     (setq gdscript-use-tab-indents nil))
 (use-package gdshader-mode
