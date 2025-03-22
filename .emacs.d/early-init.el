@@ -461,19 +461,6 @@
     :config
     (with-eval-after-load 'cape-keyword (add-to-list 'cape-keyword-list (append '(gdshader-mode) gdshader-all-keywords))))
 
-;; CMake
-
-(use-package project-cmake
-    :ensure (project-cmake
-                :host github
-                :repo "juanjosegarciaripoll/project-cmake"
-                :inherit nil
-                :after eglot)
-    :config
-    (project-cmake-scan-kits)
-    (project-cmake-eglot-integration)
-    (setq project-cmake-build-directory-name "build/emacs"))
-
 ;; Treesitter
 
 (defface treesit-custom-boolean-face
