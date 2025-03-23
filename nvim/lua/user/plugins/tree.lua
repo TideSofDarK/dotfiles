@@ -40,7 +40,7 @@ return {
           return vim.fn.fnamemodify(path, ":t")
         end,
         highlight_git = true,
-        highlight_opened_files = 'name',
+        highlight_opened_files = 'none',
         indent_markers = {
           enable = true,
           inline_arrows = true,

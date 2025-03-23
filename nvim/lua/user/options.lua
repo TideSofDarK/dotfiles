@@ -46,6 +46,10 @@ vim.o.sidescrolloff = 8
 vim.o.showmode = false
 vim.o.termguicolors = true
 -- vim.o.fillchars = "vert:▕"
+-- vim.o.fillchars = "vert:█"
+-- vim.o.fillchars = "vert:┃"
+-- vim.o.fillchars = "vert:▐"
+-- vim.o.fillchars = "vert:╎"
 
 vim.o.tabstop = 8
 vim.o.softtabstop = 4
