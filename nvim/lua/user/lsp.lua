@@ -19,7 +19,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
     map('grn', vim.lsp.buf.rename, 'Rename')
     map('gra', vim.lsp.buf.code_action, 'Code action')
 
-    if client and client.name == 'c' then
+    if client and client.name == 'clangd' then
       -- client.server_capabilities.semanticTokensProvider = nil
 
       map('<leader>to', function()
@@ -58,7 +58,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
   end,
 })
 
-vim.lsp.enable('c')
-vim.lsp.enable('cmake')
-vim.lsp.enable('glsl')
-vim.lsp.enable('lua')
+vim.lsp.enable('clangd')
+vim.lsp.enable('cmake-language-server')
+vim.lsp.enable('glsl_analyzer')
+vim.lsp.enable('lua-language-server')
+vim.lsp.enable('sourcekit-lsp')
