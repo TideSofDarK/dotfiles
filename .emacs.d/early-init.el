@@ -418,6 +418,10 @@
     (evil-define-key
         'normal my-intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
 
+;; Lua
+
+(use-package lua-mode :ensure t)
+
 ;; Markdown
 
 (use-package

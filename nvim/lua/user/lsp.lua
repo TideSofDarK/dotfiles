@@ -1,3 +1,9 @@
+vim.lsp.enable('clangd')
+vim.lsp.enable('cmake-language-server')
+vim.lsp.enable('glsl_analyzer')
+vim.lsp.enable('lua-language-server')
+vim.lsp.enable('sourcekit-lsp')
+
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
   callback = function(event)
@@ -59,9 +65,3 @@ vim.api.nvim_create_autocmd("LspAttach", {
     end
   end,
 })
-
-vim.lsp.enable('clangd')
-vim.lsp.enable('cmake-language-server')
-vim.lsp.enable('glsl_analyzer')
-vim.lsp.enable('lua-language-server')
-vim.lsp.enable('sourcekit-lsp')
