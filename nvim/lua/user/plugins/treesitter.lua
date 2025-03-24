@@ -7,10 +7,10 @@ return
   opts = {
     ensure_installed = { 'c', 'cpp', 'lua', 'python', 'vimdoc', 'vim', 'bash', 'glsl', 'markdown', 'markdown_inline', 'yaml' },
     ignore_install = { 'swift' },
-    auto_install = true,
+    auto_install = false,
     highlight = {
       enable = true,
     },
-    indent = { enable = false },
+    indent = { enable = true },
   },
 }

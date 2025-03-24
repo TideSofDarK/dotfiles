@@ -40,6 +40,7 @@ return
     vim.keymap.set('n', '<leader><space>', builtin.buffers, { desc = 'Find existing buffers' })
     vim.keymap.set('n', '<leader>/', function()
       builtin.current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
+        results_ts_highlight = false,
         border = {
           prompt = { 1, 1, 1, 1 },
           results = { 1, 1, 1, 1 },
