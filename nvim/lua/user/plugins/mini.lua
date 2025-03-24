@@ -3,14 +3,16 @@ return {
   version = false,
   config = function()
     local win_config = function()
-      local height = math.floor(0.618 * vim.o.lines)
-      local width = math.floor(0.618 * vim.o.columns)
       return {
-        anchor = 'NW',
-        height = height,
-        width = width,
-        row = math.floor(0.5 * (vim.o.lines - height)),
-        col = math.floor(0.5 * (vim.o.columns - width)),
+        -- anchor = 'NW',
+        -- height = math.floor(0.618 * vim.o.lines),
+        -- width = math.floor(0.618 * vim.o.columns),
+        -- row = math.floor(0.5 * (vim.o.lines - height)),
+        -- col = math.floor(0.5 * (vim.o.columns - width)),
+        -- border = { '┏', '━', '┓', '┃', '┛', '━', '┗', '┃' },
+
+        height = math.floor(0.3 * vim.o.lines),
+        width = 9999,
         border = { '┏', '━', '┓', '┃', '┛', '━', '┗', '┃' }
       }
     end
@@ -22,11 +24,7 @@ return {
       },
       window = {
         prompt_prefix = ' Query: ',
-        -- config = win_config,
-        config = {
-          width = 9999,
-          border = { '┏', '━', '┓', '┃', '┛', '━', '┗', '┃' }
-        },
+        config = win_config,
       },
     })
 
