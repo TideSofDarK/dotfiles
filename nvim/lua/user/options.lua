@@ -10,7 +10,7 @@ vim.wo.relativenumber = true
 vim.o.mouse = 'nv'
 
 vim.schedule(function()
-  vim.opt.clipboard = 'unnamedplus'
+    vim.opt.clipboard = 'unnamedplus'
 end)
 
 -- vim.o.breakindent = false
@@ -55,6 +55,8 @@ vim.o.tabstop = 8
 vim.o.softtabstop = 4
 vim.o.shiftwidth = 4
 
+-- vim.o.winborder = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" }
+
 if vim.fn.executable("pwsh") == 1 then
-  vim.opt.shell = "pwsh"
+    vim.opt.shell = "pwsh"
 end

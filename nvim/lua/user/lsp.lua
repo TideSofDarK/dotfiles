@@ -10,14 +10,16 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
     local client = vim.lsp.get_client_by_id(event.data.client_id)
 
-    map('gd', require('telescope.builtin').lsp_definitions, 'Go to definition')
-    map('gD', vim.lsp.buf.declaration, 'Go to declaration')
-    map('grr', require('telescope.builtin').lsp_references, 'Go to references')
-    map('gri', require('telescope.builtin').lsp_implementations, 'Go to implementation')
-    map('gO', require('telescope.builtin').lsp_document_symbols, 'Document symbols')
-    map('gW', require('telescope.builtin').lsp_workspace_symbols, 'Workspace symbols')
+    local lsp_picker = require('mini.extra').pickers.lsp
+
+    map('gO', function() lsp_picker({ scope = 'document_symbol' }) end, 'Document symbols')
+    map('gW', function() lsp_picker({ scope = 'workspace_symbol' }) end, 'Workspace symbols')
+    map('grr', function() lsp_picker({ scope = 'references' }) end, 'Go to references')
+    map('gri', function() lsp_picker({ scope = 'implementation' }) end, 'Go to implementation')
     map('grn', vim.lsp.buf.rename, 'Rename')
     map('gra', vim.lsp.buf.code_action, 'Code action')
+    map('gd', vim.lsp.buf.definition, 'Go to definition')
+    map('gD', vim.lsp.buf.declaration, 'Go to declaration')
 
     if client and client.name == 'clangd' then
       -- client.server_capabilities.semanticTokensProvider = nil
