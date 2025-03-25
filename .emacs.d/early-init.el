@@ -232,36 +232,30 @@
     ("<C-wheel-up>" . text-scale-increase)
     ("<C-wheel-down>" . text-scale-decrease))
 
-;; window
-
-;; (use-package window
-;;     :ensure nil
-;;     :after popper
-;;     :custom
-;;     (display-buffer-alist
-;;         '(
-;;              ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\|Backtrace\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|compilation\\|eldoc.*\\)\\*"
-;;                  (display-buffer-in-side-window)
-;;                  (window-height . 0.3)
-;;                  (side . bottom)
-;;                  (slot . 0)))))
-
 ;; Popper
 
 (use-package popper
-  :ensure t
-  :after evil
-  :config
-  (evil-define-key 'normal 'global (kbd "<localleader>x") 'popper-toggle)
-  (setq popper-reference-buffers
+    :ensure t
+    :after evil
+    :config
+    (evil-define-key 'normal 'global (kbd "<localleader>x") 'popper-toggle)
+    (setq popper-mode-line "")
+    (setq popper-display-control t)
+    ;; (setq popper-display-function #'display-buffer-pop-up-window)
+    (setq popper-reference-buffers
         '("\\*eldoc\\*"
-         "\\*Messages\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          help-mode
-          compilation-mode))
-  (popper-mode +1))
-  ;; (popper-echo-mode +1))
+             "^\\*godot"
+             "\\*Messages\\*"
+             "Output\\*$"
+             "\\*Async Shell Command\\*"
+             help-mode
+             compilation-mode))
+    (setq popper-window-height (lambda (win)
+                                   (fit-window-to-buffer
+                                       win
+                                       (* 2 (floor (frame-height) 5))
+                                       (floor (frame-height) 3))))
+    (popper-mode +1))
 
 ;; dired
 
@@ -431,10 +425,10 @@
 ;; Markdown
 
 (use-package
-  markdown-mode
-  :ensure t
-  :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
+    markdown-mode
+    :ensure t
+    :mode ("README\\.md\\'" . gfm-mode)
+    :init (setq markdown-command "multimarkdown"))
 
 ;; Lua
 
