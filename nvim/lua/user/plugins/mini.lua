@@ -58,12 +58,8 @@ return {
     end, { desc = 'Find by grep' })
 
     vim.keymap.set('n', '<leader>/', function()
-      extra.pickers.buf_lines({ scope = "current", preserve_order = true }, {
-        source = {
-          name = "Grep Buffer",
-        },
-      })
-    end, { desc = 'Fuzzily search in current buffer' })
+      extra.pickers.buf_lines({ preserve_order = false, scope = "current" }, {})
+    end, { desc = 'Search buffer lines' })
 
     vim.keymap.set('n', '<leader>sh', function()
       pick.builtin.help()
