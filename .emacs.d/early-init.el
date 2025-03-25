@@ -175,7 +175,7 @@
     (display-line-numbers-grow-only t)
     (display-line-numbers-width 3)
     (display-line-numbers-width-start t)
-    (global-display-line-numbers-mode t)
+    ;; (global-display-line-numbers-mode t)
     (mouse-wheel-progressive-speed nil)
     (scroll-error-top-bottom t)
     (scroll-margin 6)
@@ -214,11 +214,13 @@
     (mouse-yank-at-point nil)
     (indicate-buffer-boundaries nil)
     (indicate-empty-lines nil)
+    (compilation-scroll-output t)
     :config
     ;; (defun skip-these-buffers (_window buffer _bury-or-kill)
     ;;     "Function for `switch-to-prev-buffer-skip'."
     ;;     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
     ;; (setq switch-to-prev-buffer-skip 'skip-these-buffers)
+    (add-hook 'prog-mode-hook #'display-line-numbers-mode)
     (modify-coding-system-alist 'file "" 'utf-8)
     (advice-add 'display-startup-echo-area-message :override #'ignore)
     (advice-add 'display-startup-screen :override #'ignore)
@@ -232,16 +234,34 @@
 
 ;; window
 
-(use-package window
-    :ensure nil
-    :custom
-    (display-buffer-alist
-        '(
-             ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\|Backtrace\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|eldoc.*\\)\\*"
-                 (display-buffer-in-side-window)
-                 (window-height . 0.3)
-                 (side . bottom)
-                 (slot . 0)))))
+;; (use-package window
+;;     :ensure nil
+;;     :after popper
+;;     :custom
+;;     (display-buffer-alist
+;;         '(
+;;              ("\\*\\(Flymake diagnostics\\|xref\\|Completions\\|Backtrace\\|Compile-Log\\|[Hh]elp\\|Messages\\|Bookmark List\\|Ibuffer\\|Occur\\|compilation\\|eldoc.*\\)\\*"
+;;                  (display-buffer-in-side-window)
+;;                  (window-height . 0.3)
+;;                  (side . bottom)
+;;                  (slot . 0)))))
+
+;; Popper
+
+(use-package popper
+  :ensure t
+  :after evil
+  :config
+  (evil-define-key 'normal 'global (kbd "<localleader>x") 'popper-toggle)
+  (setq popper-reference-buffers
+        '("\\*eldoc\\*"
+         "\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          help-mode
+          compilation-mode))
+  (popper-mode +1))
+  ;; (popper-echo-mode +1))
 
 ;; dired
 
@@ -308,7 +328,7 @@
     (evil-define-key '(normal motion visual) 'global (kbd "H") 'evil-first-non-blank)
     (evil-define-key '(normal motion visual) 'global (kbd "L") 'evil-end-of-line)
 
-    (evil-define-key 'normal 'global (kbd "<leader>tn") 'global-display-line-numbers-mode)
+    (evil-define-key 'normal 'global (kbd "<leader>tn") 'display-line-numbers-mode)
 
     (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
     (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
@@ -351,16 +371,6 @@
                 my-intercept-mode-map state t t)
             state))
 
-    (defun eldoc-and-switch ()
-        "Show hover documentation and jump to *eldoc* buffer."
-        (interactive)
-        (eldoc t)
-        (let ((help-buffer "*eldoc*"))
-            (when (get-buffer help-buffer)
-                (switch-to-buffer-other-window help-buffer))))
-    (evil-define-key
-        'normal my-intercept-mode-map (kbd "K") 'eldoc-and-switch)
-
     (evil-define-command +evil:cd (&optional path)
         "Change `default-directory' with `cd'."
         (interactive "<f>")
@@ -402,10 +412,6 @@
 (elpaca transient)
 (elpaca (magit :wait t))
 
-;; EditorConfig
-
-(use-package editorconfig :ensure t :config (editorconfig-mode 1))
-
 ;; flymake
 
 (use-package
@@ -418,17 +424,25 @@
     (evil-define-key
         'normal my-intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
 
-;; Lua
+;; EditorConfig
 
-(use-package lua-mode :ensure t)
+(use-package editorconfig :ensure t :config (editorconfig-mode 1))
 
 ;; Markdown
 
 (use-package
-    markdown-mode
-    :ensure t
-    :mode ("README\\.md\\'" . gfm-mode)
-    :init (setq markdown-command "multimarkdown"))
+  markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+
+;; Lua
+
+(use-package lua-mode :ensure t)
+
+;; Swift
+
+(use-package swift-mode :ensure t)
 
 ;; GLSL
 
@@ -533,7 +547,7 @@
             :ext "\\.gd\\'"))
     (add-to-list 'treesit-auto-recipe-list treesit-auto-gdscript-config)
     (setq treesit-auto-langs
-        '(c cpp cmake toml yaml gdscript lua))
+        '(c cpp cmake toml yaml gdscript lua markdown))
     (treesit-auto-install-all)
     (global-treesit-auto-mode))
 (use-package
