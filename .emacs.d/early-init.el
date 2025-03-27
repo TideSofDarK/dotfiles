@@ -378,15 +378,13 @@
         (pulse-momentary-highlight-region beg end)
         (apply orig-fn beg end args))
     (advice-add 'evil-yank :around 'my-evil-yank-advice))
+(setq evil-collection-setup-minibuffer t)
+(setq evil-collection-want-find-usages-bindings t)
 (use-package
     evil-collection
     :ensure t
     :after evil
-    :custom
-    (evil-collection-want-find-usages-bindings t)
     :config
-    ;; (setq evil-collection-mode-list
-    ;;     '(dired ibuffer imenu magit vertico consult eglot eldoc corfu help elpaca compile eshell help))
     (evil-collection-init))
 (use-package
     evil-commentary
