@@ -550,8 +550,14 @@
     :ensure nil
     :preface
     (defun my-c-ts-indent-style()
-        `(((node-is "preproc") column-0 0)
+        `(
+             ((node-is "preproc") column-0 0)
              ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
+             ((node-is ")") parent-bol 0)
+             ((match nil "argument_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+             ((parent-is "argument_list") prev-sibling 0)
+             ((match nil "parameter_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+             ((parent-is "parameter_list") prev-sibling 0)
              ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
     (defun my-c-ts-keywords (orig-fun &rest args)
         `("#if" "#ifdef" "#ifndef" "#elif" "#else" "#endif" "#define",@(apply orig-fun args)))
