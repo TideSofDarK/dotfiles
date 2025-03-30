@@ -70,7 +70,7 @@ return {
           },
           show = {
             file = false,
-            folder = true,
+            folder = false,
             folder_arrow = false,
             git = false,
           },
