@@ -5,7 +5,7 @@ return {
     require('nvim-tree').setup({
       filters = {
         dotfiles = false,
-        custom = { '^\\.git' },
+        custom = { '.git$' },
         exclude = { vim.fn.stdpath 'config' .. '/lua/custom' },
       },
       disable_netrw = true,
