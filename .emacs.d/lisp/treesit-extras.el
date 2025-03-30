@@ -121,25 +121,25 @@
         (car (treesit-font-lock-rules
                :language 'c
                :override t
-               :feature 'constants
+               :feature 'extras-constants
                treesit-extras--c-ts-mode-constants)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'c
                :override t
-               :feature 'common
+               :feature 'extras-common
                treesit-extras--c-ts-mode-common)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'c
                :override t
-               :feature 'preprocessor
+               :feature 'extras-preprocessor
                treesit-extras--c-ts-mode-preprocessor)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'c
                :override t
-               :feature 'c-only-overrides
+               :feature 'extras
                `((macro_type_specifier name: (identifier) @font-lock-function-call-face)))) t)))
   (add-hook 'c++-ts-mode-hook
     (lambda()
@@ -147,13 +147,13 @@
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'common
+               :feature 'extras-common
                treesit-extras--c-ts-mode-common)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'fields
+               :feature 'extras-fields
                `(
                   (function_declarator declarator: ([(field_identifier) (identifier)]) @font-lock-function-name-face)
                   (field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))) t)
@@ -161,19 +161,19 @@
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'constants
+               :feature 'extras-constants
                treesit-extras--c-ts-mode-constants)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'preprocessor
+               :feature 'extras-preprocessor
                treesit-extras--c-ts-mode-preprocessor)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'namespace-types
+               :feature 'extras-namespace-types
                `(
                   (using_declaration (identifier) @font-lock-type-face)
                   (using_declaration (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-type-face))
@@ -183,7 +183,7 @@
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'namespace-functions
+               :feature 'extras-namespace-functions
                `(
                   (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
                   (function_declarator declarator: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-name-face))))) t)
@@ -191,7 +191,7 @@
         (car (treesit-font-lock-rules
                :language 'cpp
                :override t
-               :feature 'cpp-overrides
+               :feature 'extras
                '(
                   (declaration declarator: (function_declarator declarator: (identifier) @font-lock-function-name-face))
                   (parameter_declaration declarator: (_ (identifier) @treesit-extras-parameter-face))
@@ -207,14 +207,9 @@
                   (template_argument_list (type_descriptor type: (type_identifier) @font-lock-type-face))
                   (template_type name: (type_identifier) @font-lock-type-face)
                   ("::" @font-lock-punctuation-face)
-                  (call_expression
-                    function:
-                    (qualified_identifier scope: (namespace_identifier)
-                      name: (identifier) @font-lock-function-call-face))
-                  (call_expression
-                    function:
-                    (template_function name: (identifier) @font-lock-function-call-face))
-                  )))) t)))
+                  (call_expression function: (qualified_identifier name: (qualified_identifier name: (identifier) @font-lock-function-call-face)))
+                  (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
+                  (call_expression function: (template_function name: (identifier) @font-lock-function-call-face)))))) t)))
 
 (use-package gdscript-ts-mode
   :ensure nil
