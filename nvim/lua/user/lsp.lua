@@ -3,6 +3,7 @@ vim.lsp.enable('cmake-language-server')
 vim.lsp.enable('glsl_analyzer')
 vim.lsp.enable('lua-language-server')
 vim.lsp.enable('sourcekit-lsp')
+vim.lsp.enable('godot')
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
