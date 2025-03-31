@@ -32,21 +32,28 @@ return {
       function()
         require('tasks').start('cmake', 'configure', '')
       end,
-      desc = 'CMake: Configure'
+      desc = 'Configure CMake project'
     },
     {
-      '<leader>br',
+      '<leader>bt',
       function()
-        require('tasks').start('cmake', 'run', '')
+        require('tasks').set_module_param('cmake', 'target')
       end,
-      desc = 'CMake: Run'
+      desc = 'Set CMake target'
     },
     {
       '<leader>bb',
       function()
         require('tasks').start('cmake', 'build', '')
       end,
-      desc = 'CMake: Build'
+      desc = 'Build CMake target'
+    },
+    {
+      '<leader>br',
+      function()
+        require('tasks').start('cmake', 'run', '')
+      end,
+      desc = 'Run CMake target'
     },
   },
 }

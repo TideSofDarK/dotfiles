@@ -239,6 +239,7 @@
   :after evil
   :config
   (evil-define-key 'normal 'global (kbd "<localleader>x") 'popper-toggle)
+  (evil-define-key 'normal 'global (kbd "<leader>x") 'popper-toggle)
   (setq popper-mode-line "")
   (setq popper-display-control t)
   ;; (setq popper-display-function #'display-buffer-pop-up-window)
@@ -248,6 +249,7 @@
        "\\*Messages\\*"
        "Output\\*$"
        "\\*Async Shell Command\\*"
+       "^\\*Run"
        help-mode
        compilation-mode))
   (setq popper-window-height (lambda (win)
@@ -427,6 +429,20 @@
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
+
+;; CMake
+
+(use-package cmake-build
+  :ensure nil
+  :after c-ts-mode
+  :config
+  (defun define-cmake-build-key(key func)
+    (evil-define-key 'normal c-ts-mode-map key func)
+    (evil-define-key 'normal c++-ts-mode-map key func))
+  (define-cmake-build-key (kbd "<leader>bt") 'cmake-build-set-config)
+  (define-cmake-build-key (kbd "<leader>bc") 'cmake-build-run-cmake)
+  (define-cmake-build-key (kbd "<leader>bb") 'cmake-build-current)
+  (define-cmake-build-key (kbd "<leader>br") 'cmake-build-run))
 
 ;; Lua
 
