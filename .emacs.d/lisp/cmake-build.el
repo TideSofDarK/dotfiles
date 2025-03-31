@@ -116,10 +116,11 @@ By default, the name is in the form `build.<profile>`."
   :type 'function
   :group 'cmake-build)
 
-(defcustom cmake-build-export-compile-commands nil
-  "Non-nil means to generate compile_commands.sjon and symlink."
-  :type 'boolean
-  :group 'cmake-build)
+(defcustom cmake-build-export-compile-commands 'copy
+  "Either copy or symlink generated compile_commands.json to project root."
+  :type 'symbol
+  :group 'cmake-build
+  :options '(copy symlink))
 
 (defcustom cmake-build-completing-read-function 'completing-read
   "Specify completing function for cmake-build.
@@ -431,8 +432,8 @@ use the project root."
   (cadr (assoc 'cmake-build-source-root (cmake-build--get-project-data))))
 
 (defun cmake-build-default-build-dir-function (_project-root profile)
-  "Return the default build directory, `build.PROFILE'."
-  (concat "build." profile))
+  "Return the default build directory, `build/PROFILE'."
+  (concat "build/" profile))
 
 (defun cmake-build--get-build-dir-relative (&optional subdir)
   "Return the build directory relative to the project root.
@@ -740,8 +741,16 @@ If PATH is blank, unset the project root."
     (cmake-build--compile buffer-name "cmake ."
                           :other-buffer-name other-buffer-name)))
 
-(defun cmake-build--create-compile-commands-symlink ()
-  "Create symlink to <build>/compile_commands.json from project root."
+(defun cmake-build--copy-compile-commands ()
+  "Copy <build>/compile_commands.json to project root."
+  (let ((filename (expand-file-name "compile_commands.json" (cmake-build--project-root))))
+    (when (or (file-exists-p filename)
+              (file-symlink-p filename))
+      (delete-file filename)))
+  (copy-file "compile_commands.json" (cmake-build--project-root)))
+
+(defun cmake-build--symlink-compile-commands ()
+  "Symlink <build>/compile_commands.json to project root."
   (let ((filename (expand-file-name "compile_commands.json" (cmake-build--project-root))))
     (when (or (file-exists-p filename)
               (file-symlink-p filename))
@@ -763,12 +772,19 @@ If PATH is blank, unset the project root."
                               (when cmake-build-export-compile-commands " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON")
                               " " (car (cmake-build--get-profile))
                               " " (cmake-build--maybe-remote-project-root))))
-        (when (file-exists-p "CMakeCache.txt")
-          (delete-file "CMakeCache.txt"))
+        (dolist (cmake-files (directory-files-recursively "." (rx (| "CMakeFiles" "CMakeCache.txt")) t))
+          (when (file-directory-p cmake-files)
+            (message (concat "deleting: " cmake-files))
+            (delete-directory cmake-files t t))
+          (when (file-exists-p cmake-files)
+            (delete-file cmake-files)))
         (cmake-build--compile buffer-name command
-                              :other-buffer-name other-buffer-name)
-        (when cmake-build-export-compile-commands
-          (cmake-build--create-compile-commands-symlink))))))
+                              :sentinel (lambda (p e)
+                                          (when (string-equal e "finished\n")
+                                            (cl-case cmake-build-export-compile-commands
+                                                     (copy (cmake-build--copy-compile-commands))
+                                                     (symlink (cmake-build--symlink-compile-commands)))))
+                              :other-buffer-name other-buffer-name)))))
 
 (defun cmake-build-clean ()
   "Clean the current project."

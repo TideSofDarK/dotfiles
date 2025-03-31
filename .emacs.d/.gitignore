@@ -15,3 +15,4 @@ elpaca
 *.elc
 *.eld
 tramp
+cmake-build-options.el
