@@ -106,7 +106,8 @@
 ;; Fonts
 
 (let ((mono-spaced-font "Sarasa Term Slab CL")
-       (proportionately-spaced-font "Sarasa UI CL"))
+       ;; (proportionately-spaced-font "Sarasa UI CL"))
+       (proportionately-spaced-font "Sarasa Term Slab CL"))
   (set-face-attribute 'default nil
     :family mono-spaced-font
     :height 120)
@@ -244,9 +245,12 @@
   (setq popper-display-control t)
   ;; (setq popper-display-function #'display-buffer-pop-up-window)
   (setq popper-reference-buffers
-    '("\\*eldoc\\*"
+    '(
+       ;; "^\\*.*\\*$"
+       "\\*eldoc\\*"
        "^\\*godot"
        "\\*Messages\\*"
+       "\\*Warnings\\*"
        "Output\\*$"
        "\\*Async Shell Command\\*"
        "^\\*Run"
