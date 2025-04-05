@@ -623,8 +623,8 @@ If SENTINEL is non-nil, use it as the process sentinel."
 
 (defun cemako--invoke-run (project-data)
   "Invoke run for current project using CONFIG."
-  (let* ((command (concat "./" (cemako--get-current-target-executable project-data)))
-          (default-directory (cemako--get-build-dir project-data))
+  (let* ((default-directory (cemako--get-build-dir project-data))
+          (command (expand-file-name (cemako--get-current-target-executable project-data) default-directory))
           ;; (process-environment (append
           ;;                       (list (concat "PROJECT_ROOT="
           ;;                                     (cemako--maybe-remote-project-root)))
