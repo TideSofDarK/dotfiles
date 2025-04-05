@@ -135,20 +135,6 @@ argument the name of the buffer to use."
   (when-let ((project (project-current)))
     (project-name project)))
 
-(cl-defmacro cemako--with-file ((filename &key readp writep) &body body)
-  "Execute BODY in a temporary buffer using FILENAME.
-If READP is non-nil, read the file into the buffer before BODY.
-If WRITEP is non-nil, write the buffer to the file after BODY."
-  `(with-temp-buffer
-     (prog1
-       ,(if readp
-          `(when (file-exists-p ,filename)
-             (insert-file-contents ,filename)
-             ,@body)
-          `(progn ,@body))
-       (when ,writep
-         (write-region 1 (point-max) ,filename)))))
-
 (defun cemako--project-data-path ()
   "Return path to project data file."
   (file-name-concat
@@ -173,7 +159,7 @@ If WRITEP is non-nil, write the buffer to the file after BODY."
         (read "()")))))
 
 (cl-defmacro cemako--with-project-data (&body body)
-  "Execute BODY in the .cemako.el file buffer."
+  "Execute BODY in the .cemako.el file buffer. Returns BODY."
   `(with-temp-buffer
      (let* ((project-data-path (cemako--project-data-path))
              (project-data
@@ -189,6 +175,15 @@ If WRITEP is non-nil, write the buffer to the file after BODY."
          (erase-buffer)
          (cl-prettyprint project-data)
          (write-region 1 (point-max) project-data-path)))))
+
+(cl-defmacro cemako--read-valid-project-data (tag &body body)
+  "Execute BODY in the .cemako.el file buffer after validation.
+Returns project data."
+  `(cemako--with-project-data
+     (when (cemako--validate project-data ,tag)
+       (progn
+         ,@body
+         project-data))))
 
 (defmacro cemako--add-to-alist (alist &rest elements)
   "Add the association of KEY and VAL to the value of ALIST.
@@ -549,11 +544,9 @@ Do this only if BUFFER-WINDOW is nil and
 (defun cemako-run-cmake ()
   "Clear caches and run CMake."
   (interactive)
-  (when-let* ((project-data (cemako--with-project-data
-                              (progn
-                                (unless (cemako--get-current-profile project-data)
-                                  (cemako--edit-profile))
-                                project-data)))
+  (when-let* ((project-data (cemako--read-valid-project-data "run"
+                              (unless (cemako--get-current-profile project-data)
+                                (cemako--edit-profile))))
                (profile-name (cemako--get-current-profile project-data)))
     (let ((build-dir (cemako--get-build-dir project-data)))
       (unless (file-exists-p build-dir)
@@ -605,13 +598,9 @@ If SENTINEL is non-nil, use it as the process sentinel."
 (defun cemako-build ()
   "Build the current CMake target."
   (interactive)
-  (when-let* ((project-data
-                (cemako--with-project-data
-                  (when (cemako--validate project-data "build")
-                    (progn
-                      (unless (cemako--get-current-target project-data)
-                        (cemako--select-target))
-                      project-data))))
+  (when-let* ((project-data (cemako--read-valid-project-data "run"
+                              (unless (cemako--get-current-target project-data)
+                                (cemako--select-target))))
                (current-target (cemako--get-current-target project-data)))
     (cemako--invoke-build-current project-data)))
 
@@ -649,32 +638,35 @@ If SENTINEL is non-nil, use it as the process sentinel."
 (defun cemako-run ()
   "Run the current target."
   (interactive)
-  (when-let* ((project-data
-                (cemako--with-project-data
-                  (when (cemako--validate project-data "run")
-                    (progn
-                      (unless (cemako--get-current-target-executable project-data)
-                        (cemako--select-target nil t))
-                      project-data))))
+  (when-let* ((project-data (cemako--read-valid-project-data "run"
+                              (unless (cemako--get-current-target-executable project-data)
+                                (cemako--select-target nil t))))
                (current-target-executable (cemako--get-current-target-executable project-data))
-               (this-root (cemako--get-project-root)))
+               (default-directory (cemako--get-build-dir project-data)))
     (if cemako-build-before-run
       (cemako--invoke-build-current
         project-data
         (lambda (_process event)
-          (let* ((this-root this-root))
-            (when (cl-equalp "finished\n" event)
-              (cemako--invoke-run project-data)))))
+          (when (cl-equalp "finished\n" event)
+            (cemako--invoke-run project-data))))
       (cemako--invoke-run project-data))))
 
 (defun cemako-debug ()
   "Run the current target in gdb."
   (interactive)
-  (let* ((config (cemako--get-run-config))
-          (command (cemako--get-run-command config))
-          (default-directory (cemako--get-run-directory config)) ; check whether config should be (car config)
-          (process-environment (append (cemako--get-run-config-env) process-environment)))
-    (gdb (concat "gdb -i=mi --args " command))))
+  (when-let* ((project-data (cemako--read-valid-project-data "run"
+                              (unless (cemako--get-current-target-executable project-data)
+                                (cemako--select-target nil t))))
+               (current-target-executable (cemako--get-current-target-executable project-data))
+               (default-directory (cemako--get-build-dir project-data))
+               (command (expand-file-name (cemako--get-current-target-executable project-data) default-directory)))
+    (if cemako-build-before-run
+      (cemako--invoke-build-current
+        project-data
+        (lambda (_process event)
+          (when (cl-equalp "finished\n" event)
+            (gdb (concat "gdb -i=mi --args " command)))))
+      (gdb (concat "gdb -i=mi --args " command)))))
 
 (provide 'cemako)
 ;;; cemako.el ends here
