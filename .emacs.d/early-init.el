@@ -139,7 +139,7 @@
   :custom
   (frame-title-format '("GNU Emacs"))
   ;; (icon-title-format '("GNU Emacs"))
-  (fringe-mode 0)
+  (fringe-mode 4)
   (savehist-mode 1)
   (delete-by-moving-to-trash t)
   (use-short-answers t)
@@ -371,6 +371,9 @@
         my-intercept-mode-map state t t)
       state))
 
+  (defun scroll-to-center-after-goto-mark (char &optional noerror) (recenter))
+  (evil--advice-add 'evil-goto-mark :after #'scroll-to-center-after-goto-mark)
+
   (evil-define-command +evil:cd (&optional path)
     "Change `default-directory' with `cd'."
     (interactive "<f>")
@@ -436,17 +439,18 @@
 
 ;; CMake
 
-(use-package cmake-build
+(use-package cemako
   :ensure nil
   :after c-ts-mode
   :config
-  (defun define-cmake-build-key(key func)
-    (evil-define-key 'normal c-ts-mode-map key func)
-    (evil-define-key 'normal c++-ts-mode-map key func))
-  (define-cmake-build-key (kbd "<leader>bt") 'cmake-build-set-config)
-  (define-cmake-build-key (kbd "<leader>bc") 'cmake-build-run-cmake)
-  (define-cmake-build-key (kbd "<leader>bb") 'cmake-build-current)
-  (define-cmake-build-key (kbd "<leader>br") 'cmake-build-run))
+  (defun define-cemako-key(key func)
+    ;; (evil-define-key 'normal c-ts-mode-map key func)
+    ;; (evil-define-key 'normal c++-ts-mode-map key func)
+    (evil-define-key 'normal project-prefix-map key func))
+  (define-cemako-key (kbd "<leader>bt") 'cemako-select-target)
+  (define-cemako-key (kbd "<leader>bc") 'cemako-run-cemako)
+  (define-cemako-key (kbd "<leader>bb") 'cemako-build)
+  (define-cemako-key (kbd "<leader>br") 'cemako-run))
 
 ;; Lua
 
