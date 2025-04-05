@@ -446,9 +446,9 @@
   (defun define-cemako-key(key func)
     ;; (evil-define-key 'normal c-ts-mode-map key func)
     ;; (evil-define-key 'normal c++-ts-mode-map key func)
-    (evil-define-key 'normal project-prefix-map key func))
+    (evil-define-key 'normal 'global key func))
   (define-cemako-key (kbd "<leader>bt") 'cemako-select-target)
-  (define-cemako-key (kbd "<leader>bc") 'cemako-run-cemako)
+  (define-cemako-key (kbd "<leader>bc") 'cemako-run-cmake)
   (define-cemako-key (kbd "<leader>bb") 'cemako-build)
   (define-cemako-key (kbd "<leader>br") 'cemako-run))
 
