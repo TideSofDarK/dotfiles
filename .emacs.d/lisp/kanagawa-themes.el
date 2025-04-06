@@ -541,6 +541,12 @@ names to which it refers are bound."
       (eglot-diagnostic-tag-unnecessary-face (:foreground ,syn-comment :slant ,'italic))
       (eglot-diagnostic-tag-deprecated-face (:strike-through t))
       (eglot-mode-line (:inherit mode-line-buffer-id :weight normal))
+;;;;;;; lsp-mode
+      (lsp-face-semhl-member :inherit font-lock-property-name-face)
+      (lsp-face-semhl-property :inherit font-lock-property-name-face)
+      (lsp-face-semhl-parameter (:foreground ,syn-parameter))
+      (lsp-face-semhl-namespace :inherit font-lock-type-face)
+      (lsp-face-semhl-operator :inherit font-lock-operator-face)
 ;;;;;;; line numbers
       (line-number (:inherit default :foreground ,nontext :background ,bg))
       (line-number-current-line (:inherit line-number))

@@ -262,6 +262,7 @@
   (setq popper-reference-buffers
     '(
        ;; "^\\*.*\\*$"
+       "\\*lsp-help\\*"
        "\\*eldoc\\*"
        "^\\*godot"
        "\\*Messages\\*"
@@ -473,7 +474,6 @@
             :inherit nil
             :after treesit)
   :config
-  (setq gdscript-eglot-version "4.4")
   (setq gdscript-indent-offset 4)
   (setq gdscript-use-tab-indents nil))
 (use-package gdshader-mode
@@ -524,40 +524,48 @@
 
 ;; LSP
 
-(use-package
-  eglot
-  :ensure t
-  :hook
-  ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
-  :custom
-  (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
-  (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
-  (eglot-events-buffer-size 0)
-  (eglot-autoshutdown t)
-  (eglot-report-progress nil)
-  ;; (eglot-stay-out-of '(flymake eldoc))
-  :config
-  (setq jsonrpc-event-hook nil)
-  (setq eglot-events-buffer-config '(:size 0 :format full))
-  ;; (setq eldoc-idle-delay 0.1)
-  ;; (add-to-list 'eglot-server-programs
-  ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-  ;; (add-to-list 'eglot-server-programs
-  ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
-  (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
-
-  (evil-define-key
-    'normal intercept-mode-map (kbd "grn") 'eglot-rename)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "gra") 'eglot-code-actions)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "<leader>cf") 'eglot-format))
-(use-package eglot-inactive-regions
+(use-package lsp-mode
   :ensure t
   :custom
-  (eglot-inactive-regions-style 'shadow-face)
+  ;; (lsp-semantic-tokens-apply-modifiers nil)
+  (lsp-idle-delay 0.0)
+  (lsp-enable-links nil)
+  (lsp-semantic-tokens-enable t)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  (lsp-modeline-code-action-icons-enable nil)
+  (lsp-lens-enable nil)
+  (lsp-modeline-code-actions-enable nil)
+  (lsp-modeline-diagnostics-enable nil)
+  (lsp-headerline-breadcrumb-enable nil)
+  (lsp-enable-snippet nil)
+  (lsp-enable-symbol-highlighting nil)
+  (lsp-completion-provider :none)
+  (lsp-signature-auto-activate t)
+  (lsp-eldoc-enable-hover nil)
+  (lsp-signature-doc-lines 0)
+  (lsp-signature-render-documentation nil)
+  (lsp-gdscript-port 6008)
+  :init
+  (defun lsp-mode-setup-corfu-completion ()
+    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+      '(orderless)))
   :config
-  (eglot-inactive-regions-mode 1))
+  (setq lsp-semantic-token-modifier-faces
+    '(("readonly" . lsp-face-semhl-constant)
+      ("documentation" . lsp-face-semhl-comment)
+      ("defaultLibrary" . lsp-face-semhl-default-library)))
+  (evil-define-key
+    'normal intercept-mode-map (kbd "grn") 'lsp-rename)
+  (evil-define-key
+    'normal intercept-mode-map (kbd "gra") 'lsp-code-action)
+  (evil-define-key
+    'normal intercept-mode-map (kbd "<leader>cf") 'lsp-format-buffer)
+  (evil-define-key '(normal) 'global (kbd "K") 'lsp-describe-thing-at-point)
+  :hook ((gdscript-ts-mode . lsp)
+          (c-ts-mode . lsp)
+          (c++-ts-mode . lsp)
+          (lsp-completion-mode . lsp-mode-setup-corfu-completion))
+  :commands lsp)
 
 ;; Completion
 
@@ -567,16 +575,16 @@
   :custom
   (consult-line-start-from-top t)
   :config
-  (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
   (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
   (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
   (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
 (use-package
-  consult-eglot
+  consult-lsp
   :ensure t
   :config
-  (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
+  (evil-define-key 'normal 'global (kbd "gO") 'consult-lsp-file-symbols)
+  (evil-define-key 'normal 'global (kbd "gW") 'consult-lsp-symbols))
 (use-package
   vertico
   :ensure t
@@ -591,15 +599,10 @@
   :after hotfuzz
   :ensure t
   :custom
-  ;; (orderless-style-dispatchers '(orderless-affix-dispatch))
-  ;; (orderless-component-separator #'orderless-escapable-split-on-space)
   (completion-styles '(orderless hotfuzz basic))
   (completion-category-defaults nil)
   (completion-category-overrides
-    '(
-       (eglot (styles orderless))
-       (eglot-capf (styles orderless))
-       (file (styles basic partial-completion))
+    '((file (styles basic partial-completion))
        (buffer (styles orderless))
        (project-file (styles hotfuzz))
        (command (styles orderless)))))
@@ -625,6 +628,6 @@
   :custom
   (cape-dabbrev-check-other-buffers nil)
   :config
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+  (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
