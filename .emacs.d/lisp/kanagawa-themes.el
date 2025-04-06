@@ -239,7 +239,7 @@
    (float-bg-border ,sumi-ink-0)
 
    (syn-string ,spring-green)
-   (syn-variable nil)
+   (syn-variable ,fuji-white)
    (syn-number ,sakura-pink)
    (syn-constant ,surimi-orange)
    (syn-identifier ,carp-yellow)
@@ -328,7 +328,7 @@
    (float-bg-border ,dragon-black-0)
 
    (syn-string ,dragon-green-2)
-   (syn-variable nil)
+   (syn-variable ,dragon-white)
    (syn-number ,dragon-pink)
    (syn-constant ,dragon-orange)
    (syn-identifier ,carp-yellow)
@@ -417,7 +417,7 @@
    (float-bg-border ,lotus-white-0)
 
    (syn-string ,lotus-green)
-   (syn-variable nil)
+   (syn-variable ,lotus-ink-1)
    (syn-number ,lotus-pink)
    (syn-constant ,lotus-orange)
    (syn-identifier ,lotus-yellow)
