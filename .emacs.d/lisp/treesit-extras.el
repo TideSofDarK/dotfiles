@@ -236,6 +236,8 @@
   (defvar treesit-extras--gdscript-ts-mode-overrides
     `(
        ;; ((identifier) @font-lock-builtin-face (:match ,treesit-extras--gdscript-ts-mode-builtin-classes-regex @font-lock-builtin-face))
+       (await_expression "await" @font-lock-keyword-face)
+       (static_keyword) @font-lock-keyword-face
        (escape_sequence) @treesit-extras-named-operator-face
        ((identifier) @font-lock-type-face (:match ,treesit-extras--gdscript-ts-mode-builtin-classes-regex @font-lock-type-face))
        (signal_statement (name) @font-lock-function-call-face)
@@ -255,19 +257,19 @@
         (car (treesit-font-lock-rules
                :language 'gdscript
                :override t
-               :feature 'better-types
+               :feature 'extras-types
                `(,treesit-extras--gdscript-ts-mode-types))) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'gdscript
                :override t
-               :feature 'better-constants
+               :feature 'extras-constants
                treesit-extras--gdscript-ts-mode-constants)) t)
       (add-to-list 'treesit-font-lock-settings
         (car (treesit-font-lock-rules
                :language 'gdscript
                :override t
-               :feature 'overrides
+               :feature 'extras
                treesit-extras--gdscript-ts-mode-overrides)) t))))
 
 (provide 'treesit-extras)

@@ -129,7 +129,7 @@
 
 (use-package minions
   :ensure t
-  :config (minions-mode 1))
+  :config (minions-mode t))
 
 ;; emacs
 
@@ -137,14 +137,12 @@
   emacs
   :ensure nil
   :custom
-  (frame-title-format '("GNU Emacs"))
-  ;; (icon-title-format '("GNU Emacs"))
-  (fringe-mode 4)
-  (savehist-mode 1)
+  (native-comp-jit-compilation-deny-list '(".*-loaddefs.el.gz"))
+  (fringe-mode 0) ;; 4
   (delete-by-moving-to-trash t)
   (use-short-answers t)
   (frame-inhibit-implied-resize t)
-  ;; (frame-resize-pixelwise t)
+  (frame-resize-pixelwise t)
   (auto-mode-case-fold nil)
   (warning-suppress-log-types '((native-compiler)))
   (ring-bell-function 'ignore)
@@ -157,17 +155,12 @@
   (inhibit-startup-screen t)
   (inhibit-splash-screen t)
   (initial-scratch-message nil)
-  (delete-selection-mode t)
-  (electric-indent-mode t)
-  (electric-pair-mode t)
   (blink-cursor-mode nil)
   (revert-without-query (list "."))
   (auto-revert-stop-on-user-input nil)
   (auto-revert-verbose t)
   (global-auto-revert-non-file-buffers t)
   (global-auto-revert-ignore-modes '(Buffer-menu-mode))
-  (global-auto-revert-mode t)
-  (recentf-mode t)
   (truncate-lines t)
   (text-mode-ispell-word-completion nil)
   (read-extended-command-predicate
@@ -216,7 +209,23 @@
   (indicate-buffer-boundaries nil)
   (indicate-empty-lines nil)
   (compilation-scroll-output t)
+  :init
+  (defun suppress-messages (func &rest args)
+    (cl-flet ((silence (&rest args1) (ignore)))
+      (advice-add 'message :around #'silence)
+      (unwind-protect
+        (apply func args)
+        (advice-remove 'message #'silence))))
+  (advice-add 'recentf-cleanup :around #'suppress-messages)
+  (advice-add 'recentf-mode :around #'suppress-messages)
   :config
+  (let ((inhibit-message t))
+    (recentf-mode t)
+    (global-auto-revert-mode t)
+    (savehist-mode t)
+    (delete-selection-mode t)
+    (electric-indent-mode t)
+    (electric-pair-mode t))
   ;; (defun skip-these-buffers (_window buffer _bury-or-kill)
   ;;     "Function for `switch-to-prev-buffer-skip'."
   ;;     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
@@ -232,6 +241,12 @@
   ("C--" . text-scale-decrease)
   ("<C-wheel-up>" . text-scale-increase)
   ("<C-wheel-down>" . text-scale-decrease))
+
+;; ansi-color
+
+(use-package ansi-color
+  :ensure nil
+  :hook (compilation-filter . ansi-color-compilation-filter))
 
 ;; Popper
 
@@ -253,7 +268,6 @@
        "\\*Warnings\\*"
        "Output\\*$"
        "\\*Async Shell Command\\*"
-       "^\\*Run"
        help-mode
        compilation-mode))
   (setq popper-window-height (lambda (win)
@@ -261,7 +275,7 @@
                                  win
                                  (* 2 (floor (frame-height) 5))
                                  (floor (frame-height) 3))))
-  (popper-mode +1))
+  (popper-mode t))
 
 ;; dired
 
@@ -270,12 +284,7 @@
   :custom
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-listing-switches "-lah --group-directories-first")
-  (dired-dwim-target t)
-  :config
-  (when (eq system-type 'darwin)
-    (let ((gls (executable-find "gls")))
-      (when gls
-        (setq insert-directory-program gls)))))
+  (dired-dwim-target t))
 
 ;; eldoc
 
@@ -298,50 +307,41 @@
 
 ;; evil-mode
 
-(setq evil-want-empty-ex-last-command nil)
-(setq evil-want-keybinding nil)
-(setq evil-want-C-u-scroll t)
-(setq evil-want-C-d-scroll t)
-(setq evil-want-integration t)
-(setq evil-want-fine-undo t)
-(setq evil-vsplit-window-right t)
-(setq evil-auto-balance-windows nil)
 (use-package
   evil
   :ensure t
-  :init (evil-mode)
   :custom
   (evil-leader/in-all-states t)
   (evil-undo-system 'undo-fu)
+  :init
+  (setq evil-want-empty-ex-last-command nil)
+  (setq evil-want-keybinding nil)
+  (setq evil-want-C-u-scroll t)
+  (setq evil-want-C-d-scroll t)
+  (setq evil-want-integration t)
+  (setq evil-want-fine-undo t)
+  (setq evil-vsplit-window-right t)
+  (setq evil-auto-balance-windows nil)
   :config
+  (evil-mode t)
   (evil-set-leader 'normal (kbd "SPC"))
   (evil-set-leader 'normal "\\" t)
 
   (evil-define-key 'insert 'global (kbd "\C-y") nil)
   (evil-define-key 'insert 'global (kbd "TAB") 'tab-to-tab-stop)
-
   (evil-define-key 'normal 'global (kbd "M-h") 'evil-window-left)
   (evil-define-key 'normal 'global (kbd "M-l") 'evil-window-right)
   (evil-define-key 'normal 'global (kbd "M-k") 'evil-window-up)
   (evil-define-key 'normal 'global (kbd "M-j") 'evil-window-down)
-
   (evil-define-key '(normal motion visual) 'global (kbd "H") 'evil-first-non-blank)
   (evil-define-key '(normal motion visual) 'global (kbd "L") 'evil-end-of-line)
-
   (evil-define-key 'normal 'global (kbd "<leader>tn") 'display-line-numbers-mode)
-
   (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
   (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
   (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
   (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
 
   (defmacro evil-map (state key seq)
-    "Map for a given STATE a KEY to a sequence SEQ of keys.
-
-        Can handle recursive definition only if KEY is the first key of
-        SEQ, and if KEY's binding in STATE is defined as a symbol in
-        `evil-normal-state-map'.
-        Example: (evil-map visual \"<\" \"<gv\")"
     (let ((map (intern (format "evil-%S-state-map" state)))
            (key-cmd (lookup-key evil-normal-state-map key)))
       `(define-key ,map ,key
@@ -359,16 +359,13 @@
   (evil-map visual "<" "<gv")
   (evil-map visual ">" ">gv")
 
-  (defvar my-intercept-mode-map (make-sparse-keymap)
-    "High precedence keymap.")
-  (define-minor-mode my-intercept-mode
-    "Global minor mode for higher precedence evil keybindings."
-    :global t)
-  (my-intercept-mode)
+  (defvar intercept-mode-map (make-sparse-keymap))
+  (define-minor-mode intercept-mode "High precedence keymap for evil." :global t)
+  (intercept-mode)
   (dolist (state '(normal))
     (evil-make-intercept-map
       (evil-get-auxiliary-keymap
-        my-intercept-mode-map state t t)
+        intercept-mode-map state t t)
       state))
 
   (defun scroll-to-center-after-goto-mark (char &optional noerror) (recenter))
@@ -383,16 +380,17 @@
       (message "Changed directory to '%s'" (abbreviate-file-name (expand-file-name path)))))
   (evil-ex-define-cmd "cd" #'+evil:cd)
 
-  (defun my-evil-yank-advice (orig-fn beg end &rest args)
+  (defun evil-yank-highlight (orig-fn beg end &rest args)
     (pulse-momentary-highlight-region beg end)
     (apply orig-fn beg end args))
-  (advice-add 'evil-yank :around 'my-evil-yank-advice))
-(setq evil-collection-setup-minibuffer t)
-(setq evil-collection-want-find-usages-bindings t)
+  (advice-add 'evil-yank :around 'evil-yank-highlight))
 (use-package
   evil-collection
   :ensure t
   :after evil
+  :init
+  (setq evil-collection-setup-minibuffer t)
+  (setq evil-collection-want-find-usages-bindings t)
   :config
   (evil-collection-init))
 (use-package
@@ -421,9 +419,9 @@
   :config
   (setq flymake-indicator-type 'fringes)
   (evil-define-key
-    'normal my-intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
+    'normal intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
   (evil-define-key
-    'normal my-intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
+    'normal intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
 
 ;; EditorConfig
 
@@ -486,10 +484,9 @@
             :after glsl-mode)
   :after cape
   :init
-  (defvar my-gdshader-keywords (regexp-opt '("instance" "varying") 'symbols))
   (defun gdshader-config()
     (interactive)
-    (font-lock-add-keywords nil `((,my-gdshader-keywords . glsl-keyword-face)))
+    (font-lock-add-keywords nil '(((regexp-opt '("instance" "varying") 'symbols) . glsl-keyword-face)))
     (setq-local completion-at-point-functions (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
   :hook (gdshader-mode . gdshader-config)
   :config
@@ -550,11 +547,11 @@
   (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
 
   (evil-define-key
-    'normal my-intercept-mode-map (kbd "grn") 'eglot-rename)
+    'normal intercept-mode-map (kbd "grn") 'eglot-rename)
   (evil-define-key
-    'normal my-intercept-mode-map (kbd "gra") 'eglot-code-actions)
+    'normal intercept-mode-map (kbd "gra") 'eglot-code-actions)
   (evil-define-key
-    'normal my-intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+    'normal intercept-mode-map (kbd "<leader>cf") 'eglot-format))
 (use-package eglot-inactive-regions
   :ensure t
   :custom
@@ -617,14 +614,11 @@
   (corfu-auto t)
   (corfu-auto-delay 0.15)
   (corfu-auto-prefix 2)
-  (corfu-popupinfo-mode t)
   (corfu-popupinfo-delay 0.25)
-  :config
-  (add-hook 'eshell-mode-hook
-    (lambda ()
-      (setq-local corfu-auto nil)
-      (corfu-mode)))
+  :init
   (global-corfu-mode)
+  (let ((inhibit-message t))
+    (corfu-popupinfo-mode))
   :bind (:map corfu-map ("C-y" . corfu-complete)))
 (use-package cape
   :ensure t

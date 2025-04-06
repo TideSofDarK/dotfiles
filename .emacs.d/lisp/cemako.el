@@ -58,36 +58,8 @@
   :type 'string
   :group 'cemako)
 
-(defcustom cemako-run-window-autoswitch t
-  "Automatically switch between Build and Run output buffers in the visible window."
-  :type 'boolean
-  :group 'cemako)
-
 (defcustom cemako-build-before-run t
   "Build automatically before running app, when using `cemako-run`."
-  :type 'boolean
-  :group 'cemako)
-
-(defcustom cemako-run-window-size 20
-  "Size of window to split."
-  :type 'integer
-  :group 'cemako)
-
-(defcustom cemako-split-threshold 40.0
-  "Threshold (percentage) at which to *not* split the current window.
-Beyond this threshold, we instead use the other window.  That is,
-if `cemako-run-window-size` is greater than this percentage
-of the current window, it will not be split."
-  :type 'float
-  :group 'cemako)
-
-(defcustom cemako-never-split nil
-  "Never split the window, instead always use the other window."
-  :type 'boolean
-  :group 'cemako)
-
-(defcustom cemako-switch-to-build nil
-  "Whether to switch to build window with `cemako-build'."
   :type 'boolean
   :group 'cemako)
 
@@ -231,20 +203,6 @@ Specified via the defcustom `cemako-project-name-function'."
   (let ((default-directory (cemako--get-project-root)))
     (funcall cemako-project-name-function)))
 
-(defun cemako--build-buffer-name (project-data &optional _name)
-  "Return the name of the build buffer."
-  (concat "*Build " (cemako-project-name)
-    "/" (cemako--get-current-profile project-data)
-    ": " (cemako--get-current-target project-data)
-    "*"))
-
-(defun cemako--run-buffer-name (project-data)
-  "Return the name of the run buffer."
-  (concat "*Run " (cemako-project-name)
-    "/" (cemako--get-current-profile project-data)
-    ": " (cemako--get-current-target project-data)
-    "*"))
-
 (defun cemako--get-options (project-data)
   "Return CMake options for current project."
   (let ((options (cdr (assoc 'options project-data))))
@@ -272,32 +230,6 @@ Specified via the defcustom `cemako-project-name-function'."
   "Return current CMake target executable."
   (cdr (assoc 'current-target-executable project-data)))
 
-(defun cemako--get-configs ()
-  "Return configs for current project."
-  (when (cemako--get-project-root)
-    (cdr (assoc 'cemako-run-configs
-           (cemako--get-project-data)))))
-
-(defun cemako--get-config (&optional config)
-  "Return a specific CONFIG for current project."
-  (cdr (assoc (or config (cemako-get-run-config-name))
-         (cemako--get-configs))))
-
-(defun cemako--get-build-config (&optional config)
-  "Return build target associated to CONFIG."
-  (let ((config (cemako--get-config config)))
-    (cdr (assoc :build config))))
-
-(defun cemako--get-run-config (&optional config)
-  "Return run config associated to CONFIG."
-  (let ((config (cemako--get-config config)))
-    (cdr (assoc :run config))))
-
-(defun cemako--get-run-config-env (&optional config)
-  "Return run config environment associated to CONFIG."
-  (let ((config (cemako--get-config config)))
-    (cdr (assoc :env config))))
-
 (defun cemako-default-build-dir-function (project-data)
   "Return the default build directory, `build/PROFILE'."
   (concat "build/" (cemako--get-current-profile project-data)))
@@ -314,94 +246,19 @@ Specified via the defcustom `cemako-project-name-function'."
       (message "Build directory doesn't exist: %s\nDo you need to initialize CMake?" path)
       nil)))
 
-(defun cemako--get-run-command (config)
-  "Get the run command associated to CONFIG.
-Return the concatenation of the second and third elements of
-config, except when the first element is nil, in which case
-prepend the build directory."
-  (if (car config)
-    (concat (cadr config) " " (caddr config))
-    (concat
-      (cemako--get-build-dir-relative)
-      (concat (cadr config) " " (caddr config)))))
-
-(defun cemako--switch-to-buffer (buffer buffer-window other-window)
-  "Conditionally switch to BUFFER in OTHER-WINDOW.
-Do this only if BUFFER-WINDOW is nil and
-`cemako-run-window-autoswitch' is non-nil."
-  (if buffer-window t
-    (when (and cemako-run-window-autoswitch
-            other-window)
-      (set-window-dedicated-p other-window nil)
-      (set-window-buffer other-window buffer)
-      (set-window-dedicated-p other-window t)
-      t)))
-
-(defun cemako--split-to-buffer (name other-name)
-  "Display buffers NAME and OTHER-NAME, adjusting window layout."
-  (let* ((window-point-insertion-type t)
-          ;; Make sure we have a buffer created regardless
-          (buffer (get-buffer-create name))
-          (current-buffer-window (get-buffer-window))
-          (new-buffer-window (get-buffer-window name))
-          (other-buffer-window (and other-name (get-buffer-window other-name t)))
-          (split-is-current (or (eql current-buffer-window new-buffer-window)
-                              (eql current-buffer-window other-buffer-window))))
-    (when (or (and other-buffer-window
-                cemako-run-window-autoswitch)
-            (and (not cemako-never-split)
-              (not split-is-current)
-              (<= cemako-run-window-size
-                (* (/ cemako-split-threshold 100.0)
-                  (window-total-height current-buffer-window)))))
-      (unless (cemako--switch-to-buffer buffer (get-buffer-window buffer t) other-buffer-window)
-        (when (and (not other-buffer-window)
-                (not (get-buffer-window name t)))
-          (let ((window (split-window-below (- cemako-run-window-size))))
-            (set-window-buffer window buffer)
-            (set-window-dedicated-p window t))))
-      t)))
-
-(cl-defun cemako--compile (buffer-name command &key sentinel other-buffer-name)
-  "Compile COMMAND in BUFFER-NAME, with SENTINEL and OTHER-BUFFER-NAME."
-  (let* ((did-split (cemako--split-to-buffer buffer-name other-buffer-name))
-          (display-buffer-alist
-            ;; Suppress the window only if we actually split
-            (if did-split
-              (cons (list buffer-name #'display-buffer-no-window)
-                display-buffer-alist)
-              display-buffer-alist))
-          (actual-directory default-directory))
-    (if (get-buffer-process buffer-name)
-      (message "Already building %s"
-        (funcall cemako-project-name-function))
-      (with-current-buffer buffer-name
-        (setq-local compilation-directory actual-directory)
-        (setq-local default-directory actual-directory))
-      ;; compile saves buffers; rely on this now
-      (let (compilation-buffer)
-        (cl-flet ((run-compile ()
-                    (setq compilation-buffer (compile command))))
-          (let ((w (get-buffer-window buffer-name t)))
-            (if (and w (not (eql (get-buffer-window) w)))
-              (if cemako-switch-to-build
-                (progn
-                  (switch-to-buffer-other-window buffer-name)
-                  (run-compile))
-                (with-selected-window w
-                  (run-compile)))
-              (run-compile))))
-        (when sentinel
-          (let ((process (get-buffer-process compilation-buffer)))
-            (when (process-live-p process)
-              (set-process-sentinel process
-                (lambda (p e)
-                  (funcall sentinel p e)
-                  (compilation-sentinel p e))))))
-        (with-current-buffer buffer-name
-          (dolist (w (get-buffer-window-list buffer-name nil t))
-            (set-window-point w (point-max)))
-          (visual-line-mode 1))))))
+(cl-defun cemako--compile (command &key sentinel)
+  "Compile COMMAND with SENTINEL."
+  (if (get-buffer-process "*compilation*")
+    (message "Compilation is already running!")
+    (let (compilation-buffer)
+      (setq compilation-buffer (compile command))
+      (when sentinel
+        (let ((process (get-buffer-process compilation-buffer)))
+          (when (process-live-p process)
+            (set-process-sentinel process
+              (lambda (p e)
+                (compilation-sentinel p e)
+                (funcall sentinel p e)))))))))
 
 (defun cemako-edit-options (&optional options-string)
   "Set CMake options to OPTIONS-STRING."
@@ -552,8 +409,6 @@ Do this only if BUFFER-WINDOW is nil and
       (unless (file-exists-p build-dir)
         (make-directory build-dir t))
       (let* ((default-directory build-dir)
-              (buffer-name (cemako--build-buffer-name project-data))
-              (other-buffer-name (cemako--run-buffer-name project-data))
               (command (concat "cmake -B . -S " (cemako--get-project-root)
                          " " (cemako--get-options project-data)
                          " " (cemako--get-current-profile-options project-data)
@@ -566,34 +421,27 @@ Do this only if BUFFER-WINDOW is nil and
           (when (file-exists-p cmake-cache)
             (delete-file cmake-cache)))
         (cemako--ensure-query-file-exists build-dir)
-        (cemako--compile buffer-name command
+        (cemako--compile command
           :sentinel (lambda (p e)
                       (when (string-equal e "finished\n")
                         (cl-case cemako-export-compile-commands
                           (copy (cemako--copy-compile-commands))
-                          (symlink (cemako--symlink-compile-commands)))))
-          :other-buffer-name other-buffer-name)))))
+                          (symlink (cemako--symlink-compile-commands))))))))))
 
 (defun cemako-clean ()
   "Clean the current project."
   (interactive)
   (let* ((project-data (cemako--read-project-data))
-          (default-directory (cemako--get-build-dir project-data))
-          (buffer-name (cemako--build-buffer-name project-data))
-          (other-buffer-name (cemako--run-buffer-name project-data)))
-    (cemako--compile buffer-name "cmake --build . --target clean"
-      :other-buffer-name other-buffer-name)))
+          (default-directory (cemako--get-build-dir project-data)))
+    (cemako--compile "cmake --build . --target clean")))
 
 (defun cemako--invoke-build-current (project-data &optional sentinel)
   "Invoke build for current project.
 If SENTINEL is non-nil, use it as the process sentinel."
   (when-let* ((target-name (cemako--get-current-target project-data))
                (default-directory (cemako--get-build-dir project-data))
-               (command (concat "cmake --build .  --target " target-name))
-               (buffer-name (cemako--build-buffer-name project-data))
-               (other-buffer-name (cemako--run-buffer-name project-data)))
-    (cemako--compile buffer-name command
-      :sentinel sentinel :other-buffer-name other-buffer-name)))
+               (command (concat "cmake --build .  --target " target-name)))
+    (cemako--compile command :sentinel sentinel)))
 
 (defun cemako-build ()
   "Build the current CMake target."
@@ -613,27 +461,8 @@ If SENTINEL is non-nil, use it as the process sentinel."
 (defun cemako--invoke-run (project-data)
   "Invoke run for current project using CONFIG."
   (let* ((default-directory (cemako--get-build-dir project-data))
-          (command (expand-file-name (cemako--get-current-target-executable project-data) default-directory))
-          ;; (process-environment (append
-          ;;                       (list (concat "PROJECT_ROOT="
-          ;;                                     (cemako--maybe-remote-project-root)))
-          ;;                       (cemako--get-run-config-env)
-          ;;                       process-environment))
-          (buffer-name (cemako--run-buffer-name project-data))
-          (other-buffer-name (cemako--build-buffer-name project-data))
-          (display-buffer-alist
-            (if (cemako--split-to-buffer buffer-name other-buffer-name)
-              (cons (list buffer-name #'display-buffer-no-window)
-                display-buffer-alist)
-              display-buffer-alist)))
-    (if (get-buffer-process buffer-name)
-      (message "Already running %s" (funcall cemako-project-name-function))
-      (message "Command: %s\n" command)
-      (message "Directory: %s\n" default-directory)
-      (message "Project root: %s\n" (cemako--get-project-root))
-      (with-current-buffer buffer-name
-        (insert command))
-      (funcall cemako-run-function command buffer-name))))
+          (command (expand-file-name (cemako--get-current-target-executable project-data) default-directory)))
+    (compile command)))
 
 (defun cemako-run ()
   "Run the current target."
@@ -641,8 +470,8 @@ If SENTINEL is non-nil, use it as the process sentinel."
   (when-let* ((project-data (cemako--read-valid-project-data "run"
                               (unless (cemako--get-current-target-executable project-data)
                                 (cemako--select-target nil t))))
-               (current-target-executable (cemako--get-current-target-executable project-data))
-               (default-directory (cemako--get-build-dir project-data)))
+               (default-directory (cemako--get-build-dir project-data))
+               (current-target-executable (cemako--get-current-target-executable project-data)))
     (if cemako-build-before-run
       (cemako--invoke-build-current
         project-data
@@ -655,10 +484,10 @@ If SENTINEL is non-nil, use it as the process sentinel."
   "Run the current target in gdb."
   (interactive)
   (when-let* ((project-data (cemako--read-valid-project-data "run"
-                              (unless (cemako--get-current-target-executable project-data)
-                                (cemako--select-target nil t))))
-               (current-target-executable (cemako--get-current-target-executable project-data))
+                               (unless (cemako--get-current-target-executable project-data)
+                                 (cemako--select-target nil t))))
                (default-directory (cemako--get-build-dir project-data))
+               (current-target-executable (cemako--get-current-target-executable project-data))
                (command (expand-file-name (cemako--get-current-target-executable project-data) default-directory)))
     (if cemako-build-before-run
       (cemako--invoke-build-current
