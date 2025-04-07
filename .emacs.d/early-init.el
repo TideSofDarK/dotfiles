@@ -1,4 +1,6 @@
-;; Disable GC During Init
+;;; early-init.el --- Early Init -*- lexical-binding: t; -*-
+
+;;; Disable GC During Init
 
 (put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
 (put 'gc-cons-percentage 'value-during-init 0.6)
@@ -10,15 +12,15 @@
 (add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
 (setq gc-cons-percentage (get 'gc-cons-percentage 'value-during-init))
 
-;; Maximize On Launch
+;;; Maximize On Launch
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;; Add Lisp Path
+;;; Add Lisp Path
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 
-;; elpaca
+;;; Elpaca
 
 (setq package-enable-at-startup nil)
 (defvar elpaca-installer-version 0.10)
@@ -103,7 +105,7 @@
   (setq elpaca-use-package-by-default t))
 (elpaca-wait)
 
-;; Fonts
+;;; Fonts
 
 (let ((mono-spaced-font "Sarasa Term Slab CL")
        ;; (proportionately-spaced-font "Sarasa UI CL"))
@@ -118,20 +120,20 @@
     :family proportionately-spaced-font
     :height 1.0))
 
-;; Theme
+;;; Theme
 
 (setq kanagawa-themes-keyword-italic t)
 (setq kanagawa-themes-comment-italic t)
 (require 'kanagawa-themes)
 (load-theme 'kanagawa-wave :no-confirm-loading)
 
-;; minions
+;;; minions
 
 (use-package minions
   :ensure t
   :config (minions-mode t))
 
-;; emacs
+;;; emacs
 
 (use-package
   emacs
@@ -242,13 +244,13 @@
   ("<C-wheel-up>" . text-scale-increase)
   ("<C-wheel-down>" . text-scale-decrease))
 
-;; ansi-color
+;;; ansi-color
 
 (use-package ansi-color
   :ensure nil
   :hook (compilation-filter . ansi-color-compilation-filter))
 
-;; Popper
+;;; Popper
 
 (use-package popper
   :ensure t
@@ -278,7 +280,7 @@
                                  (floor (frame-height) 3))))
   (popper-mode t))
 
-;; dired
+;;; dired
 
 (use-package dired
   :ensure nil
@@ -287,7 +289,7 @@
   (dired-listing-switches "-lah --group-directories-first")
   (dired-dwim-target t))
 
-;; eldoc
+;;; eldoc
 
 (use-package eldoc
   :ensure nil
@@ -297,16 +299,16 @@
   :config
   (global-eldoc-mode))
 
-;; org
+;;; org
 
 (use-package org :ensure nil)
 
-;; undo-fu
+;;; undo-fu
 
 (use-package undo-fu :ensure t)
 (use-package undo-fu-session :ensure t :config (undo-fu-session-global-mode))
 
-;; evil-mode
+;;; evil-mode
 
 (use-package
   evil
@@ -399,7 +401,7 @@
   :ensure t
   :config (evil-commentary-mode))
 
-;; drag-stuff
+;;; drag-stuff
 
 (use-package drag-stuff
   :ensure t
@@ -407,12 +409,12 @@
   (define-key evil-visual-state-map (kbd "J") 'drag-stuff-down)
   (define-key evil-visual-state-map (kbd "K") 'drag-stuff-up))
 
-;; magit
+;;; magit
 
 (elpaca transient)
 (elpaca (magit :wait t))
 
-;; flymake
+;;; flymake
 
 (use-package
   flymake
@@ -424,11 +426,11 @@
   (evil-define-key
     'normal intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
 
-;; EditorConfig
+;;; EditorConfig
 
 (use-package editorconfig :ensure t :config (editorconfig-mode 1))
 
-;; Markdown
+;;; Markdown
 
 (use-package
   markdown-mode
@@ -436,7 +438,7 @@
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
 
-;; CMake
+;;; CMake
 
 (use-package cemako
   :ensure nil
@@ -451,21 +453,21 @@
   (define-cemako-key (kbd "<leader>bb") 'cemako-build)
   (define-cemako-key (kbd "<leader>br") 'cemako-run))
 
-;; Lua
+;;; Lua
 
 (use-package lua-mode :ensure t)
 
-;; Swift
+;;; Swift
 
 (use-package swift-mode :ensure t)
 
-;; GLSL
+;;; GLSL
 
 (use-package glsl-mode
   :ensure t
   :mode ("\\.shader\\'" "\\.glsl\\'"))
 
-;; Godot
+;;; Godot
 
 (use-package gdscript-mode
   :ensure (gdscript-mode
@@ -492,7 +494,7 @@
   :config
   (with-eval-after-load 'cape-keyword (add-to-list 'cape-keyword-list (append '(gdshader-mode) gdshader-all-keywords))))
 
-;; Treesitter
+;;; Treesitter
 
 (use-package
   treesit
@@ -516,27 +518,30 @@
     '(c cpp cmake toml yaml gdscript lua markdown))
   (treesit-auto-install-all)
   (global-treesit-auto-mode))
-(require 'treesit-extras)
+(use-package treesit-extras :ensure nil)
 (use-package
   cmake-ts-mode
   :ensure nil
   :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 
-;; LSP
+;;; LSP
 
+(setenv "LSP_USE_PLISTS" "true")
 (use-package lsp-mode
   :ensure t
   :custom
-  ;; (lsp-semantic-tokens-apply-modifiers nil)
-  (lsp-idle-delay 0.0)
+  (lsp-use-plists t)
+  (lsp-idle-delay 0.15)
   (lsp-enable-links nil)
   (lsp-semantic-tokens-enable t)
+  (lsp-semantic-tokens-apply-modifiers nil)
   (lsp-headerline-breadcrumb-icons-enable nil)
   (lsp-modeline-code-action-icons-enable nil)
   (lsp-lens-enable nil)
   (lsp-modeline-code-actions-enable nil)
   (lsp-modeline-diagnostics-enable nil)
   (lsp-headerline-breadcrumb-enable nil)
+  (lsp-enable-folding nil)
   (lsp-enable-snippet nil)
   (lsp-enable-symbol-highlighting nil)
   (lsp-completion-provider :none)
@@ -544,6 +549,8 @@
   (lsp-eldoc-enable-hover nil)
   (lsp-signature-doc-lines 0)
   (lsp-signature-render-documentation nil)
+  (lsp-enable-indentation nil)
+  (lsp-enable-on-type-formatting nil)
   (lsp-gdscript-port 6008)
   :init
   (defun lsp-mode-setup-corfu-completion ()
@@ -567,7 +574,7 @@
           (lsp-completion-mode . lsp-mode-setup-corfu-completion))
   :commands lsp)
 
-;; Completion
+;;; Completion
 
 (use-package
   consult
@@ -631,3 +638,13 @@
   (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
+
+;;; Done
+
+(provide 'early-init)
+
+;; Local variables:
+;; byte-compile-warnings: (not obsolete free-vars)
+;; End:
+
+;;; early-init.el ends here

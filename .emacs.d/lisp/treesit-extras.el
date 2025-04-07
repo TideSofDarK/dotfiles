@@ -273,3 +273,5 @@
                treesit-extras--gdscript-ts-mode-overrides)) t))))
 
 (provide 'treesit-extras)
+
+;;; treesit-extras.el ends here
