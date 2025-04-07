@@ -401,9 +401,11 @@ Specified via the defcustom `cemako-project-name-function'."
 (defun cemako-run-cmake ()
   "Clear caches and run CMake."
   (interactive)
-  (when-let* ((project-data (cemako--read-valid-project-data "run"
-                              (unless (cemako--get-current-profile project-data)
-                                (cemako--edit-profile))))
+  (when-let* ((project-data (cemako--with-project-data
+                                (progn
+                                  (unless (cemako--get-current-profile project-data)
+                                    (cemako--edit-profile))
+                                  project-data)))
                (profile-name (cemako--get-current-profile project-data)))
     (let ((build-dir (cemako--get-build-dir project-data)))
       (unless (file-exists-p build-dir)
