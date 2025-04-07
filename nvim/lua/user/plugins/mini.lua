@@ -2,6 +2,9 @@ return {
   'echasnovski/mini.nvim',
   version = false,
   config = function()
+    local icons = require('mini.icons')
+    icons.setup({ style = "ascii" })
+
     local win_config = function()
       return {
         -- anchor = 'NW',
