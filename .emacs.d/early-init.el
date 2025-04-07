@@ -534,7 +534,7 @@
   (lsp-idle-delay 0.15)
   (lsp-enable-links nil)
   (lsp-semantic-tokens-enable t)
-  (lsp-semantic-tokens-apply-modifiers nil)
+  (lsp-semantic-tokens-apply-modifiers t)
   (lsp-headerline-breadcrumb-icons-enable nil)
   (lsp-modeline-code-action-icons-enable nil)
   (lsp-lens-enable nil)

@@ -88,6 +88,7 @@
        [(true) (false)] @treesit-extras-boolean-face
        (null) @treesit-extras-null-face
        (char_literal "'" @font-lock-string-face)
+       (char_literal (character) @font-lock-string-face)
        (escape_sequence) @treesit-extras-named-operator-face
        (case_statement value: (identifier) @font-lock-constant-face)
        (sizeof_expression "sizeof" @treesit-extras-named-operator-face)
