@@ -561,6 +561,9 @@
     '(("readonly" . lsp-face-semhl-constant)
       ("documentation" . lsp-face-semhl-comment)
       ("defaultLibrary" . lsp-face-semhl-default-library)))
+  (defun lsp--gdscript-ignore-errors (original-function &rest args)
+    (if (string-equal major-mode "gdscript-ts-mode") nil (apply original-function args)))
+  (advice-add #'lsp--get-message-type :around #'lsp--gdscript-ignore-errors)
   (evil-define-key
     'normal intercept-mode-map (kbd "grn") 'lsp-rename)
   (evil-define-key
