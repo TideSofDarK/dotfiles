@@ -398,37 +398,46 @@ Specified via the defcustom `cemako-project-name-function'."
     (when (not (file-exists-p query-file))
       (make-empty-file query-file t))))
 
+(defun cemako-clear-cmake-cache ()
+  "Clear CMake caches."
+  (interactive)
+  (when-let* ((project-data (cemako--read-project-data))
+               (profile-name (cemako--get-current-profile project-data))
+               (build-dir (cemako--get-build-dir project-data)))
+    (when (file-exists-p build-dir)
+      (let* ((default-directory build-dir))
+        (dolist (cmake-cache (directory-files-recursively "." (rx (| "CMakeFiles" "CMakeCache.txt")) t))
+          (when (file-directory-p cmake-cache)
+            (message (concat "deleting: " cmake-cache))
+            (delete-directory cmake-cache t t))
+          (when (file-exists-p cmake-cache)
+            (delete-file cmake-cache)))))))
+
 (defun cemako-run-cmake ()
-  "Clear caches and run CMake."
+  "Run CMake with current profile."
   (interactive)
   (when-let* ((project-data (cemako--with-project-data
                                 (progn
                                   (unless (cemako--get-current-profile project-data)
                                     (cemako--edit-profile))
                                   project-data)))
-               (profile-name (cemako--get-current-profile project-data)))
-    (let ((build-dir (cemako--get-build-dir project-data)))
-      (unless (file-exists-p build-dir)
-        (make-directory build-dir t))
-      (let* ((default-directory build-dir)
-              (command (concat "cmake -B . -S " (cemako--get-project-root)
-                         " " (cemako--get-options project-data)
-                         " " (cemako--get-current-profile-options project-data)
-                         (when cemako-export-compile-commands
-                           " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"))))
-        (dolist (cmake-cache (directory-files-recursively "." (rx (| "CMakeFiles" "CMakeCache.txt")) t))
-          (when (file-directory-p cmake-cache)
-            (message (concat "deleting: " cmake-cache))
-            (delete-directory cmake-cache t t))
-          (when (file-exists-p cmake-cache)
-            (delete-file cmake-cache)))
-        (cemako--ensure-query-file-exists build-dir)
-        (cemako--compile command
-          :sentinel (lambda (p e)
-                      (when (string-equal e "finished\n")
-                        (cl-case cemako-export-compile-commands
-                          (copy (cemako--copy-compile-commands))
-                          (symlink (cemako--symlink-compile-commands))))))))))
+               (profile-name (cemako--get-current-profile project-data))
+               (build-dir (cemako--get-build-dir project-data)))
+    (unless (file-exists-p build-dir)
+      (make-directory build-dir t))
+    (let* ((default-directory build-dir)
+            (command (concat "cmake -B . -S " (cemako--get-project-root)
+                       " " (cemako--get-options project-data)
+                       " " (cemako--get-current-profile-options project-data)
+                       (when cemako-export-compile-commands
+                         " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"))))
+      (cemako--ensure-query-file-exists build-dir)
+      (cemako--compile command
+        :sentinel (lambda (p e)
+                    (when (string-equal e "finished\n")
+                      (cl-case cemako-export-compile-commands
+                        (copy (cemako--copy-compile-commands))
+                        (symlink (cemako--symlink-compile-commands)))))))))
 
 (defun cemako-clean ()
   "Clean the current project."
