@@ -264,7 +264,6 @@
   (setq popper-reference-buffers
     '(
        ;; "^\\*.*\\*$"
-       "\\*lsp-help\\*"
        "\\*eldoc\\*"
        "^\\*godot"
        "\\*Messages\\*"
@@ -476,6 +475,7 @@
             :inherit nil
             :after treesit)
   :config
+  (setq gdscript-eglot-version "4.4")
   (setq gdscript-indent-offset 4)
   (setq gdscript-use-tab-indents nil))
 (use-package gdshader-mode
@@ -526,56 +526,52 @@
 
 ;;; LSP
 
-(setenv "LSP_USE_PLISTS" "true")
-(use-package lsp-mode
+(use-package
+  eglot
+  :ensure t
+  :hook
+  ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
+  :custom
+  (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
+  (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
+  (eglot-events-buffer-size 0)
+  (eglot-autoshutdown t)
+  (eglot-report-progress nil)
+  (eglot-events-buffer-config '(:size 0 :format full))
+  ;; (eglot-stay-out-of '(flymake eldoc))
+  (jsonrpc-event-hook nil)
+  :config
+  (add-to-list 'eglot-server-programs
+    '((c-ts-mode c++-ts-mode c-mode c++-mode)
+       . ("clangd"
+           "-j=8"
+           "--log=error"
+           "--malloc-trim"
+           "--background-index"
+           "--clang-tidy"
+           "--completion-style=detailed"
+           "--pch-storage=memory"
+           "--header-insertion=never"
+           "--header-insertion-decorators=0")))
+  ;; (setq eldoc-idle-delay 0.1)
+  ;; (add-to-list 'eglot-server-programs
+  ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
+  ;; (add-to-list 'eglot-server-programs
+  ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+  (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
+
+  (evil-define-key
+    'normal intercept-mode-map (kbd "grn") 'eglot-rename)
+  (evil-define-key
+    'normal intercept-mode-map (kbd "gra") 'eglot-code-actions)
+  (evil-define-key
+    'normal intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+(use-package eglot-inactive-regions
   :ensure t
   :custom
-  (lsp-use-plists t)
-  (lsp-idle-delay 0.15)
-  (lsp-enable-links nil)
-  (lsp-semantic-tokens-enable t)
-  (lsp-semantic-tokens-apply-modifiers t)
-  (lsp-headerline-breadcrumb-icons-enable nil)
-  (lsp-modeline-code-action-icons-enable nil)
-  (lsp-lens-enable nil)
-  (lsp-modeline-code-actions-enable nil)
-  (lsp-modeline-diagnostics-enable nil)
-  (lsp-headerline-breadcrumb-enable nil)
-  (lsp-enable-folding nil)
-  (lsp-enable-snippet nil)
-  (lsp-enable-symbol-highlighting nil)
-  (lsp-completion-provider :none)
-  (lsp-signature-auto-activate t)
-  (lsp-eldoc-enable-hover nil)
-  (lsp-signature-doc-lines 0)
-  (lsp-signature-render-documentation nil)
-  (lsp-enable-indentation nil)
-  (lsp-enable-on-type-formatting nil)
-  (lsp-gdscript-port 6008)
-  :init
-  (defun lsp-mode-setup-corfu-completion ()
-    (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-      '(orderless)))
+  (eglot-inactive-regions-style 'shadow-face)
   :config
-  (setq lsp-semantic-token-modifier-faces
-    '(("readonly" . lsp-face-semhl-constant)
-      ("documentation" . lsp-face-semhl-comment)
-      ("defaultLibrary" . lsp-face-semhl-default-library)))
-  (defun lsp--gdscript-ignore-errors (original-function &rest args)
-    (if (string-equal major-mode "gdscript-ts-mode") nil (apply original-function args)))
-  (advice-add #'lsp--get-message-type :around #'lsp--gdscript-ignore-errors)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "grn") 'lsp-rename)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "gra") 'lsp-code-action)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "<leader>cf") 'lsp-format-buffer)
-  (evil-define-key '(normal) 'global (kbd "K") 'lsp-describe-thing-at-point)
-  :hook ((gdscript-ts-mode . lsp)
-          (c-ts-mode . lsp)
-          (c++-ts-mode . lsp)
-          (lsp-completion-mode . lsp-mode-setup-corfu-completion))
-  :commands lsp)
+  (eglot-inactive-regions-mode 1))
 
 ;;; Completion
 
@@ -585,16 +581,16 @@
   :custom
   (consult-line-start-from-top t)
   :config
+  (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
   (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
   (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
   (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
 (use-package
-  consult-lsp
+  consult-eglot
   :ensure t
   :config
-  (evil-define-key 'normal 'global (kbd "gO") 'consult-lsp-file-symbols)
-  (evil-define-key 'normal 'global (kbd "gW") 'consult-lsp-symbols))
+  (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
 (use-package
   vertico
   :ensure t
@@ -612,7 +608,9 @@
   (completion-styles '(orderless hotfuzz basic))
   (completion-category-defaults nil)
   (completion-category-overrides
-    '((file (styles basic partial-completion))
+    '((eglot (styles orderless))
+       (eglot-capf (styles orderless))
+       (file (styles basic partial-completion))
        (buffer (styles orderless))
        (project-file (styles hotfuzz))
        (command (styles orderless)))))
@@ -638,7 +636,7 @@
   :custom
   (cape-dabbrev-check-other-buffers nil)
   :config
-  (advice-add 'lsp-completion-at-point :around #'cape-wrap-buster)
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 
