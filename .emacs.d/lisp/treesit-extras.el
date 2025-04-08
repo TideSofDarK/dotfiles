@@ -71,7 +71,7 @@
        ((field_identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))
        ((identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))))
   (defconst treesit-extras--c-ts-mode-common
-    `(
+    `(("." @font-lock-punctuation-face)
        (parameter_declaration declarator: (identifier) @treesit-extras-parameter-face)
        (parameter_declaration declarator: (pointer_declarator declarator: (identifier) @treesit-extras-parameter-face))
        (parameter_declaration declarator: (pointer_declarator declarator: (pointer_declarator declarator: (identifier) @treesit-extras-parameter-face)))
@@ -137,6 +137,12 @@
                :override t
                :feature 'extras-constants
                treesit-extras--c-ts-mode-constants)) t)
+      (add-to-list 'res
+        (car (treesit-font-lock-rules
+                :language mode
+                :override t
+                :feature 'extras-fields
+                `((field_expression field: (field_identifier) @treesit-extras-field-face)))) t)
       (if (eq mode 'c)
         (progn
           (add-to-list 'res
