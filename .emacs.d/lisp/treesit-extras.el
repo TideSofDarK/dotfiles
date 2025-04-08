@@ -6,22 +6,22 @@
 
 (defface treesit-extras-boolean-face
   '((t :inherit font-lock-constant-face :weight bold))
-  "Custom face for tree-sitter. Sometimes used with 'true', 'false' keywords."
+  "Custom face for tree-sitter. Used with 'true', 'false' keywords."
   :group 'font-lock-faces)
 
 (defface treesit-extras-null-face
   '((t :inherit font-lock-builtin-face))
-  "Custom face for tree-sitter. Sometimes used with 'NULL' or 'nullptr'."
+  "Custom face for tree-sitter. Used with 'NULL' or 'nullptr'."
   :group 'font-lock-faces)
 
-(defface treesit-extras-special-keyword-1-face
+(defface treesit-extras-this-face
   '((t :inherit font-lock-keyword-face))
-  "Custom face for tree-sitter. Sometimes used with 'this' keywords."
+  "Custom face for tree-sitter. Used with 'this' keywords."
   :group 'font-lock-faces)
 
-(defface treesit-extras-special-keyword-2-face
+(defface treesit-extras-return-face
   '((t :inherit font-lock-keyword-face))
-  "Custom face for tree-sitter. Sometimes used with 'return' keywords."
+  "Custom face for tree-sitter. Used with 'return' keywords."
   :group 'font-lock-faces)
 
 (defface treesit-extras-enumerator-face
@@ -66,17 +66,11 @@
        ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
   (defun treesit-extras--c-ts-keywords (orig-fun &rest args)
     `("#if" "#ifdef" "#ifndef" "#elif" "#else" "#endif" "#define",@(apply orig-fun args)))
-  :config
-  (setq c-ts-mode-indent-offset 4)
-  (setq c-ts-mode-indent-style #'treesit-extras--c-ts-indent-style)
-  (setq c-ts-mode-enable-doxygen t)
-  (setq c-ts-mode--preproc-keywords '("#include"))
-  (advice-add 'c-ts-mode--keywords :around #'treesit-extras--c-ts-keywords)
-  (defvar treesit-extras--c-ts-mode-constants
+  (defconst treesit-extras--c-ts-mode-constants
     `(
        ((field_identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))
        ((identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))))
-  (defvar treesit-extras--c-ts-mode-common
+  (defconst treesit-extras--c-ts-mode-common
     `(
        (parameter_declaration declarator: (identifier) @treesit-extras-parameter-face)
        (parameter_declaration declarator: (pointer_declarator declarator: (identifier) @treesit-extras-parameter-face))
@@ -94,12 +88,12 @@
        (sizeof_expression "sizeof" @treesit-extras-named-operator-face)
        (labeled_statement label: (_) @treesit-extras-label-face)
        (goto_statement label: (_) @treesit-extras-label-face)
-       ("return" @treesit-extras-special-keyword-2-face)
+       ("return" @treesit-extras-return-face)
        (sized_type_specifier) @font-lock-builtin-face
        (primitive_type) @font-lock-builtin-face
        (enumerator
          name: (identifier) @treesit-extras-enumerator-face)))
-  (defvar treesit-extras--c-ts-mode-preprocessor
+  (defconst treesit-extras--c-ts-mode-preprocessor
     `(
        (call_expression function: (identifier) @font-lock-function-call-face)
        (call_expression function: (field_expression field: (field_identifier) @font-lock-function-call-face))
@@ -116,101 +110,105 @@
          "(" @font-lock-punctuation-face
          (identifier) @treesit-extras-parameter-face
          ")" @font-lock-punctuation-face)))
-  (add-hook 'c-ts-mode-hook
-    (lambda()
-      (add-to-list 'treesit-font-lock-settings
+  :config
+  (setq c-ts-mode-indent-offset 4)
+  (setq c-ts-mode-indent-style #'treesit-extras--c-ts-indent-style)
+  (setq c-ts-mode-enable-doxygen t)
+  (setq c-ts-mode--preproc-keywords '("#include"))
+  (advice-add 'c-ts-mode--keywords :around #'treesit-extras--c-ts-keywords)
+  (push 'extras (nth 3 c-ts-mode--feature-list))
+  (push 'extras-common (nth 3 c-ts-mode--feature-list))
+  (push 'extras-preprocessor (nth 3 c-ts-mode--feature-list))
+  (push 'extras-namespace-types (nth 3 c-ts-mode--feature-list))
+  (push 'extras-namespace-functions (nth 3 c-ts-mode--feature-list))
+  (push 'extras-fields (nth 3 c-ts-mode--feature-list))
+  (push 'extras-constants (nth 3 c-ts-mode--feature-list))
+  (defun treesit-extras--c-ts-fontlock-settings (orig-fun &rest args)
+    (let ((res (apply orig-fun args)))
+      (add-to-list 'res
         (car (treesit-font-lock-rules
-               :language 'c
-               :override t
-               :feature 'extras-constants
-               treesit-extras--c-ts-mode-constants)) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'c
-               :override t
-               :feature 'extras-common
-               treesit-extras--c-ts-mode-common)) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'c
-               :override t
-               :feature 'extras-preprocessor
-               treesit-extras--c-ts-mode-preprocessor)) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'c
-               :override t
-               :feature 'extras
-               `((macro_type_specifier name: (identifier) @font-lock-function-call-face)))) t)))
-  (add-hook 'c++-ts-mode-hook
-    (lambda()
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'cpp
+               :language (car args)
                :override t
                :feature 'extras-common
                treesit-extras--c-ts-mode-common)) t)
-      (add-to-list 'treesit-font-lock-settings
+      (add-to-list 'res
         (car (treesit-font-lock-rules
-               :language 'cpp
-               :override t
-               :feature 'extras-fields
-               `(
-                  (function_declarator declarator: ([(field_identifier) (identifier)]) @font-lock-function-name-face)
-                  (field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'cpp
+               :language (car args)
                :override t
                :feature 'extras-constants
                treesit-extras--c-ts-mode-constants)) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'cpp
-               :override t
-               :feature 'extras-preprocessor
-               treesit-extras--c-ts-mode-preprocessor)) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'cpp
-               :override t
-               :feature 'extras-namespace-types
-               `(
-                  (using_declaration (identifier) @font-lock-type-face)
-                  (using_declaration (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-type-face))
-                  (namespace_identifier) @font-lock-type-face
-                  (qualified_identifier scope: (namespace_identifier) name: (qualified_identifier scope: (namespace_identifier) name: (identifier)  @font-lock-type-face))))) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'cpp
-               :override t
-               :feature 'extras-namespace-functions
-               `(
-                  (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
-                  (function_declarator declarator: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-name-face))))) t)
-      (add-to-list 'treesit-font-lock-settings
-        (car (treesit-font-lock-rules
-               :language 'cpp
-               :override t
-               :feature 'extras
-               '(
-                  (declaration declarator: (function_declarator declarator: (identifier) @font-lock-function-name-face))
-                  (parameter_declaration declarator: (_ (identifier) @treesit-extras-parameter-face))
-                  ((this) @treesit-extras-special-keyword-1-face)
-                  (concept_definition name: (_) @font-lock-type-face)
-                  (template_function name: (identifier) @font-lock-function-name-face)
-                  (new_expression "new" @treesit-extras-named-operator-face)
-                  (delete_expression "delete" @treesit-extras-named-operator-face)
-                  (function_definition type: (type_identifier) @font-lock-keyword-face (:match "\\`compl\\'" @font-lock-keyword-face))
-                  (template_parameter_list (["<" ">"]) @font-lock-punctuation-face)
-                  (template_parameter_list (parameter_declaration declarator: (_) @treesit-extras-parameter-face))
-                  (template_argument_list (["<" ">"]) @font-lock-punctuation-face)
-                  (template_argument_list (type_descriptor type: (type_identifier) @font-lock-type-face))
-                  (template_type name: (type_identifier) @font-lock-type-face)
-                  ("::" @font-lock-punctuation-face)
-                  (call_expression function: (qualified_identifier name: (qualified_identifier name: (identifier) @font-lock-function-call-face)))
-                  (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
-                  (call_expression function: (template_function name: (identifier) @font-lock-function-call-face)))))) t)))
+      (if (eq (car args) 'c)
+        (progn
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'c
+                   :override t
+                   :feature 'extras-preprocessor
+                   treesit-extras--c-ts-mode-preprocessor)) t)
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'c
+                   :override t
+                   :feature 'extras
+                   `((macro_type_specifier name: (identifier) @font-lock-function-call-face)))) t))
+        (progn
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'extras-fields
+                   `(
+                      (function_declarator declarator: ([(field_identifier) (identifier)]) @font-lock-function-name-face)
+                      (field_declaration type: (placeholder_type_specifier (auto)) declarator: (field_identifier) @font-lock-function-name-face)))) t)
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'extras-preprocessor
+                   treesit-extras--c-ts-mode-preprocessor)) t)
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'extras-namespace-types
+                   `(
+                      (using_declaration (identifier) @font-lock-type-face)
+                      (using_declaration (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-type-face))
+                      (namespace_identifier) @font-lock-type-face
+                      (qualified_identifier scope: (namespace_identifier) name: (qualified_identifier scope: (namespace_identifier) name: (identifier)  @font-lock-type-face))))) t)
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'extras-namespace-functions
+                   `(
+                      (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
+                      (function_declarator declarator: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-name-face))))) t)
+          (add-to-list 'res
+            (car (treesit-font-lock-rules
+                   :language 'cpp
+                   :override t
+                   :feature 'extras
+                   '(
+                      (declaration declarator: (function_declarator declarator: (identifier) @font-lock-function-name-face))
+                      (parameter_declaration declarator: (_ (identifier) @treesit-extras-parameter-face))
+                      ((this) @treesit-extras-this-face)
+                      (concept_definition name: (_) @font-lock-type-face)
+                      (template_function name: (identifier) @font-lock-function-name-face)
+                      (new_expression "new" @treesit-extras-named-operator-face)
+                      (delete_expression "delete" @treesit-extras-named-operator-face)
+                      (function_definition type: (type_identifier) @font-lock-keyword-face (:match "\\`compl\\'" @font-lock-keyword-face))
+                      (template_parameter_list (["<" ">"]) @font-lock-punctuation-face)
+                      (template_parameter_list (parameter_declaration declarator: (_) @treesit-extras-parameter-face))
+                      (template_argument_list (["<" ">"]) @font-lock-punctuation-face)
+                      (template_argument_list (type_descriptor type: (type_identifier) @font-lock-type-face))
+                      (template_type name: (type_identifier) @font-lock-type-face)
+                      ("::" @font-lock-punctuation-face)
+                      (call_expression function: (qualified_identifier name: (qualified_identifier name: (identifier) @font-lock-function-call-face)))
+                      (call_expression function: (qualified_identifier scope: (namespace_identifier) name: (identifier) @font-lock-function-call-face))
+                      (call_expression function: (template_function name: (identifier) @font-lock-function-call-face))))) t)))
+      res))
+  (advice-add 'c-ts-mode--font-lock-settings :around #'treesit-extras--c-ts-fontlock-settings))
 
 (use-package gdscript-ts-mode
   :ensure nil
@@ -244,8 +242,8 @@
        (signal_statement (name) @font-lock-function-call-face)
        [(true) (false)] @treesit-extras-boolean-face
        (null) @treesit-extras-null-face
-       (attribute (identifier) @treesit-extras-special-keyword-1-face (:match ,(rx (| "self")) @treesit-extras-special-keyword-1-face))
-       (return_statement "return" @treesit-extras-special-keyword-2-face)
+       (attribute (identifier) @treesit-extras-this-face (:match ,(rx (| "self")) @treesit-extras-this-face))
+       (return_statement "return" @treesit-extras-return-face)
        ([,@treesit-extras--gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
        ([,@treesit-extras--gdscript-ts-mode-operators] @font-lock-operator-face)
        ([,@treesit-extras--gdscript-ts-mode-named-operators] @treesit-extras-named-operator-face)
