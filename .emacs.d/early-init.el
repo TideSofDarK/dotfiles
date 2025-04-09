@@ -238,6 +238,7 @@
   (advice-add 'display-startup-screen :override #'ignore)
   (setq custom-file (locate-user-emacs-file "custom.el"))
   (load custom-file 'noerror 'nomessage)
+  (set-display-table-slot standard-display-table 0 ?\ )
   :bind
   ("C-=" . text-scale-increase)
   ("C--" . text-scale-decrease)

@@ -223,7 +223,7 @@
   :ensure nil
   :after gdscript-mode
   :preface
-  (defvar treesit-extras--gdscript-ts-mode-punctuation '("[" "]" "(" ")" "{" "}" "," ":"))
+  (defvar treesit-extras--gdscript-ts-mode-punctuation '("[" "]" "(" ")" "{" "}" "," ":" "."))
   (defvar treesit-extras--gdscript-ts-mode-named-operators
     '("not" "in" "and" "is"))
   (defvar treesit-extras--gdscript-ts-mode-constants
@@ -233,7 +233,6 @@
        (variable_statement name: (name) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))))
   (defvar treesit-extras--gdscript-ts-mode-overrides
     `(
-       (attribute "." @font-lock-punctuation-face)
        (await_expression "await" @font-lock-keyword-face)
        (static_keyword) @font-lock-keyword-face
        (escape_sequence) @treesit-extras-named-operator-face
