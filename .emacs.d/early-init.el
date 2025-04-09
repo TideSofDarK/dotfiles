@@ -538,9 +538,11 @@
   (eglot-autoshutdown t)
   (eglot-report-progress nil)
   (eglot-events-buffer-config '(:size 0 :format full))
+  (eglot-send-changes-idle-time 0.1)
+  (eglot-extend-to-xref t)
   ;; (eglot-stay-out-of '(flymake eldoc))
-  (jsonrpc-event-hook nil)
   :config
+  (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
     '((c-ts-mode c++-ts-mode c-mode c++-mode)
        . ("clangd"
