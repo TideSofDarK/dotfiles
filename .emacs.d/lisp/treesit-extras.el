@@ -40,8 +40,8 @@
   :group 'font-lock-faces)
 
 (defface treesit-extras-named-operator-face
-  '((t :inherit font-lock-operator-face :weight bold))
-  "Custom 'new' face for C/C++ tree-sitter."
+  '((t :inherit font-lock-keyword-face))
+  "Custom named operator face for tree-sitter."
   :group 'font-lock-faces)
 
 (defface treesit-extras-label-face
