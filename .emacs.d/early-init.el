@@ -548,7 +548,6 @@
        . ("clangd"
            "-j=8"
            "--log=error"
-           "--malloc-trim"
            "--background-index"
            "--clang-tidy"
            "--completion-style=detailed"
