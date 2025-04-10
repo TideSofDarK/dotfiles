@@ -313,18 +313,22 @@
 (use-package
   evil
   :ensure t
-  :custom
-  (evil-leader/in-all-states t)
-  (evil-undo-system 'undo-fu)
-  :init
+  :preface
   (setq evil-want-empty-ex-last-command nil)
   (setq evil-want-keybinding nil)
   (setq evil-want-C-u-scroll t)
   (setq evil-want-C-d-scroll t)
+  (setq evil-want-Y-yank-to-eol t)
   (setq evil-want-integration t)
   (setq evil-want-fine-undo t)
+  (setq evil-want-minibuffer t)
+  (setq evil-leader/in-all-states t)
+  (setq evil-undo-system 'undo-fu)
   (setq evil-vsplit-window-right t)
   (setq evil-auto-balance-windows nil)
+  (setq evil-echo-state nil)
+  (setq evil-kill-on-visual-paste nil)
+  (setq evil-search-module 'evil-search)
   :config
   (evil-mode t)
   (evil-set-leader 'normal (kbd "SPC"))
@@ -374,15 +378,6 @@
   (defun scroll-to-center-after-goto-mark (char &optional noerror) (recenter))
   (evil--advice-add 'evil-goto-mark :after #'scroll-to-center-after-goto-mark)
 
-  (evil-define-command +evil:cd (&optional path)
-    "Change `default-directory' with `cd'."
-    (interactive "<f>")
-    (let ((path (or path "~")))
-      (evil-ex-define-cmd "cd" #'+evil:cd)
-      (cd path)
-      (message "Changed directory to '%s'" (abbreviate-file-name (expand-file-name path)))))
-  (evil-ex-define-cmd "cd" #'+evil:cd)
-
   (defun evil-yank-highlight (orig-fn beg end &rest args)
     (pulse-momentary-highlight-region beg end)
     (apply orig-fn beg end args))
@@ -406,8 +401,8 @@
 (use-package drag-stuff
   :ensure t
   :config
-  (define-key evil-visual-state-map (kbd "J") 'drag-stuff-down)
-  (define-key evil-visual-state-map (kbd "K") 'drag-stuff-up))
+  (evil-define-key 'visual 'global (kbd "J") 'drag-stuff-down)
+  (evil-define-key 'visual 'global (kbd "K") 'drag-stuff-up))
 
 ;;; magit
 
@@ -419,8 +414,9 @@
 (use-package
   flymake
   :ensure nil
+  :custom
+  (flymake-indicator-type 'fringes)
   :config
-  (setq flymake-indicator-type 'fringes)
   (evil-define-key
     'normal intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
   (evil-define-key
@@ -435,8 +431,7 @@
 (use-package
   markdown-mode
   :ensure t
-  :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
+  :mode ("README\\.md\\'" . gfm-mode))
 
 ;;; CMake
 
@@ -452,6 +447,10 @@
   (define-cemako-key (kbd "<leader>bc") 'cemako-run-cmake)
   (define-cemako-key (kbd "<leader>bb") 'cemako-build)
   (define-cemako-key (kbd "<leader>br") 'cemako-run))
+(use-package
+  cmake-ts-mode
+  :ensure nil
+  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 
 ;;; Lua
 
@@ -505,7 +504,9 @@
 (use-package
   treesit-auto
   :ensure t
-  :custom (treesit-auto-install 't)
+  :custom
+  (treesit-auto-install 't)
+  (treesit-auto-langs '(c cpp cmake toml yaml gdscript lua markdown))
   :config
   (setq treesit-auto-gdscript-config
     (make-treesit-auto-recipe
@@ -515,15 +516,9 @@
       :url "https://github.com/PrestonKnopp/tree-sitter-gdscript"
       :ext "\\.gd\\'"))
   (add-to-list 'treesit-auto-recipe-list treesit-auto-gdscript-config)
-  (setq treesit-auto-langs
-    '(c cpp cmake toml yaml gdscript lua markdown))
   (treesit-auto-install-all)
   (global-treesit-auto-mode))
 (use-package treesit-extras :ensure nil)
-(use-package
-  cmake-ts-mode
-  :ensure nil
-  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
 
 ;;; LSP
 
