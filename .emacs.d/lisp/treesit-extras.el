@@ -246,10 +246,11 @@
        (enum_definition name: (_) @font-lock-type-face)
        (enumerator left: (identifier) @treesit-extras-enumerator-face)
        (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)))
-  (defvar treesit-extras--gdscript-ts--treesit-keywords '("and" "as" "break" "class" "class_name"
+  (defvar treesit-extras--gdscript-ts-mode-keywords '("and" "as" "break" "class" "class_name"
                                                            "const" "continue" "elif" "else" "enum" "export" "extends" "for" "func" "if" "in" "is"
                                                            "master" "match" "not" "onready" "or" "pass"  "puppet" "remote" "remotesync" "return" "setget" "signal"
                                                            "var" "while"))
+  (defvar treesit-extras--gdscript-ts-mode-type-regex "\\`\\(int\\|bool\\|float\\|void\\|[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\)\\'")
   (defvar gdscript-ts--treesit-settings
     (treesit-font-lock-rules
       :language 'gdscript
@@ -261,12 +262,11 @@
       `(,@treesit-extras--gdscript-ts-mode-overrides
          (function_definition (name) @font-lock-function-name-face)
          (class_definition
-           (name) @font-lock-function-name-face)
-         (parameters (identifier) @treesit-extras-parameter-face))
+           (name) @font-lock-function-name-face))
 
       :language 'gdscript
       :feature 'keyword
-      `(([,@treesit-extras--gdscript-ts--treesit-keywords] @font-lock-keyword-face)
+      `(([,@treesit-extras--gdscript-ts-mode-keywords] @font-lock-keyword-face)
          ([(false) (true)] @font-lock-keyword-face))
 
       :language 'gdscript
@@ -275,21 +275,18 @@
 
       :language 'gdscript
       :feature 'type
-      `(((identifier) @font-lock-type-face (:match "\\`[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\'" @font-lock-type-face))
+      `(((identifier) @font-lock-type-face (:match ,treesit-extras--gdscript-ts-mode-type-regex @font-lock-type-face))
          ((type) @font-lock-type-face)
          (get_node) @font-lock-type-face)
 
       :feature 'function
       :language 'gdscript
-      '(
-         (typed_parameter (identifier) @treesit-extras-parameter-face)
-         (call (identifier) @font-lock-function-call-face)
+      '((call (identifier) @font-lock-function-call-face)
          (attribute_call (identifier) @font-lock-function-call-face))
 
       :language 'gdscript
       :feature 'variable
-      `(,@treesit-extras--gdscript-ts-mode-constants
-         (_ (name) @font-lock-variable-name-face))
+      `(,@treesit-extras--gdscript-ts-mode-constants)
 
       :feature 'number
       :language 'gdscript
