@@ -72,6 +72,7 @@
        ((identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))))
   (defconst treesit-extras--c-ts-mode-common
     `(("." @font-lock-punctuation-face)
+       (attribute_declaration) @font-lock-constant-face
        (parameter_declaration declarator: (identifier) @treesit-extras-parameter-face)
        (parameter_declaration declarator: (pointer_declarator declarator: (identifier) @treesit-extras-parameter-face))
        (parameter_declaration declarator: (pointer_declarator declarator: (pointer_declarator declarator: (identifier) @treesit-extras-parameter-face)))
@@ -84,7 +85,6 @@
        (char_literal "'" @font-lock-string-face)
        (char_literal (character) @font-lock-string-face)
        (escape_sequence) @treesit-extras-named-operator-face
-       (case_statement value: (identifier) @font-lock-constant-face)
        (sizeof_expression "sizeof" @treesit-extras-named-operator-face)
        (labeled_statement label: (_) @treesit-extras-label-face)
        (goto_statement label: (_) @treesit-extras-label-face)
@@ -139,10 +139,10 @@
                treesit-extras--c-ts-mode-constants)) t)
       (add-to-list 'res
         (car (treesit-font-lock-rules
-                :language mode
-                :override t
-                :feature 'extras-fields
-                `((field_expression field: (field_identifier) @treesit-extras-field-face)))) t)
+               :language mode
+               :override t
+               :feature 'extras-fields
+               `((field_expression field: (field_identifier) @treesit-extras-field-face)))) t)
       (if (eq mode 'c)
         (progn
           (add-to-list 'res
