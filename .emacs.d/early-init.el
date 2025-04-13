@@ -211,6 +211,9 @@
   (indicate-buffer-boundaries nil)
   (indicate-empty-lines nil)
   (compilation-scroll-output t)
+  (mouse-highlight nil)
+  (show-help-function nil)
+  (tooltip-mode nil)
   :init
   (defun suppress-messages (func &rest args)
     (cl-flet ((silence (&rest args1) (ignore)))
