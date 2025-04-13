@@ -474,7 +474,8 @@
 (use-package gdscript-mode
   :ensure (gdscript-mode
             :host github
-            :repo "godotengine/emacs-gdscript-mode"
+            :repo "TideSofDarK/emacs-gdscript-mode"
+            :branch "patch-1"
             :inherit nil
             :after treesit)
   :config

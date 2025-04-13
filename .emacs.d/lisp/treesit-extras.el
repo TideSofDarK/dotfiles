@@ -219,88 +219,88 @@
         (append res treesit-extras--c-ts-mode-fontlock-settings-cpp))))
   (advice-add 'c-ts-mode--font-lock-settings :around #'treesit-extras--c-ts-mode-fontlock-settings-wrapper))
 
-(use-package gdscript-ts-mode
-  :ensure nil
-  :after gdscript-mode
-  :preface
-  (defvar treesit-extras--gdscript-ts-mode-punctuation '("[" "]" "(" ")" "{" "}" "," ":" "."))
-  (defvar treesit-extras--gdscript-ts-mode-named-operators
-    '("not" "in" "and" "is"))
-  (defvar treesit-extras--gdscript-ts-mode-constants
-    `(
-       (const_statement name: (name) @font-lock-constant-face)
-       ((identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))
-       (variable_statement name: (name) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))))
-  (defvar treesit-extras--gdscript-ts-mode-overrides
-    `(
-       (await_expression "await" @font-lock-keyword-face)
-       (static_keyword) @font-lock-keyword-face
-       (escape_sequence) @treesit-extras-named-operator-face
-       (signal_statement (name) @font-lock-function-call-face)
-       [(true) (false)] @treesit-extras-boolean-face
-       (null) @treesit-extras-null-face
-       (attribute (identifier) @treesit-extras-this-face (:match ,(rx (| "self")) @treesit-extras-this-face))
-       (return_statement "return" @treesit-extras-return-face)
-       ([,@treesit-extras--gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
-       ([,@treesit-extras--gdscript-ts-mode-named-operators] @treesit-extras-named-operator-face)
-       (enum_definition name: (_) @font-lock-type-face)
-       (enumerator left: (identifier) @treesit-extras-enumerator-face)
-       (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)))
-  (defvar treesit-extras--gdscript-ts-mode-keywords '("and" "as" "break" "class" "class_name"
-                                                           "const" "continue" "elif" "else" "enum" "export" "extends" "for" "func" "if" "in" "is"
-                                                           "master" "match" "not" "onready" "or" "pass"  "puppet" "remote" "remotesync" "return" "setget" "signal"
-                                                           "var" "while"))
-  (defvar treesit-extras--gdscript-ts-mode-type-regex "\\`\\(int\\|bool\\|float\\|void\\|[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\)\\'")
-  (defvar gdscript-ts--treesit-settings
-    (treesit-font-lock-rules
-      :language 'gdscript
-      :feature 'comment
-      `((comment) @font-lock-comment-face)
+;; (use-package gdscript-ts-mode
+;;   :ensure nil
+;;   :after gdscript-mode
+;;   :preface
+;;   (defvar treesit-extras--gdscript-ts-mode-punctuation '("[" "]" "(" ")" "{" "}" "," ":" "."))
+;;   (defvar treesit-extras--gdscript-ts-mode-named-operators
+;;     '("not" "in" "and" "is"))
+;;   (defvar treesit-extras--gdscript-ts-mode-constants
+;;     `(
+;;        (const_statement name: (name) @font-lock-constant-face)
+;;        ((identifier) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))
+;;        (variable_statement name: (name) @font-lock-constant-face (:match ,treesit-extras--constant-regex @font-lock-constant-face))))
+;;   (defvar treesit-extras--gdscript-ts-mode-overrides
+;;     `(
+;;        (await_expression "await" @font-lock-keyword-face)
+;;        (static_keyword) @font-lock-keyword-face
+;;        (escape_sequence) @treesit-extras-named-operator-face
+;;        (signal_statement (name) @font-lock-function-call-face)
+;;        [(true) (false)] @treesit-extras-boolean-face
+;;        (null) @treesit-extras-null-face
+;;        (attribute (identifier) @treesit-extras-this-face (:match ,(rx (| "self")) @treesit-extras-this-face))
+;;        (return_statement "return" @treesit-extras-return-face)
+;;        ([,@treesit-extras--gdscript-ts-mode-punctuation] @font-lock-punctuation-face)
+;;        ([,@treesit-extras--gdscript-ts-mode-named-operators] @treesit-extras-named-operator-face)
+;;        (enum_definition name: (_) @font-lock-type-face)
+;;        (enumerator left: (identifier) @treesit-extras-enumerator-face)
+;;        (annotation "@" @font-lock-preprocessor-face (identifier) @font-lock-preprocessor-face)))
+;;   (defvar treesit-extras--gdscript-ts-mode-keywords '("and" "as" "break" "class" "class_name"
+;;                                                            "const" "continue" "elif" "else" "enum" "export" "extends" "for" "func" "if" "in" "is"
+;;                                                            "master" "match" "not" "onready" "or" "pass"  "puppet" "remote" "remotesync" "return" "setget" "signal"
+;;                                                            "var" "while"))
+;;   (defvar treesit-extras--gdscript-ts-mode-type-regex "\\`\\(int\\|bool\\|float\\|void\\|[A-Z][a-zA-Z0-9_]*[a-z][a-zA-Z0-9_]*\\)\\'")
+;;   (defvar gdscript-ts--treesit-settings
+;;     (treesit-font-lock-rules
+;;       :language 'gdscript
+;;       :feature 'comment
+;;       `((comment) @font-lock-comment-face)
 
-      :language 'gdscript
-      :feature 'definition
-      `(,@treesit-extras--gdscript-ts-mode-overrides
-         (function_definition (name) @font-lock-function-name-face)
-         (class_definition
-           (name) @font-lock-function-name-face))
+;;       :language 'gdscript
+;;       :feature 'definition
+;;       `(,@treesit-extras--gdscript-ts-mode-overrides
+;;          (function_definition (name) @font-lock-function-name-face)
+;;          (class_definition
+;;            (name) @font-lock-function-name-face))
 
-      :language 'gdscript
-      :feature 'keyword
-      `(([,@treesit-extras--gdscript-ts-mode-keywords] @font-lock-keyword-face)
-         ([(false) (true)] @font-lock-keyword-face))
+;;       :language 'gdscript
+;;       :feature 'keyword
+;;       `(([,@treesit-extras--gdscript-ts-mode-keywords] @font-lock-keyword-face)
+;;          ([(false) (true)] @font-lock-keyword-face))
 
-      :language 'gdscript
-      :feature 'string
-      '((string) @font-lock-string-face)
+;;       :language 'gdscript
+;;       :feature 'string
+;;       '((string) @font-lock-string-face)
 
-      :language 'gdscript
-      :feature 'type
-      `(((identifier) @font-lock-type-face (:match ,treesit-extras--gdscript-ts-mode-type-regex @font-lock-type-face))
-         ((type) @font-lock-type-face)
-         (get_node) @font-lock-type-face)
+;;       :language 'gdscript
+;;       :feature 'type
+;;       `(((identifier) @font-lock-type-face (:match ,treesit-extras--gdscript-ts-mode-type-regex @font-lock-type-face))
+;;          ((type) @font-lock-type-face)
+;;          (get_node) @font-lock-type-face)
 
-      :feature 'function
-      :language 'gdscript
-      '((call (identifier) @font-lock-function-call-face)
-         (attribute_call (identifier) @font-lock-function-call-face))
+;;       :feature 'function
+;;       :language 'gdscript
+;;       '((call (identifier) @font-lock-function-call-face)
+;;          (attribute_call (identifier) @font-lock-function-call-face))
 
-      :language 'gdscript
-      :feature 'variable
-      `(,@treesit-extras--gdscript-ts-mode-constants)
+;;       :language 'gdscript
+;;       :feature 'variable
+;;       `(,@treesit-extras--gdscript-ts-mode-constants)
 
-      :feature 'number
-      :language 'gdscript
-      '(([(integer) (float)] @font-lock-number-face))
+;;       :feature 'number
+;;       :language 'gdscript
+;;       '(([(integer) (float)] @font-lock-number-face))
 
-      :feature 'property
-      :language 'gdscript
-      '((attribute (identifier) (identifier) @font-lock-property-use-face))
+;;       :feature 'property
+;;       :language 'gdscript
+;;       '((attribute (identifier) (identifier) @font-lock-property-use-face))
 
-      :feature 'operator
-      :language 'gdscript
-      `(["+" "-" "*" "/" "^" ">" "<" "=" "%" "%=" "->" "." "!=" "+="
-          "-=" "/=" "*=" "==" ">>" "<<" "~" "&" "|" "&=" "|=" "-"
-          ">=" "<=" "||" "&&" ">>=" "<<=" "^="] @font-lock-operator-face))))
+;;       :feature 'operator
+;;       :language 'gdscript
+;;       `(["+" "-" "*" "/" "^" ">" "<" "=" "%" "%=" "->" "." "!=" "+="
+;;           "-=" "/=" "*=" "==" ">>" "<<" "~" "&" "|" "&=" "|=" "-"
+;;           ">=" "<=" "||" "&&" ">>=" "<<=" "^="] @font-lock-operator-face))))
 
 (provide 'treesit-extras)
 
