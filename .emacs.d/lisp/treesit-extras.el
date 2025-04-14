@@ -79,11 +79,12 @@
        (parameter_declaration declarator: (pointer_declarator declarator: (pointer_declarator declarator: (pointer_declarator declarator: (identifier) @treesit-extras-parameter-face))))
        (parameter_declaration declarator: (function_declarator declarator: (parenthesized_declarator (_ declarator: (identifier) @treesit-extras-parameter-face))))
        (field_identifier) @treesit-extras-field-face
-       (conditional_expression (["?" ":"]) @font-lock-operator-face)
+       (conditional_expression (["?" ":"]) @font-lock-keyword-face)
        [(true) (false)] @treesit-extras-boolean-face
        (null) @treesit-extras-null-face
        (char_literal "'" @font-lock-string-face)
        (char_literal (character) @font-lock-string-face)
+       (case_statement value: (identifier) @font-lock-constant-face)
        (escape_sequence) @treesit-extras-named-operator-face
        (sizeof_expression "sizeof" @treesit-extras-named-operator-face)
        (labeled_statement label: (_) @treesit-extras-label-face)
