@@ -871,9 +871,9 @@ names to which it refers are bound."
         (magit-section-highlight (:background ,bg-m2 :extend t))
         (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold))
 ;;;;;;; treesit-custom
-        ;; (treesit-extras-parameter-face (:foreground ,syn-parameter))
         ;; (treesit-extras-boolean-face (:foreground ,syn-special-2 :weight bold))
         ;; (treesit-extras-null-face (:foreground ,syn-special-2))
+        (treesit-extras-parameter-face (:foreground ,syn-parameter))
         (treesit-extras-this-face (:inherit font-lock-keyword-face :foreground ,syn-special-2))
         (treesit-extras-return-face (:inherit font-lock-keyword-face :foreground ,syn-special-3))
         (treesit-extras-named-operator-face (:inherit font-lock-operator-face :weight bold)))))
