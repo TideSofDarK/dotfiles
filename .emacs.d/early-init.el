@@ -101,7 +101,7 @@
   :ensure nil
   :custom
   (native-comp-jit-compilation-deny-list '(".*-loaddefs.el.gz"))
-  (fringe-mode 0) ;; 4
+  ;; (fringe-mode 0)
   (delete-by-moving-to-trash t)
   (use-short-answers t)
   (frame-inhibit-implied-resize t)
@@ -135,12 +135,13 @@
   ;; (global-display-line-numbers-mode t)
   (mouse-wheel-progressive-speed nil)
   (scroll-error-top-bottom t)
-  (scroll-margin 6)
+  (scroll-margin 0) ;; Broken as of 30.1
   (scroll-conservatively 101)
   (scroll-up-aggressively 0.01)
   (scroll-down-aggressively 0.01)
   (scroll-preserve-screen-position t)
   (auto-window-vscroll nil)
+  (fast-but-imprecise-scrolling t)
   (indent-tabs-mode nil)
   (tab-width 4)
   (use-dialog-box nil)
@@ -164,7 +165,6 @@
   (bidi-inhibit-bpa t)
   (initial-major-mode 'fundamental-mode)
   (redisplay-skip-fontification-on-input t)
-  (fast-but-imprecise-scrolling t)
   (window-divider-default-bottom-width 1)
   (window-divider-default-places t)
   (window-divider-default-right-width 1)
@@ -299,6 +299,7 @@
   (evil-set-leader 'normal "\\" t)
 
   (evil-define-key 'insert 'global (kbd "\C-y") nil)
+  (evil-define-key 'normal 'global (kbd "C-l") 'evil-ex-nohighlight)
   (evil-define-key 'insert 'global (kbd "TAB") 'tab-to-tab-stop)
   (evil-define-key 'normal 'global (kbd "M-h") 'evil-window-left)
   (evil-define-key 'normal 'global (kbd "M-l") 'evil-window-right)
@@ -371,7 +372,7 @@
 ;;; magit
 
 (elpaca transient)
-(elpaca (magit :wait t))
+(elpaca (magit :wait t) (setq magit-section-visibility-indicator nil))
 
 ;;; flymake
 
@@ -380,6 +381,7 @@
   :ensure nil
   :custom
   (flymake-indicator-type 'fringes)
+  (flymake-fringe-indicator-position nil)
   :config
   (evil-define-key
     'normal intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
