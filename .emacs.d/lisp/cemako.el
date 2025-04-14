@@ -95,7 +95,7 @@ argument the name of the buffer to use."
 
 (defun cemako-default-project-root-function ()
   "Return the project root using `project.el'."
-  (when-let ((project (project-current)))
+  (when-let* ((project (project-current)))
     (project-root project)))
 
 (defun cemako--get-project-root ()
@@ -104,7 +104,7 @@ argument the name of the buffer to use."
 
 (defun cemako-default-project-name-function ()
   "Return the project name."
-  (when-let ((project (project-current)))
+  (when-let* ((project (project-current)))
     (project-name project)))
 
 (defun cemako--project-data-path ()
@@ -218,7 +218,7 @@ Specified via the defcustom `cemako-project-name-function'."
 
 (defun cemako--get-current-profile-options (project-data)
   "Return a string of arguments associated with current CMake profile."
-  (when-let ((current-profile (cemako--get-current-profile project-data))
+  (when-let* ((current-profile (cemako--get-current-profile project-data))
               (profiles (cemako--get-profiles project-data)))
     (cdr (assoc current-profile profiles))))
 
