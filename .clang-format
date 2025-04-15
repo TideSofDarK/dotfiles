@@ -39,6 +39,7 @@ BraceWrapping:
     IndentBraces: false
     SplitEmptyFunction: true
     SplitEmptyRecord: true
+    BeforeCatch: true
 BinPackArguments: false
 BinPackParameters: false
 
