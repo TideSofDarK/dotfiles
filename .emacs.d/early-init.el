@@ -129,8 +129,8 @@
   emacs
   :ensure nil
   :custom
+  (fringe-mode '(nil . 0))
   (native-comp-jit-compilation-deny-list '(".*-loaddefs.el.gz"))
-  ;; (fringe-mode 'left-only)
   (delete-by-moving-to-trash t)
   (use-short-answers t)
   (frame-inhibit-implied-resize t)
@@ -425,25 +425,29 @@
   :ensure nil
   :config
   (defun define-cemako-key(key func)
-    ;; (evil-define-key 'normal c-ts-mode-map key func)
-    ;; (evil-define-key 'normal c++-ts-mode-map key func)
     (evil-define-key 'normal 'global key func))
   (define-cemako-key (kbd "<leader>bt") 'cemako-select-target)
   (define-cemako-key (kbd "<leader>bc") 'cemako-run-cmake)
   (define-cemako-key (kbd "<leader>bb") 'cemako-build)
   (define-cemako-key (kbd "<leader>br") 'cemako-run))
 (use-package
-  cmake-ts-mode
-  :ensure nil
-  :mode ("CMakeLists\\.txt\\'" "\\.cmake\\'"))
+  cmake-mode
+  :ensure nil)
 
 ;;; Lua
 
-(use-package lua-mode :ensure t)
+(use-package lua-mode
+  :ensure t)
+
+;;; Rust
+
+(use-package rust-ts-mode
+  :ensure nil)
 
 ;;; Swift
 
-(use-package swift-mode :ensure t)
+(use-package swift-mode
+  :ensure t)
 
 ;;; GLSL
 
@@ -462,21 +466,17 @@
   :config
   (setq gdscript-eglot-version "4.4")
   (setq gdscript-indent-offset 4)
-  (setq gdscript-use-tab-indents nil)
-  (use-package gdscript-ts-mode
-    :ensure nil
-    :mode ("\\.gd\\'")))
+  (setq gdscript-use-tab-indents nil))
 (use-package gdshader-mode
   :ensure (gdshader-mode
             :host github
             :repo "bbbscarter/gdshader-mode"
-            :inherit nil
-            :after glsl-mode)
+            :inherit nil)
   :after cape
   :init
+  (defvar gdshader-keyword-list
+    '("shader_type" "render_mode" "group_uniforms" "instance" "varying"))
   (defun gdshader-config()
-    (interactive)
-    (font-lock-add-keywords nil '(((regexp-opt '("instance" "varying") 'symbols) . glsl-keyword-face)))
     (setq-local completion-at-point-functions (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
   :hook (gdshader-mode . gdshader-config)
   :config
@@ -486,19 +486,26 @@
 
 (use-package treesit
   :ensure nil
-  :config
-  (setq treesit-font-lock-level 4))
+  :custom
+  (treesit-font-lock-level 4))
 (use-package treesit-langs
   :ensure (treesit-langs
             :host github
             :repo "emacs-tree-sitter/treesit-langs"
             :inherit nil
             :after treesit)
+  :custom
+  (treesit-langs-bundle-version "0.12.269")
   :init
-  (setq treesit-langs-bundle-version "0.12.269")
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
   (treesit-langs-major-mode-setup)
+  (setq major-mode-remap-alist '((c-mode . c-ts-mode)
+                                  (c++-mode . c++-ts-mode)
+                                  (lua-mode . lua-ts-mode)
+                                  (gdscript-mode . gdscript-ts-mode)
+                                  (markdown-mode . markdown-ts-mode)
+                                  (cmake-mode . cmake-ts-mode)))
   (use-package treesit-extras :ensure nil))
 
 ;;; LSP
@@ -506,7 +513,7 @@
 (use-package eglot
   :ensure t
   :hook
-  ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
+  ((c-ts-mode c++-ts-mode gdscript-ts-mode) . eglot-ensure)
   :custom
   (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
   (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
@@ -572,9 +579,10 @@
   (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
 (use-package vertico
   :ensure t
+  :custom
+  (vertico-cycle t)
+  (vertico-resize nil)
   :config
-  (setq vertico-cycle t)
-  (setq vertico-resize nil)
   (vertico-mode 1))
 (use-package hotfuzz
   :ensure (hotfuzz :host github :url "axelf4/hotfuzz"))
