@@ -353,6 +353,7 @@
   :ensure t
   :after evil
   :init
+  (setq evil-collection-magit-section-use-z-for-folds t)
   (setq evil-collection-setup-minibuffer t)
   (setq evil-collection-want-find-usages-bindings t)
   :config
