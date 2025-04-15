@@ -278,19 +278,26 @@
 (use-package eldoc
   :ensure nil
   :custom
-  (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+  (eldoc-documentation-strategy 'eldoc-documentation-compose)
   (eldoc-idle-delay 0.1)
+  (eldoc-print-after-edit nil)
+  (eldoc-echo-area-display-truncation-message nil)
   :config
   (global-eldoc-mode))
 
 ;;; org
 
-(use-package org :ensure nil)
+(use-package org
+  :ensure nil)
 
 ;;; undo-fu
 
-(use-package undo-fu :ensure t)
-(use-package undo-fu-session :ensure t :config (undo-fu-session-global-mode))
+(use-package undo-fu
+  :ensure t)
+(use-package undo-fu-session
+  :ensure t
+  :config
+  (undo-fu-session-global-mode))
 
 ;;; evil-mode
 
