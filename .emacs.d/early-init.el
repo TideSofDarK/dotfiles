@@ -235,6 +235,7 @@
        "\\*Warnings\\*"
        "Output\\*$"
        "\\*Async Shell Command\\*"
+       xref--xref-buffer-mode
        help-mode
        compilation-mode))
   (setq popper-window-height (lambda (win)
@@ -545,6 +546,10 @@
   :custom
   (consult-line-start-from-top t)
   :config
+  (advice-add #'register-preview :override #'consult-register-window)
+  (setq xref-show-xrefs-function #'consult-xref
+    xref-show-definitions-function #'consult-xref)
+  (evil-define-key 'normal intercept-mode-map (kbd "grr") 'xref-find-references)
   (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
   (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
   (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
