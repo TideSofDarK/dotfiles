@@ -1,6 +1,32 @@
 ;;; early-init.el --- Early Init -*- lexical-binding: t; -*-
 
-;;; Disable GC During Init
+;; Copyright (C) 2025 TideS
+
+;; Author: TideS <tidesmain@gmail.com>
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Utilities
+
+(defun suppress-messages (func &rest args)
+  (cl-flet ((silence (&rest args1) (ignore)))
+    (advice-add 'message :around #'silence)
+    (unwind-protect
+      (apply func args)
+      (advice-remove 'message #'silence))))
+
+;;; Optimize GC During Init
 
 (put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
 (put 'gc-cons-percentage 'value-during-init 0.6)
@@ -83,10 +109,13 @@
 
 ;;; Theme
 
-(setq kanagawa-themes-keyword-italic t)
-(setq kanagawa-themes-comment-italic t)
-(require 'kanagawa-themes)
-(load-theme 'kanagawa-wave :no-confirm-loading)
+(use-package kanagawa-themes
+  :ensure nil
+  :custom
+  (kanagawa-themes-keyword-italic t)
+  (kanagawa-themes-comment-italic t)
+  :config
+  (load-theme 'kanagawa-wave :no-confirm-loading))
 
 ;;; minions
 
@@ -101,7 +130,7 @@
   :ensure nil
   :custom
   (native-comp-jit-compilation-deny-list '(".*-loaddefs.el.gz"))
-  ;; (fringe-mode 0)
+  ;; (fringe-mode 'left-only)
   (delete-by-moving-to-trash t)
   (use-short-answers t)
   (frame-inhibit-implied-resize t)
@@ -176,14 +205,10 @@
   (show-help-function nil)
   (tooltip-mode nil)
   :init
-  (defun suppress-messages (func &rest args)
-    (cl-flet ((silence (&rest args1) (ignore)))
-      (advice-add 'message :around #'silence)
-      (unwind-protect
-        (apply func args)
-        (advice-remove 'message #'silence))))
   (advice-add 'recentf-cleanup :around #'suppress-messages)
   (advice-add 'recentf-mode :around #'suppress-messages)
+  (advice-add 'display-startup-echo-area-message :override #'ignore)
+  (advice-add 'display-startup-screen :override #'ignore)
   :config
   (let ((inhibit-message t))
     (recentf-mode t)
@@ -192,14 +217,8 @@
     (delete-selection-mode t)
     (electric-indent-mode t)
     (electric-pair-mode t))
-  ;; (defun skip-these-buffers (_window buffer _bury-or-kill)
-  ;;     "Function for `switch-to-prev-buffer-skip'."
-  ;;     (string-match "\\*[^*]+\\*" (buffer-name buffer)))
-  ;; (setq switch-to-prev-buffer-skip 'skip-these-buffers)
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (modify-coding-system-alist 'file "" 'utf-8)
-  (advice-add 'display-startup-echo-area-message :override #'ignore)
-  (advice-add 'display-startup-screen :override #'ignore)
   (setq custom-file (locate-user-emacs-file "custom.el"))
   (load custom-file 'noerror 'nomessage)
   (set-display-table-slot standard-display-table 0 ?\ )
@@ -396,8 +415,7 @@
 
 ;;; Markdown
 
-(use-package
-  markdown-mode
+(use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode))
 
@@ -405,7 +423,6 @@
 
 (use-package cemako
   :ensure nil
-  :after c-ts-mode
   :config
   (defun define-cemako-key(key func)
     ;; (evil-define-key 'normal c-ts-mode-map key func)
@@ -441,12 +458,14 @@
             :host github
             :repo "TideSofDarK/emacs-gdscript-mode"
             :branch "patch-1"
-            :inherit nil
-            :after treesit)
+            :inherit nil)
   :config
   (setq gdscript-eglot-version "4.4")
   (setq gdscript-indent-offset 4)
-  (setq gdscript-use-tab-indents nil))
+  (setq gdscript-use-tab-indents nil)
+  (use-package gdscript-ts-mode
+    :ensure nil
+    :mode ("\\.gd\\'")))
 (use-package gdshader-mode
   :ensure (gdshader-mode
             :host github
@@ -465,34 +484,24 @@
 
 ;;; Treesitter
 
-(use-package
-  treesit
+(use-package treesit
   :ensure nil
   :config
   (setq treesit-font-lock-level 4))
-(use-package
-  treesit-auto
-  :ensure t
-  :custom
-  (treesit-auto-install 't)
-  (treesit-auto-langs '(c cpp cmake toml yaml gdscript lua markdown))
+(use-package treesit-langs
+  :ensure (treesit-langs
+            :host github
+            :repo "emacs-tree-sitter/treesit-langs"
+            :inherit nil
+            :after treesit)
+  :init
+  (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
-  (setq treesit-auto-gdscript-config
-    (make-treesit-auto-recipe
-      :lang 'gdscript
-      :ts-mode 'gdscript-ts-mode
-      :remap 'gdscript-mode
-      :url "https://github.com/PrestonKnopp/tree-sitter-gdscript"
-      :ext "\\.gd\\'"))
-  (add-to-list 'treesit-auto-recipe-list treesit-auto-gdscript-config)
-  (treesit-auto-install-all)
-  (global-treesit-auto-mode))
-(use-package treesit-extras :ensure nil)
+  (use-package treesit-extras :ensure nil))
 
 ;;; LSP
 
-(use-package
-  eglot
+(use-package eglot
   :ensure t
   :hook
   ((c-ts-mode c++-ts-mode rust-ts-mode gdscript-ts-mode) . eglot-ensure)
@@ -541,8 +550,7 @@
 
 ;;; Completion
 
-(use-package
-  consult
+(use-package consult
   :ensure t
   :custom
   (consult-line-start-from-top t)
@@ -556,13 +564,11 @@
   (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
   (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
-(use-package
-  consult-eglot
+(use-package consult-eglot
   :ensure t
   :config
   (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
-(use-package
-  vertico
+(use-package vertico
   :ensure t
   :config
   (setq vertico-cycle t)
@@ -584,7 +590,9 @@
        (buffer (styles orderless))
        (project-file (styles hotfuzz))
        (command (styles orderless)))))
-(use-package marginalia :ensure t :init (marginalia-mode))
+(use-package marginalia
+  :ensure t
+  :init (marginalia-mode))
 (use-package corfu
   :ensure t
   :custom
