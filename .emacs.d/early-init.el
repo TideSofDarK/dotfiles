@@ -382,7 +382,7 @@
   flymake
   :ensure nil
   :custom
-  (flymake-indicator-type 'fringes)
+  (flymake-indicator-type nil)
   (flymake-fringe-indicator-position nil)
   :config
   (evil-define-key
