@@ -495,8 +495,10 @@
             :inherit nil
             :after treesit)
   :init
+  (setq treesit-langs-bundle-version "0.12.269")
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
+  (treesit-langs-major-mode-setup)
   (use-package treesit-extras :ensure nil))
 
 ;;; LSP
