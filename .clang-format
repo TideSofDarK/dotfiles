@@ -17,10 +17,10 @@ AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
 
-AlwaysBreakAfterDefinitionReturnType: None
-AlwaysBreakAfterReturnType: None
+BreakAfterReturnType: None
 AlwaysBreakBeforeMultilineStrings: false
-AlwaysBreakTemplateDeclarations: MultiLine
+BreakTemplateDeclarations: Yes
+BreakBeforeConceptDeclarations: Always
 
 BreakBeforeBraces: Custom
 BraceWrapping:
@@ -84,5 +84,5 @@ SpaceAroundPointerQualifiers: Default
 SpaceInEmptyBlock: false
 SpaceInEmptyParentheses: false
 
-UseCRLF: false
+LineEnding: DeriveLF
 UseTab: Never
