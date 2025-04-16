@@ -335,6 +335,7 @@
   (evil-define-key '(normal motion visual) 'global (kbd "H") 'evil-first-non-blank)
   (evil-define-key '(normal motion visual) 'global (kbd "L") 'evil-end-of-line)
   (evil-define-key 'normal 'global (kbd "<leader>tn") 'display-line-numbers-mode)
+  (evil-define-key 'normal 'global (kbd "<leader>tl") 'global-hl-line-mode)
   (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
   (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
   (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
@@ -592,6 +593,7 @@
   (vertico-cycle t)
   (vertico-resize nil)
   :config
+  (keymap-set vertico-map "C-y" #'vertico-insert)
   (vertico-mode 1))
 (use-package hotfuzz
   :ensure (hotfuzz :host github :url "axelf4/hotfuzz"))
@@ -627,7 +629,8 @@
   (global-corfu-mode)
   (let ((inhibit-message t))
     (corfu-popupinfo-mode))
-  :bind (:map corfu-map ("C-y" . corfu-complete)))
+  (keymap-set corfu-map "RET" nil)
+  (keymap-set corfu-map "C-y" #'corfu-complete))
 (use-package cape
   :ensure t
   :custom
