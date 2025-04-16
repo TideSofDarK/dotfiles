@@ -437,8 +437,7 @@
   (define-cemako-key (kbd "<leader>bc") 'cemako-run-cmake)
   (define-cemako-key (kbd "<leader>bb") 'cemako-build)
   (define-cemako-key (kbd "<leader>br") 'cemako-run))
-(use-package
-  cmake-mode
+(use-package cmake-mode
   :ensure nil)
 
 ;;; Lua
@@ -449,7 +448,8 @@
 ;;; Rust
 
 (use-package rust-ts-mode
-  :ensure nil)
+  :ensure nil
+  :after treesit-langs)
 
 ;;; Swift
 
@@ -512,8 +512,10 @@
                                   (lua-mode . lua-ts-mode)
                                   (gdscript-mode . gdscript-ts-mode)
                                   (markdown-mode . markdown-ts-mode)
-                                  (cmake-mode . cmake-ts-mode)))
-  (use-package treesit-extras :ensure nil))
+                                  (cmake-mode . cmake-ts-mode))))
+(use-package treesit-extras
+  :ensure nil
+  :after treesit-langs)
 
 ;;; LSP
 
