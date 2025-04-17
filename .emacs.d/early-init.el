@@ -447,19 +447,6 @@
   (define-cemako-key (kbd "<leader>bc") 'cemako-run-cmake)
   (define-cemako-key (kbd "<leader>bb") 'cemako-build)
   (define-cemako-key (kbd "<leader>br") 'cemako-run))
-(use-package cmake-mode
-  :ensure nil)
-
-;;; Lua
-
-(use-package lua-mode
-  :ensure t)
-
-;;; Rust
-
-(use-package rust-ts-mode
-  :ensure nil
-  :after treesit-langs)
 
 ;;; Swift
 
@@ -517,15 +504,10 @@
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
   (treesit-langs-major-mode-setup)
-  (setq major-mode-remap-alist '((c-mode . c-ts-mode)
-                                  (c++-mode . c++-ts-mode)
-                                  (lua-mode . lua-ts-mode)
-                                  (gdscript-mode . gdscript-ts-mode)
-                                  (markdown-mode . markdown-ts-mode)
-                                  (cmake-mode . cmake-ts-mode))))
-(use-package treesit-extras
-  :ensure nil
-  :after treesit-langs)
+  (use-package cmake-ts-mode :ensure nil)
+  (use-package rust-ts-mode :ensure nil)
+  (use-package lua-ts-mode :ensure nil)
+  (use-package treesit-extras :ensure nil))
 
 ;;; LSP
 
