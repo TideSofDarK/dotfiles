@@ -499,11 +499,13 @@
             :inherit nil
             :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.269")
+  (treesit-langs-bundle-version "0.12.270")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
   (treesit-langs-major-mode-setup)
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
   (use-package cmake-ts-mode :ensure nil)
   (use-package rust-ts-mode :ensure nil)
   (use-package lua-ts-mode :ensure nil)
