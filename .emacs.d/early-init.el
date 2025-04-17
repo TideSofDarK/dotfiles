@@ -122,6 +122,8 @@
   :config
   (setopt modus-themes-common-palette-overrides
     '((fringe unspecified)
+       (bg-region bg-lavender)
+       (fg-region unspecified)
        (fg-line-number-inactive "gray50")
        (fg-line-number-active fg-main)
        (bg-line-number-inactive unspecified)
@@ -139,6 +141,9 @@
 (use-package emacs
   :ensure nil
   :custom
+  (isearch-lazy-count t)
+  (isearch-lazy-highlight t)
+  (vc-follow-symlinks t)
   (fringe-mode '(nil . 0))
   (native-comp-jit-compilation-deny-list '(".*-loaddefs.el.gz"))
   (delete-by-moving-to-trash t)
@@ -149,7 +154,6 @@
   (warning-suppress-log-types '((native-compiler)))
   (ring-bell-function 'ignore)
   (help-window-select t)
-  (tab-always-indent t)
   (menu-bar-mode nil)
   (scroll-bar-mode nil)
   (tool-bar-mode nil)
@@ -181,6 +185,7 @@
   (scroll-preserve-screen-position t)
   ;; (auto-window-vscroll nil)
   ;; (fast-but-imprecise-scrolling t)
+  (tab-always-indent t)
   (indent-tabs-mode nil)
   (tab-width 4)
   (use-dialog-box nil)
@@ -201,7 +206,7 @@
   (bidi-display-reordering 'left-to-right)
   (bidi-paragraph-direction 'left-to-right)
   (bidi-inhibit-bpa t)
-  (initial-major-mode 'fundamental-mode)
+  (initial-major-mode 'text-mode)
   (redisplay-skip-fontification-on-input t)
   (window-divider-default-bottom-width 1)
   (window-divider-default-places t)
@@ -278,6 +283,10 @@
 (use-package dired
   :ensure nil
   :custom
+  (dired-auto-revert-buffer t)
+  (dired-recursive-copies 'always)
+  (dired-recursive-deletes 'always)
+  (dired-ls-F-marks-symlinks t)
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-listing-switches "-lah --group-directories-first")
   (dired-dwim-target t))
@@ -292,8 +301,7 @@
   (eldoc-idle-delay 0.1)
   (eldoc-print-after-edit nil)
   (eldoc-echo-area-display-truncation-message nil)
-  :config
-  (global-eldoc-mode))
+  :hook (after-init . global-eldoc-mode))
 
 ;;; org
 
@@ -306,8 +314,7 @@
   :ensure t)
 (use-package undo-fu-session
   :ensure t
-  :config
-  (undo-fu-session-global-mode))
+  :hook (after-init . undo-fu-session-global-mode))
 
 ;;; evil-mode
 
@@ -388,7 +395,7 @@
   evil-collection
   :ensure t
   :after evil
-  :init
+  :preface
   (setq evil-collection-magit-section-use-z-for-folds t)
   (setq evil-collection-setup-minibuffer t)
   (setq evil-collection-want-find-usages-bindings t)
@@ -409,8 +416,15 @@
 
 ;;; magit
 
-(elpaca transient)
-(elpaca (magit :wait t) (setq magit-section-visibility-indicator nil))
+(use-package transient
+  :ensure t)
+(use-package diff-hl
+  :ensure t)
+(use-package magit
+  :ensure t
+  :after (transient diff-hl)
+  :custom
+  (magit-section-visibility-indicator nil))
 
 ;;; flymake
 
@@ -420,15 +434,16 @@
   :custom
   (flymake-indicator-type nil)
   (flymake-fringe-indicator-position nil)
-  :config
-  (evil-define-key
-    'normal intercept-mode-map (kbd "[d") 'flymake-goto-prev-error)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "]d") 'flymake-goto-next-error))
+  :bind*
+  ("[d" . flymake-goto-prev-error)
+  ("]d" . flymake-goto-next-error))
 
 ;;; EditorConfig
 
-(use-package editorconfig :ensure t :config (editorconfig-mode 1))
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
 
 ;;; Markdown
 
@@ -440,13 +455,11 @@
 
 (use-package cemako
   :ensure nil
-  :config
-  (defun define-cemako-key(key func)
-    (evil-define-key 'normal 'global key func))
-  (define-cemako-key (kbd "<leader>bt") 'cemako-select-target)
-  (define-cemako-key (kbd "<leader>bc") 'cemako-run-cmake)
-  (define-cemako-key (kbd "<leader>bb") 'cemako-build)
-  (define-cemako-key (kbd "<leader>br") 'cemako-run))
+  :bind
+  ("<leader>bt" . cemako-select-target)
+  ("<leader>bc" . cemako-run-cmake)
+  ("<leader>bb" . cemako-build)
+  ("<leader>br" . cemako-run))
 
 ;;; Swift
 
@@ -456,8 +469,7 @@
 ;;; GLSL
 
 (use-package glsl-mode
-  :ensure t
-  :mode ("\\.shader\\'" "\\.glsl\\'"))
+  :ensure t)
 
 ;;; Godot
 
@@ -467,10 +479,10 @@
             :repo "TideSofDarK/emacs-gdscript-mode"
             :branch "patch-1"
             :inherit nil)
-  :config
-  (setq gdscript-eglot-version "4.4")
-  (setq gdscript-indent-offset 4)
-  (setq gdscript-use-tab-indents nil))
+  :custom
+  (gdscript-eglot-version "4.4")
+  (gdscript-indent-offset 4)
+  (gdscript-use-tab-indents nil))
 (use-package gdshader-mode
   :ensure (gdshader-mode
             :host github
@@ -506,31 +518,36 @@
   (treesit-langs-major-mode-setup)
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  ;; (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
   (use-package cmake-ts-mode :ensure nil)
   (use-package rust-ts-mode :ensure nil)
   (use-package lua-ts-mode :ensure nil)
   (use-package treesit-extras :ensure nil))
 
-;;; LSP
+;;; Eglot
 
 (use-package eglot
   :ensure t
   :hook
-  ((c-ts-mode c++-ts-mode gdscript-ts-mode) . eglot-ensure)
+  ((c-ts-mode c++-ts-mode gdscript-ts-mode glsl-ts-mode cmake-ts-mode) . eglot-ensure)
   :custom
-  (eglot-mode-line-format '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
-  (eglot-ignored-server-capabilities '(:inlayHintProvider :documentHighlightProvider))
+  (eglot-mode-line-format
+    '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
+  (eglot-ignored-server-capabilities
+    '(:inlayHintProvider :documentHighlightProvider :documentOnTypeFormattingProvider))
   (eglot-events-buffer-size 0)
   (eglot-autoshutdown t)
   (eglot-report-progress nil)
   (eglot-events-buffer-config '(:size 0 :format full))
   (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
+  (eglot-code-action-indications '(eldoc-hint))
   ;; (eglot-stay-out-of '(flymake eldoc))
+  ;; (eldoc-idle-delay 0.1)
   :config
   (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
-    '((c-ts-mode c++-ts-mode c-mode c++-mode)
+    '((c-ts-mode c++-ts-mode)
        . ("clangd"
            "-j=8"
            "--log=error"
@@ -540,19 +557,17 @@
            "--pch-storage=memory"
            "--header-insertion=never"
            "--header-insertion-decorators=0")))
-  ;; (setq eldoc-idle-delay 0.1)
-  ;; (add-to-list 'eglot-server-programs
-  ;;              `(cmake-ts-mode . ("~/.local/bin/cmake-language-server")))
-  ;; (add-to-list 'eglot-server-programs
-  ;;              `(glsl-mode . ("~/.config/emacs/lsp-servers/glsl_analyzer/glsl_analyzer"))))
+  (add-to-list 'eglot-server-programs
+    `(glsl-ts-mode . ("glsl_analyzer")))
+  (add-to-list 'eglot-server-programs
+    `(cmake-ts-mode . ("cmake-language-server")))
   (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
-
   (evil-define-key
     'normal intercept-mode-map (kbd "grn") 'eglot-rename)
   (evil-define-key
     'normal intercept-mode-map (kbd "gra") 'eglot-code-actions)
   (evil-define-key
-    'normal intercept-mode-map (kbd "<leader>cf") 'eglot-format))
+    'normal eglot-mode-map (kbd "<leader>cf") 'eglot-format))
 (use-package eglot-inactive-regions
   :ensure t
   :custom
@@ -618,7 +633,7 @@
   (corfu-auto-delay 0.15)
   (corfu-auto-prefix 2)
   (corfu-popupinfo-delay 0.25)
-  :init
+  :config
   (global-corfu-mode)
   (let ((inhibit-message t))
     (corfu-popupinfo-mode))

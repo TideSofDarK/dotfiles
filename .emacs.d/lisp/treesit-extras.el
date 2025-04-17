@@ -130,7 +130,7 @@
          ")" @font-lock-punctuation-face)))
   :config
   (setq c-ts-mode-indent-offset 4)
-  (setq c-ts-mode-indent-style #'treesit-extras--c-ts-indent-style)
+  (setq c-ts-mode-indent-style 'bsd)
   (setq c-ts-mode-enable-doxygen t)
   (setq c-ts-mode--preproc-keywords '("#include"))
   (advice-add 'c-ts-mode--keywords :around #'treesit-extras--c-ts-keywords)
