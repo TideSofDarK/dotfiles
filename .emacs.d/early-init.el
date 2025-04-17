@@ -115,7 +115,18 @@
   (kanagawa-themes-keyword-italic t)
   (kanagawa-themes-comment-italic t)
   :config
-  (load-theme 'kanagawa-wave :no-confirm-loading))
+  ;; (load-theme 'kanagawa-wave :no-confirm-loading)
+  )
+(use-package modus-themes
+  :ensure t
+  :config
+  (setopt modus-themes-common-palette-overrides
+    '((fringe unspecified)
+       (fg-line-number-inactive "gray50")
+       (fg-line-number-active fg-main)
+       (bg-line-number-inactive unspecified)
+       (bg-line-number-active unspecified)))
+  (load-theme 'modus-vivendi :no-confirm-loading))
 
 ;;; minions
 
@@ -125,8 +136,7 @@
 
 ;;; emacs
 
-(use-package
-  emacs
+(use-package emacs
   :ensure nil
   :custom
   (fringe-mode '(nil . 0))
@@ -163,14 +173,14 @@
   (display-line-numbers-width-start t)
   ;; (global-display-line-numbers-mode t)
   (mouse-wheel-progressive-speed nil)
-  (scroll-error-top-bottom t)
-  (scroll-margin 0) ;; Broken as of 30.1
-  (scroll-conservatively 101)
-  (scroll-up-aggressively 0.01)
-  (scroll-down-aggressively 0.01)
+  ;; (scroll-error-top-bottom t)
+  (scroll-margin 6)
+  ;; (scroll-conservatively 101)
+  ;; (scroll-up-aggressively 0.01)
+  ;; (scroll-down-aggressively 0.01)
   (scroll-preserve-screen-position t)
-  (auto-window-vscroll nil)
-  (fast-but-imprecise-scrolling t)
+  ;; (auto-window-vscroll nil)
+  ;; (fast-but-imprecise-scrolling t)
   (indent-tabs-mode nil)
   (tab-width 4)
   (use-dialog-box nil)
@@ -184,7 +194,6 @@
   (enable-recursive-minibuffers t)
   (minibuffer-prompt-properties
     '(read-only t cursor-intangible t face minibuffer-prompt))
-  (eldoc-echo-area-use-multiline-p nil)
   (switch-to-buffer-obey-display-actions t)
   ;; (pixel-scroll-precision-mode t)
   ;; (pixel-scroll-precision-use-momentum nil)
@@ -278,6 +287,7 @@
 (use-package eldoc
   :ensure nil
   :custom
+  (eldoc-echo-area-use-multiline-p nil)
   (eldoc-documentation-strategy 'eldoc-documentation-compose)
   (eldoc-idle-delay 0.1)
   (eldoc-print-after-edit nil)
@@ -301,8 +311,7 @@
 
 ;;; evil-mode
 
-(use-package
-  evil
+(use-package evil
   :ensure t
   :preface
   (setq evil-want-empty-ex-last-command nil)
