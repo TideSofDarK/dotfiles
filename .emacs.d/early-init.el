@@ -465,9 +465,10 @@
   :custom
   (flymake-indicator-type nil)
   (flymake-fringe-indicator-position nil)
-  :bind*
-  ("[d" . flymake-goto-prev-error)
-  ("]d" . flymake-goto-next-error))
+  :bind
+  (:map evil-normal-state-map
+        ("[d" . flymake-goto-prev-error)
+        ("]d" . flymake-goto-next-error)))
 
 ;;; EditorConfig
 
