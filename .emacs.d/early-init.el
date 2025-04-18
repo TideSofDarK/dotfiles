@@ -114,20 +114,40 @@
   :custom
   (kanagawa-themes-keyword-italic t)
   (kanagawa-themes-comment-italic t)
-  :config
+  ;; :config
   ;; (load-theme 'kanagawa-wave :no-confirm-loading)
   )
 (use-package modus-themes
   :ensure t
   :config
+  (defun better-modus-faces (&rest _)
+    (when-let* ((current-theme (car custom-enabled-themes))
+                 (modus-theme (modus-themes--modus-p current-theme)))
+      (modus-themes-with-colors
+        (custom-theme-set-faces current-theme
+          '(region ((t :extend nil)))
+          `(font-lock-keyword-face ((,c
+                                      :inherit modus-themes-bold
+                                      :foreground ,keyword
+                                      :slant italic)))
+          ;; `(font-lock-bracket-face ((,c :foreground ,cyan-faint)))
+          `(font-lock-operator-face ((,c :foreground ,cyan-faint)))
+          `(font-lock-number-face ((,c :foreground ,rust)))
+          `(font-lock-variable-name-face ((,c :foreground ,fg-main)))
+          `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
+  (add-hook 'enable-theme-functions #'better-modus-faces)
+  (setopt modus-themes-italic-constructs t)
+  ;; (setopt modus-themes-bold-constructs t)
   (setopt modus-themes-common-palette-overrides
-    '((fringe unspecified)
+    (append
+      '() ;; modus-themes-preset-overrides-faint
+      '((fringe unspecified)
        (bg-region bg-lavender)
        (fg-region unspecified)
        (fg-line-number-inactive "gray50")
        (fg-line-number-active fg-main)
        (bg-line-number-inactive unspecified)
-       (bg-line-number-active unspecified)))
+       (bg-line-number-active unspecified))))
   (load-theme 'modus-vivendi :no-confirm-loading))
 
 ;;; minions
@@ -297,11 +317,10 @@
   :ensure nil
   :custom
   (eldoc-echo-area-use-multiline-p nil)
-  (eldoc-documentation-strategy 'eldoc-documentation-compose)
+  ;; (eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   (eldoc-idle-delay 0.1)
   (eldoc-print-after-edit nil)
-  (eldoc-echo-area-display-truncation-message nil)
-  :hook (after-init . global-eldoc-mode))
+  (eldoc-echo-area-display-truncation-message nil))
 
 ;;; org
 
