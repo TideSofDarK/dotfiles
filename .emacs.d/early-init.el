@@ -23,7 +23,7 @@
   (cl-flet ((silence (&rest args1) (ignore)))
     (advice-add 'message :around #'silence)
     (unwind-protect
-      (apply func args)
+        (apply func args)
       (advice-remove 'message #'silence))))
 
 ;;; Optimize GC During Init
@@ -32,7 +32,8 @@
 (put 'gc-cons-percentage 'value-during-init 0.6)
 (defun restore-gc-cons-percentage-after-init ()
   (let ((expected-value (get 'gc-cons-percentage 'value-during-init))
-         (value-to-restore (get 'gc-cons-percentage 'original-value-before-init)))
+        (value-to-restore (get 'gc-cons-percentage
+                               'original-value-before-init)))
     (when (and value-to-restore (equal gc-cons-percentage expected-value))
       (setq gc-cons-percentage value-to-restore))))
 (add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
@@ -54,32 +55,32 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                        :ref nil :depth 1 :inherit ignore
-                        :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                        :build (:not elpaca--activate-package)))
+                              :ref nil :depth 1 :inherit ignore
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
-        (build (expand-file-name "elpaca/" elpaca-builds-directory))
-        (order (cdr elpaca-order))
-        (default-directory repo))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
   (add-to-list 'load-path (if (file-exists-p build) build repo))
   (unless (file-exists-p repo)
     (make-directory repo t)
     (when (<= emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
-      (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
                                                   ,@(when-let* ((depth (plist-get order :depth)))
                                                       (list (format "--depth=%d" depth) "--no-single-branch"))
                                                   ,(plist-get order :repo) ,repo))))
-                 ((zerop (call-process "git" nil buffer t "checkout"
-                           (or (plist-get order :ref) "--"))))
-                 (emacs (concat invocation-directory invocation-name))
-                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                           "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                 ((require 'elpaca))
-                 ((elpaca-generate-autoloads "elpaca" repo)))
-        (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-        (error "%s" (with-current-buffer buffer (buffer-string))))
+                  ((zerop (call-process "git" nil buffer t "checkout"
+                                        (or (plist-get order :ref) "--"))))
+                  (emacs (concat invocation-directory invocation-name))
+                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                  ((require 'elpaca))
+                  ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
       ((error) (warn "%s" err) (delete-directory repo 'recursive))))
   (unless (require 'elpaca-autoloads nil t)
     (require 'elpaca)
@@ -95,17 +96,17 @@
 ;;; Fonts
 
 (let ((mono-spaced-font "Sarasa Term Slab CL")
-       ;; (proportionately-spaced-font "Sarasa UI CL"))
-       (proportionately-spaced-font "Sarasa Term Slab CL"))
+      ;; (proportionately-spaced-font "Sarasa UI CL"))
+      (proportionately-spaced-font "Sarasa Term Slab CL"))
   (set-face-attribute 'default nil
-    :family mono-spaced-font
-    :height 120)
+                      :family mono-spaced-font
+                      :height 120)
   (set-face-attribute 'fixed-pitch nil
-    :family mono-spaced-font
-    :height 1.0)
+                      :family mono-spaced-font
+                      :height 1.0)
   (set-face-attribute 'variable-pitch nil
-    :family proportionately-spaced-font
-    :height 1.0))
+                      :family proportionately-spaced-font
+                      :height 1.0))
 
 ;;; Theme
 
@@ -122,32 +123,31 @@
   :config
   (defun better-modus-faces (&rest _)
     (when-let* ((current-theme (car custom-enabled-themes))
-                 (modus-theme (modus-themes--modus-p current-theme)))
+                (modus-theme (modus-themes--modus-p current-theme)))
       (modus-themes-with-colors
-        (custom-theme-set-faces current-theme
-          '(region ((t :extend nil)))
-          `(font-lock-keyword-face ((,c
-                                      :inherit modus-themes-bold
-                                      :foreground ,keyword
-                                      :slant italic)))
-          ;; `(font-lock-bracket-face ((,c :foreground ,cyan-faint)))
-          `(font-lock-operator-face ((,c :foreground ,cyan-faint)))
-          `(font-lock-number-face ((,c :foreground ,rust)))
-          `(font-lock-variable-name-face ((,c :foreground ,fg-main)))
-          `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
+        (custom-theme-set-faces
+         current-theme
+         `(region ((,c :background ,bg-region
+                       :foreground ,fg-region
+                       :extend nil)))
+         `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                       :foreground ,keyword
+                                       :slant italic)))
+         ;; `(font-lock-bracket-face ((,c :foreground ,cyan-faint)))
+         `(font-lock-operator-face ((,c :foreground ,cyan-faint)))
+         `(font-lock-number-face ((,c :foreground ,red-faint)))
+         `(font-lock-variable-name-face ((,c :foreground ,fg-main)))
+         `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
-  ;; (setopt modus-themes-bold-constructs t)
   (setopt modus-themes-common-palette-overrides
-    (append
-      '() ;; modus-themes-preset-overrides-faint
-      '((fringe unspecified)
-       (bg-region bg-lavender)
-       (fg-region unspecified)
-       (fg-line-number-inactive "gray50")
-       (fg-line-number-active fg-main)
-       (bg-line-number-inactive unspecified)
-       (bg-line-number-active unspecified))))
+          '((fringe unspecified)
+            ;; (bg-region bg-lavender)
+            (fg-region unspecified)
+            (fg-line-number-inactive "gray50")
+            (fg-line-number-active fg-main)
+            (bg-line-number-inactive unspecified)
+            (bg-line-number-active unspecified)))
   (load-theme 'modus-vivendi :no-confirm-loading))
 
 ;;; minions
@@ -161,10 +161,11 @@
 (use-package emacs
   :ensure nil
   :custom
+  ;; (fringe-mode '(nil . 0))
+  (fringe-mode 0)
   (isearch-lazy-count t)
   (isearch-lazy-highlight t)
   (vc-follow-symlinks t)
-  (fringe-mode '(nil . 0))
   (native-comp-jit-compilation-deny-list '(".*-loaddefs.el.gz"))
   (delete-by-moving-to-trash t)
   (use-short-answers t)
@@ -190,7 +191,7 @@
   (truncate-lines t)
   (text-mode-ispell-word-completion nil)
   (read-extended-command-predicate
-    #'command-completion-default-include-p)
+   #'command-completion-default-include-p)
   (display-line-numbers-type 'relative)
   (display-line-numbers-grow-only t)
   (display-line-numbers-width 3)
@@ -205,6 +206,7 @@
   (scroll-preserve-screen-position t)
   ;; (auto-window-vscroll nil)
   ;; (fast-but-imprecise-scrolling t)
+  (fill-column 80)
   (tab-always-indent t)
   (indent-tabs-mode nil)
   (tab-width 4)
@@ -218,7 +220,7 @@
   (auto-save-default nil)
   (enable-recursive-minibuffers t)
   (minibuffer-prompt-properties
-    '(read-only t cursor-intangible t face minibuffer-prompt))
+   '(read-only t cursor-intangible t face minibuffer-prompt))
   (switch-to-buffer-obey-display-actions t)
   ;; (pixel-scroll-precision-mode t)
   ;; (pixel-scroll-precision-use-momentum nil)
@@ -280,22 +282,22 @@
   (setq popper-display-control t)
   ;; (setq popper-display-function #'display-buffer-pop-up-window)
   (setq popper-reference-buffers
-    '(
-       ;; "^\\*.*\\*$"
-       "\\*eldoc\\*"
-       "^\\*godot"
-       "\\*Messages\\*"
-       "\\*Warnings\\*"
-       "Output\\*$"
-       "\\*Async Shell Command\\*"
-       xref--xref-buffer-mode
-       help-mode
-       compilation-mode))
+        '(
+          ;; "^\\*.*\\*$"
+          "\\*eldoc\\*"
+          "^\\*godot"
+          "\\*Messages\\*"
+          "\\*Warnings\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          xref--xref-buffer-mode
+          help-mode
+          compilation-mode))
   (setq popper-window-height (lambda (win)
                                (fit-window-to-buffer
-                                 win
-                                 (* 2 (floor (frame-height) 5))
-                                 (floor (frame-height) 3))))
+                                win
+                                (* 2 (floor (frame-height) 5))
+                                (floor (frame-height) 3))))
   (popper-mode t))
 
 ;;; dired
@@ -367,9 +369,12 @@
   (evil-define-key 'normal 'global (kbd "M-l") 'evil-window-right)
   (evil-define-key 'normal 'global (kbd "M-k") 'evil-window-up)
   (evil-define-key 'normal 'global (kbd "M-j") 'evil-window-down)
-  (evil-define-key '(normal motion visual) 'global (kbd "H") 'evil-first-non-blank)
-  (evil-define-key '(normal motion visual) 'global (kbd "L") 'evil-end-of-line)
-  (evil-define-key 'normal 'global (kbd "<leader>tn") 'display-line-numbers-mode)
+  (evil-define-key '(normal motion visual)
+    'global (kbd "H") 'evil-first-non-blank)
+  (evil-define-key '(normal motion visual)
+    'global (kbd "L") 'evil-end-of-line)
+  (evil-define-key 'normal 'global
+    (kbd "<leader>tn") 'display-line-numbers-mode)
   (evil-define-key 'normal 'global (kbd "<leader>tl") 'global-hl-line-mode)
   (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
   (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
@@ -378,30 +383,32 @@
 
   (defmacro evil-map (state key seq)
     (let ((map (intern (format "evil-%S-state-map" state)))
-           (key-cmd (lookup-key evil-normal-state-map key)))
+          (key-cmd (lookup-key evil-normal-state-map key)))
       `(define-key ,map ,key
-         (lambda ()
-           (interactive)
-           ,(if (string-equal key (substring seq 0 1))
-              `(let ((orig-this-command this-command))
-                 (setq this-command ',key-cmd)
-                 (call-interactively ',key-cmd)
-                 (run-hooks 'post-command-hook)
-                 (setq this-command orig-this-command)
-                 (execute-kbd-macro ,(substring seq 1)))
-              (execute-kbd-macro ,seq))))))
+                   (lambda ()
+                     (interactive)
+                     ,(if (string-equal key (substring seq 0 1))
+                          `(let ((orig-this-command this-command))
+                             (setq this-command ',key-cmd)
+                             (call-interactively ',key-cmd)
+                             (run-hooks 'post-command-hook)
+                             (setq this-command orig-this-command)
+                             (execute-kbd-macro ,(substring seq 1)))
+                        (execute-kbd-macro ,seq))))))
 
   (evil-map visual "<" "<gv")
   (evil-map visual ">" ">gv")
 
   (defvar intercept-mode-map (make-sparse-keymap))
-  (define-minor-mode intercept-mode "High precedence keymap for evil." :global t)
+  (define-minor-mode intercept-mode
+    "High precedence keymap for evil."
+    :global t)
   (intercept-mode)
   (dolist (state '(normal))
     (evil-make-intercept-map
-      (evil-get-auxiliary-keymap
-        intercept-mode-map state t t)
-      state))
+     (evil-get-auxiliary-keymap
+      intercept-mode-map state t t)
+     state))
 
   (defun scroll-to-center-after-goto-mark (char &optional noerror) (recenter))
   (evil--advice-add 'evil-goto-mark :after #'scroll-to-center-after-goto-mark)
@@ -432,6 +439,11 @@
   :config
   (evil-define-key 'visual 'global (kbd "J") 'drag-stuff-down)
   (evil-define-key 'visual 'global (kbd "K") 'drag-stuff-up))
+
+;;; Apheleia
+
+(use-package apheleia
+  :ensure t)
 
 ;;; magit
 
@@ -494,28 +506,32 @@
 
 (use-package gdscript-mode
   :ensure (gdscript-mode
-            :host github
-            :repo "TideSofDarK/emacs-gdscript-mode"
-            :branch "patch-1"
-            :inherit nil)
+           :host github
+           :repo "TideSofDarK/emacs-gdscript-mode"
+           :branch "patch-1"
+           :inherit nil)
   :custom
   (gdscript-eglot-version "4.4")
   (gdscript-indent-offset 4)
   (gdscript-use-tab-indents nil))
 (use-package gdshader-mode
   :ensure (gdshader-mode
-            :host github
-            :repo "bbbscarter/gdshader-mode"
-            :inherit nil)
+           :host github
+           :repo "bbbscarter/gdshader-mode"
+           :inherit nil)
   :after cape
   :init
   (defvar gdshader-keyword-list
     '("shader_type" "render_mode" "group_uniforms" "instance" "varying"))
   (defun gdshader-config()
-    (setq-local completion-at-point-functions (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
+    (setq-local completion-at-point-functions
+                (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
   :hook (gdshader-mode . gdshader-config)
   :config
-  (with-eval-after-load 'cape-keyword (add-to-list 'cape-keyword-list (append '(gdshader-mode) gdshader-all-keywords))))
+  (with-eval-after-load 'cape-keyword
+    (add-to-list
+     'cape-keyword-list
+     (append '(gdshader-mode) gdshader-all-keywords))))
 
 ;;; Treesitter
 
@@ -525,10 +541,10 @@
   (treesit-font-lock-level 4))
 (use-package treesit-langs
   :ensure (treesit-langs
-            :host github
-            :repo "emacs-tree-sitter/treesit-langs"
-            :inherit nil
-            :after treesit)
+           :host github
+           :repo "emacs-tree-sitter/treesit-langs"
+           :inherit nil
+           :after treesit)
   :custom
   (treesit-langs-bundle-version "0.12.270")
   :init
@@ -548,12 +564,18 @@
 (use-package eglot
   :ensure t
   :hook
-  ((c-ts-mode c++-ts-mode gdscript-ts-mode glsl-ts-mode cmake-ts-mode) . eglot-ensure)
+  ((c-ts-mode c++-ts-mode
+              gdscript-ts-mode glsl-ts-mode
+              cmake-ts-mode) . eglot-ensure)
   :custom
   (eglot-mode-line-format
-    '(eglot-mode-line-menu eglot-mode-line-session eglot-mode-line-action-suggestion))
+   '(eglot-mode-line-menu
+     eglot-mode-line-session
+     eglot-mode-line-action-suggestion))
   (eglot-ignored-server-capabilities
-    '(:inlayHintProvider :documentHighlightProvider :documentOnTypeFormattingProvider))
+   '(:inlayHintProvider
+     :documentHighlightProvider
+     :documentOnTypeFormattingProvider))
   (eglot-events-buffer-size 0)
   (eglot-autoshutdown t)
   (eglot-report-progress nil)
@@ -566,21 +588,23 @@
   :config
   (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
-    '((c-ts-mode c++-ts-mode)
-       . ("clangd"
-           "-j=8"
-           "--log=error"
-           "--background-index"
-           "--clang-tidy"
-           "--completion-style=detailed"
-           "--pch-storage=memory"
-           "--header-insertion=never"
-           "--header-insertion-decorators=0")))
+               '((c-ts-mode c++-ts-mode)
+                 . ("clangd"
+                    "-j=8"
+                    "--log=error"
+                    "--background-index"
+                    "--clang-tidy"
+                    "--completion-style=detailed"
+                    "--pch-storage=memory"
+                    "--header-insertion=never"
+                    "--header-insertion-decorators=0")))
   (add-to-list 'eglot-server-programs
-    `(glsl-ts-mode . ("glsl_analyzer")))
+               `(glsl-ts-mode . ("glsl_analyzer")))
   (add-to-list 'eglot-server-programs
-    `(cmake-ts-mode . ("cmake-language-server")))
-  (set-face-attribute 'eglot-mode-line nil :inherit 'mode-line-buffer-id :weight 'normal)
+               `(cmake-ts-mode . ("cmake-language-server")))
+  (set-face-attribute 'eglot-mode-line nil
+                      :inherit 'mode-line-buffer-id
+                      :weight 'normal)
   (evil-define-key
     'normal intercept-mode-map (kbd "grn") 'eglot-rename)
   (evil-define-key
@@ -600,10 +624,10 @@
   :ensure t
   :custom
   (consult-line-start-from-top t)
+  (xref-show-xrefs-function #'consult-xref)
+  (xref-show-definitions-function #'consult-xref)
   :config
   (advice-add #'register-preview :override #'consult-register-window)
-  (setq xref-show-xrefs-function #'consult-xref
-    xref-show-definitions-function #'consult-xref)
   (evil-define-key 'normal intercept-mode-map (kbd "grr") 'xref-find-references)
   (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
   (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
@@ -632,12 +656,12 @@
   (completion-styles '(orderless hotfuzz basic))
   (completion-category-defaults nil)
   (completion-category-overrides
-    '((eglot (styles orderless))
-       (eglot-capf (styles orderless))
-       (file (styles basic partial-completion))
-       (buffer (styles orderless))
-       (project-file (styles hotfuzz))
-       (command (styles orderless)))))
+   '((eglot (styles orderless))
+     (eglot-capf (styles orderless))
+     (file (styles basic partial-completion))
+     (buffer (styles orderless))
+     (project-file (styles hotfuzz))
+     (command (styles orderless)))))
 (use-package marginalia
   :ensure t
   :init (marginalia-mode))
