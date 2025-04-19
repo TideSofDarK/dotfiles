@@ -115,9 +115,8 @@
   :custom
   (kanagawa-themes-keyword-italic t)
   (kanagawa-themes-comment-italic t)
-  ;; :config
-  ;; (load-theme 'kanagawa-wave :no-confirm-loading)
-  )
+  :config
+  (load-theme 'kanagawa-wave t t))
 (use-package modus-themes
   :ensure t
   :config
@@ -127,6 +126,8 @@
       (modus-themes-with-colors
         (custom-theme-set-faces
          current-theme
+         `(eglot-mode-line
+           ((,c :inherit mode-line-buffer-id :weight normal)))
          `(eglot-diagnostic-tag-unnecessary-face
            ((,c :inherit font-lock-comment-face)))
          `(region ((,c :background ,bg-region
@@ -134,17 +135,18 @@
          `(font-lock-keyword-face ((,c :inherit modus-themes-bold
                                        :foreground ,keyword
                                        :slant italic)))
-         ;; `(font-lock-bracket-face ((,c :foreground     ,cyan-faint)))
-         ;; `(font-lock-punctuation-face ((,c :foreground ,cyan-faint)))
-         ;; `(font-lock-delimiter-face ((,c :foreground   ,cyan-faint)))
-         `(font-lock-operator-face ((,c :foreground ,cyan-faint)))
-         `(font-lock-variable-name-face ((,c :foreground ,fg-main)))
          `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides '((type cyan-cooler)))
   (setopt modus-themes-common-palette-overrides
-          '((number red-faint)
+          '(
+            ;; (bracket ,cyan-faint)
+            ;; (delimiter ,cyan-faint)
+            ;; (punctuation ,cyan-faint)
+            (variable fg-main)
+            (operator cyan-faint)
+            (number red-faint)
             (bg-active-argument unspecified)
             (bg-active-value unspecified)
             (fringe unspecified)
@@ -152,9 +154,9 @@
             (fg-line-number-active fg-main)
             (bg-line-number-inactive unspecified)
             (bg-line-number-active unspecified)))
-  (load-theme 'modus-operandi :no-confirm-loading)
-  (load-theme 'modus-vivendi-tinted :no-confirm-loading)
-  (load-theme 'modus-vivendi :no-confirm-loading))
+  (load-theme 'modus-operandi t t)
+  (load-theme 'modus-vivendi-tinted t t)
+  (load-theme 'modus-vivendi t))
 
 ;;; minions
 
@@ -616,9 +618,6 @@
                `(glsl-ts-mode . ("glsl_analyzer")))
   (add-to-list 'eglot-server-programs
                `(cmake-ts-mode . ("cmake-language-server")))
-  (set-face-attribute 'eglot-mode-line nil
-                      :inherit 'mode-line-buffer-id
-                      :weight 'normal)
   (evil-define-key
     'normal intercept-mode-map (kbd "grn") 'eglot-rename)
   (evil-define-key
