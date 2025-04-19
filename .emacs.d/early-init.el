@@ -17,7 +17,7 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;; Utilities
+;;; Code:
 
 (defun suppress-messages (func &rest args)
   (cl-flet ((silence (&rest args1) (ignore)))
@@ -108,7 +108,7 @@
                       :family proportionately-spaced-font
                       :height 1.0))
 
-;;; Theme
+;;; Themes
 
 (use-package kanagawa-themes
   :ensure nil
@@ -122,7 +122,7 @@
   :config
   (defun better-modus-faces (&rest _)
     (when-let* ((current-theme (car custom-enabled-themes))
-                (modus-theme (modus-themes--modus-p current-theme)))
+                (modus-theme (member current-theme modus-themes-items)))
       (modus-themes-with-colors
         (custom-theme-set-faces
          current-theme
@@ -154,9 +154,10 @@
             (fg-line-number-active fg-main)
             (bg-line-number-inactive unspecified)
             (bg-line-number-active unspecified)))
-  (load-theme 'modus-operandi t t)
-  (load-theme 'modus-vivendi-tinted t t)
-  (load-theme 'modus-vivendi t))
+  (dolist (theme modus-themes-items)
+    (load-theme theme t t)
+    (enable-theme theme))
+  (enable-theme 'modus-vivendi))
 
 ;;; minions
 
@@ -707,9 +708,4 @@
 ;;; Done
 
 (provide 'early-init)
-
-;; Local variables:
-;; byte-compile-warnings: (not obsolete free-vars)
-;; End:
-
 ;;; early-init.el ends here

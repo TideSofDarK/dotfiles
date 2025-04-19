@@ -24,8 +24,8 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 ;;; Commentary:
+
 ;; Minimal CMake integration for Emacs (that just works)
 ;;
 ;; Based on cmake-build.el by Ryan Pavlik
@@ -35,14 +35,13 @@
 ;; That file is intended to be modified by hand but the package
 ;; also provides some convenient interactive prompts.
 
-
 ;;; Code:
 
-
-(require 'cl-lib)
-(require 'project)
-(require 'compile)
-(require 'json)
+(eval-when-compile
+  (require 'cl-lib)
+  (require 'project)
+  (require 'compile)
+  (require 'json))
 
 (defgroup cemako ()
   "Use CMake to build projects and run targets based on configurations."
@@ -178,9 +177,9 @@ otherwise prepend it to the list.
 Otherwise, return key explaining why not."
   (cond
    ((not (cemako--get-project-root))
-     :data-missing)
+    :data-missing)
    ((not (file-directory-p (cemako--get-build-dir project-data)))
-     :build-dir-missing)
+    :build-dir-missing)
    (t t)))
 
 (defun cemako--validate (project-data tag)
