@@ -463,7 +463,11 @@
   flymake
   :ensure nil
   :custom
-  (flymake-indicator-type nil)
+  (flymake-margin-indicators-string
+   '((error "E" compilation-error)
+     (warning "W" compilation-warning)
+     (note "I" compilation-info)))
+  (flymake-indicator-type 'margins)
   (flymake-fringe-indicator-position nil)
   :bind
   (:map evil-normal-state-map
