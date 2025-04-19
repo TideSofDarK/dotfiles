@@ -127,27 +127,33 @@
       (modus-themes-with-colors
         (custom-theme-set-faces
          current-theme
+         `(eglot-diagnostic-tag-unnecessary-face
+           ((,c :inherit font-lock-comment-face)))
          `(region ((,c :background ,bg-region
-                       :foreground ,fg-region
                        :extend nil)))
          `(font-lock-keyword-face ((,c :inherit modus-themes-bold
                                        :foreground ,keyword
                                        :slant italic)))
-         ;; `(font-lock-bracket-face ((,c :foreground ,cyan-faint)))
+         ;; `(font-lock-bracket-face ((,c :foreground     ,cyan-faint)))
+         ;; `(font-lock-punctuation-face ((,c :foreground ,cyan-faint)))
+         ;; `(font-lock-delimiter-face ((,c :foreground   ,cyan-faint)))
          `(font-lock-operator-face ((,c :foreground ,cyan-faint)))
-         `(font-lock-number-face ((,c :foreground ,red-faint)))
          `(font-lock-variable-name-face ((,c :foreground ,fg-main)))
          `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
+  (setopt modus-vivendi-tinted-palette-overrides '((type cyan-cooler)))
   (setopt modus-themes-common-palette-overrides
-          '((fringe unspecified)
-            ;; (bg-region bg-lavender)
-            (fg-region unspecified)
+          '((number red-faint)
+            (bg-active-argument unspecified)
+            (bg-active-value unspecified)
+            (fringe unspecified)
             (fg-line-number-inactive "gray50")
             (fg-line-number-active fg-main)
             (bg-line-number-inactive unspecified)
             (bg-line-number-active unspecified)))
+  (load-theme 'modus-operandi :no-confirm-loading)
+  (load-theme 'modus-vivendi-tinted :no-confirm-loading)
   (load-theme 'modus-vivendi :no-confirm-loading))
 
 ;;; minions
@@ -255,7 +261,7 @@
     (electric-pair-mode t))
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (modify-coding-system-alist 'file "" 'utf-8)
-  (setq custom-file (locate-user-emacs-file "custom.el"))
+  (setopt custom-file (locate-user-emacs-file "custom.el"))
   (load custom-file 'noerror 'nomessage)
   (set-display-table-slot standard-display-table 0 ?\ )
   :bind
@@ -278,26 +284,26 @@
   :config
   (evil-define-key 'normal 'global (kbd "<localleader>x") 'popper-toggle)
   (evil-define-key 'normal 'global (kbd "<leader>x") 'popper-toggle)
-  (setq popper-mode-line "")
-  (setq popper-display-control t)
+  (setopt popper-mode-line "")
+  (setopt popper-display-control t)
   ;; (setq popper-display-function #'display-buffer-pop-up-window)
-  (setq popper-reference-buffers
-        '(
-          ;; "^\\*.*\\*$"
-          "\\*eldoc\\*"
-          "^\\*godot"
-          "\\*Messages\\*"
-          "\\*Warnings\\*"
-          "Output\\*$"
-          "\\*Async Shell Command\\*"
-          xref--xref-buffer-mode
-          help-mode
-          compilation-mode))
-  (setq popper-window-height (lambda (win)
-                               (fit-window-to-buffer
-                                win
-                                (* 2 (floor (frame-height) 5))
-                                (floor (frame-height) 3))))
+  (setopt popper-reference-buffers
+          '(
+            ;; "^\\*.*\\*$"
+            "\\*eldoc\\*"
+            "^\\*godot"
+            "\\*Messages\\*"
+            "\\*Warnings\\*"
+            "Output\\*$"
+            "\\*Async Shell Command\\*"
+            xref--xref-buffer-mode
+            help-mode
+            compilation-mode))
+  (setopt popper-window-height (lambda (win)
+                                 (fit-window-to-buffer
+                                  win
+                                  (* 2 (floor (frame-height) 5))
+                                  (floor (frame-height) 3))))
   (popper-mode t))
 
 ;;; dired
@@ -342,21 +348,21 @@
 (use-package evil
   :ensure t
   :preface
-  (setq evil-want-empty-ex-last-command nil)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-d-scroll t)
-  (setq evil-want-Y-yank-to-eol t)
-  (setq evil-want-integration t)
-  (setq evil-want-fine-undo t)
-  (setq evil-want-minibuffer t)
-  (setq evil-leader/in-all-states t)
-  (setq evil-undo-system 'undo-fu)
-  (setq evil-vsplit-window-right t)
-  (setq evil-auto-balance-windows nil)
-  (setq evil-echo-state nil)
-  (setq evil-kill-on-visual-paste nil)
-  (setq evil-search-module 'evil-search)
+  (setopt evil-want-empty-ex-last-command nil)
+  (setopt evil-want-keybinding nil)
+  (setopt evil-want-C-u-scroll t)
+  (setopt evil-want-C-d-scroll t)
+  (setopt evil-want-Y-yank-to-eol t)
+  (setopt evil-want-integration t)
+  (setopt evil-want-fine-undo t)
+  (setopt evil-want-minibuffer t)
+  (setopt evil-leader/in-all-states t)
+  (setopt evil-undo-system 'undo-fu)
+  (setopt evil-vsplit-window-right t)
+  (setopt evil-auto-balance-windows nil)
+  (setopt evil-echo-state nil)
+  (setopt evil-kill-on-visual-paste nil)
+  (setopt evil-search-module 'evil-search)
   :config
   (evil-mode t)
   (evil-set-leader 'normal (kbd "SPC"))
@@ -376,6 +382,7 @@
   (evil-define-key 'normal 'global
     (kbd "<leader>tn") 'display-line-numbers-mode)
   (evil-define-key 'normal 'global (kbd "<leader>tl") 'global-hl-line-mode)
+  (evil-define-key 'normal 'global (kbd "<leader>to") 'ff-find-other-file)
   (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
   (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
   (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
@@ -422,9 +429,9 @@
   :ensure t
   :after evil
   :preface
-  (setq evil-collection-magit-section-use-z-for-folds t)
-  (setq evil-collection-setup-minibuffer t)
-  (setq evil-collection-want-find-usages-bindings t)
+  (setopt evil-collection-magit-section-use-z-for-folds t)
+  (setopt evil-collection-setup-minibuffer t)
+  (setopt evil-collection-want-find-usages-bindings t)
   :config
   (evil-collection-init))
 (use-package
@@ -467,7 +474,9 @@
    '((error "E" compilation-error)
      (warning "W" compilation-warning)
      (note "I" compilation-info)))
-  (flymake-indicator-type 'margins)
+  ;; (flymake-indicator-type 'margins)
+  (flymake-indicator-type nil)
+  ;; (flymake-margin-indicator-position 'right-margin)
   (flymake-fringe-indicator-position nil)
   :bind
   (:map evil-normal-state-map

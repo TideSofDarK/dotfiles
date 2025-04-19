@@ -198,7 +198,10 @@
          :language mode
          :override t
          :feature 'extras-fields
-         `((field_expression
+         `((initializer_pair
+            designator: (field_designator
+                         (field_identifier) @treesit-extras-field-face))
+           (field_expression
             field: (field_identifier) @treesit-extras-field-face))))
        t)
       (if (eq mode 'c)
