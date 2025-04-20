@@ -523,8 +523,8 @@
   :ensure (glsl-mode
            :host github
            :repo "TideSofDarK/glsl-mode"
-           :branch "playground"
-            :inherit nil)
+           :branch "better-ts-mode"
+           :inherit nil)
   :config
   (use-package glsl-ts-mode :ensure nil))
 
@@ -571,7 +571,7 @@
            :inherit nil
            :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.270")
+  (treesit-langs-bundle-version "0.12.271")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
@@ -588,9 +588,9 @@
 (use-package eglot
   :ensure t
   :hook
-  ((c-ts-mode c++-ts-mode
-              gdscript-ts-mode glsl-ts-mode
-              cmake-ts-mode) . eglot-ensure)
+  ((c-ts-mode c++-ts-mode gdscript-ts-mode
+              glsl-ts-mode cmake-ts-mode)
+   . eglot-ensure)
   :custom
   (eglot-mode-line-format
    '(eglot-mode-line-menu
