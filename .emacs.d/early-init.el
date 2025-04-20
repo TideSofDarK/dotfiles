@@ -517,7 +517,10 @@
 ;;; GLSL
 
 (use-package glsl-mode
-  :ensure t)
+  :ensure (glsl-mode
+           :host github
+           :repo "Xaldew/glsl-mode"
+           :inherit nil))
 
 ;;; Godot
 
