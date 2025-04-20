@@ -519,8 +519,11 @@
 (use-package glsl-mode
   :ensure (glsl-mode
            :host github
-           :repo "Xaldew/glsl-mode"
-           :inherit nil))
+           :repo "TideSofDarK/glsl-mode"
+           :branch "playground"
+            :inherit nil)
+  :config
+  (use-package glsl-ts-mode :ensure nil))
 
 ;;; Godot
 
@@ -572,7 +575,6 @@
   (treesit-langs-major-mode-setup)
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  ;; (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
   (use-package cmake-ts-mode :ensure nil)
   (use-package rust-ts-mode :ensure nil)
   (use-package lua-ts-mode :ensure nil)
@@ -647,6 +649,7 @@
   (evil-define-key 'normal intercept-mode-map (kbd "grr") 'xref-find-references)
   (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
   (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
+  (evil-define-key 'normal 'global (kbd "<leader>st") 'consult-theme)
   (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
   (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
