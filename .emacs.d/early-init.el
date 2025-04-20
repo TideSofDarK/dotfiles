@@ -113,14 +113,13 @@
 
 ;;; Themes
 
-(load-theme 'manoj-dark t)
 (use-package kanagawa-themes
   :ensure nil
   :custom
   (kanagawa-themes-keyword-italic t)
   (kanagawa-themes-comment-italic t)
   :config
-  (load-theme 'kanagawa-wave t t))
+  (load-theme 'kanagawa-wave t))
 (use-package modus-themes
   :ensure t
   :config
