@@ -527,8 +527,7 @@
 (use-package gdscript-mode
   :ensure (gdscript-mode
            :host github
-           :repo "TideSofDarK/emacs-gdscript-mode"
-           :branch "patch-1"
+           :repo "godotengine/emacs-gdscript-mode"
            :inherit nil)
   :custom
   (gdscript-eglot-version "4.4")
