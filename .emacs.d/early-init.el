@@ -113,6 +113,7 @@
 
 ;;; Themes
 
+(load-theme 'manoj-dark t)
 (use-package kanagawa-themes
   :ensure nil
   :custom
@@ -524,7 +525,14 @@
            :host github
            :repo "TideSofDarK/glsl-mode"
            :branch "better-ts-mode"
-           :inherit nil))
+           :inherit nil)
+  :init
+  (custom-set-faces
+   '(glsl-extension-face
+     ((t :inherit font-lock-constant-face))))
+  (custom-set-faces
+   '(glsl-shader-variable-name-face
+     ((t :inherit font-lock-preprocessor-face :slant italic)))))
 
 ;;; Godot
 
