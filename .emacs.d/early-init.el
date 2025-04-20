@@ -524,9 +524,7 @@
            :host github
            :repo "TideSofDarK/glsl-mode"
            :branch "better-ts-mode"
-           :inherit nil)
-  :config
-  (use-package glsl-ts-mode :ensure nil))
+           :inherit nil))
 
 ;;; Godot
 
@@ -578,6 +576,7 @@
   (treesit-langs-major-mode-setup)
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  (use-package glsl-ts-mode :ensure nil)
   (use-package cmake-ts-mode :ensure nil)
   (use-package rust-ts-mode :ensure nil)
   (use-package lua-ts-mode :ensure nil)
