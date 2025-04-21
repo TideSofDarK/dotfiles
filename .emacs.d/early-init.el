@@ -26,18 +26,20 @@
         (apply func args)
       (advice-remove 'message #'silence))))
 
-;;; Optimize GC During Init
+;;; Optimize GC
 
-(put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
-(put 'gc-cons-percentage 'value-during-init 0.6)
-(defun restore-gc-cons-percentage-after-init ()
-  (let ((expected-value (get 'gc-cons-percentage 'value-during-init))
-        (value-to-restore (get 'gc-cons-percentage
-                               'original-value-before-init)))
-    (when (and value-to-restore (equal gc-cons-percentage expected-value))
-      (setq gc-cons-percentage value-to-restore))))
-(add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
-(setq gc-cons-percentage (get 'gc-cons-percentage 'value-during-init))
+(setq gc-cons-threshold (eval-when-compile (* 1024 1024 1024)))
+(run-with-idle-timer 2 t (lambda () (garbage-collect)))
+;; (put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
+;; (put 'gc-cons-percentage 'value-during-init 0.6)
+;; (defun restore-gc-cons-percentage-after-init ()
+;;   (let ((expected-value (get 'gc-cons-percentage 'value-during-init))
+;;         (value-to-restore (get 'gc-cons-percentage
+;;                                'original-value-before-init)))
+;;     (when (and value-to-restore (equal gc-cons-percentage expected-value))
+;;       (setq gc-cons-percentage value-to-restore))))
+;; (add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
+;; (setq gc-cons-percentage (get 'gc-cons-percentage 'value-during-init))
 
 ;;; Maximize On Launch
 
