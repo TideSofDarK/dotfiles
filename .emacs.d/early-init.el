@@ -376,6 +376,7 @@
   (evil-set-leader 'normal (kbd "SPC"))
   (evil-set-leader 'normal "\\" t)
 
+  ;; (define-key evil-command-line-map [tab] nil t)
   (evil-define-key 'insert 'global (kbd "\C-y") nil)
   (evil-define-key 'normal 'global (kbd "C-l") 'evil-ex-nohighlight)
   (evil-define-key 'insert 'global (kbd "TAB") 'tab-to-tab-stop)
