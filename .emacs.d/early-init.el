@@ -143,7 +143,9 @@
          `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
-  (setopt modus-vivendi-tinted-palette-overrides '((type cyan-cooler)))
+  (setopt modus-vivendi-tinted-palette-overrides
+          '((type cyan-cooler)
+            (comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
           '(
             ;; (bracket ,cyan-faint)
@@ -168,7 +170,8 @@
 
 (use-package minions
   :ensure t
-  :config (minions-mode t))
+  :config
+  (minions-mode t))
 
 ;;; emacs
 
@@ -267,10 +270,20 @@
     (delete-selection-mode t)
     (electric-indent-mode t)
     (electric-pair-mode t))
+
   (add-hook 'prog-mode-hook #'display-line-numbers-mode)
+  (add-hook 'display-line-numbers-mode-hook
+            (lambda ()
+              (setq left-margin-width
+                    (if display-line-numbers-mode 1 0))
+              (set-window-buffer (selected-window)
+                                 (window-buffer (selected-window)))))
+
   (modify-coding-system-alist 'file "" 'utf-8)
+
   (setopt custom-file (locate-user-emacs-file "custom.el"))
   (load custom-file 'noerror 'nomessage)
+
   (set-display-table-slot standard-display-table 0 ?\ )
   :bind
   ("C-=" . text-scale-increase)
@@ -447,6 +460,7 @@
   evil-commentary
   :ensure t
   :config (evil-commentary-mode))
+(elpaca-wait)
 
 ;;; drag-stuff
 
@@ -477,16 +491,17 @@
 
 (use-package
   flymake
-  :ensure nil
+  :ensure t
   :custom
   (flymake-margin-indicators-string
    '((error "E" compilation-error)
      (warning "W" compilation-warning)
      (note "I" compilation-info)))
-  ;; (flymake-indicator-type 'margins)
-  (flymake-indicator-type nil)
+  (flymake-autoresize-margins nil)
+  (flymake-indicator-type 'margins)
+  ;; (flymake-indicator-type nil)
   ;; (flymake-margin-indicator-position 'right-margin)
-  (flymake-fringe-indicator-position nil)
+  ;; (flymake-fringe-indicator-position nil)
   :bind
   (:map evil-normal-state-map
         ("[d" . flymake-goto-prev-error)
