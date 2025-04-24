@@ -692,22 +692,16 @@
   :config
   (keymap-set vertico-map "C-y" #'vertico-insert)
   (vertico-mode 1))
-(use-package hotfuzz
-  :ensure (hotfuzz :host github :url "axelf4/hotfuzz"))
 (use-package
   orderless
-  :after hotfuzz
   :ensure t
   :custom
-  (completion-styles '(orderless hotfuzz basic))
+  (completion-styles '(orderless flex))
   (completion-category-defaults nil)
   (completion-category-overrides
-   '((eglot (styles orderless))
-     (eglot-capf (styles orderless))
-     (file (styles basic partial-completion))
-     (buffer (styles orderless))
-     (project-file (styles hotfuzz))
-     (command (styles orderless)))))
+   '((file (styles basic partial-completion))
+     (eglot (styles orderless))
+     (eglot-capf (styles orderless)))))
 (use-package marginalia
   :ensure t
   :init (marginalia-mode))
