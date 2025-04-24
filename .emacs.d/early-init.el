@@ -700,6 +700,7 @@
   (completion-category-defaults nil)
   (completion-category-overrides
    '((file (styles basic partial-completion))
+     (imenu (styles flex))
      (eglot (styles orderless))
      (eglot-capf (styles orderless)))))
 (use-package marginalia
