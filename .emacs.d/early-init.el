@@ -139,13 +139,13 @@
                        :extend nil)))
          `(font-lock-keyword-face ((,c :inherit modus-themes-bold
                                        :foreground ,keyword
-                                       :slant italic)))
-         `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
+                                       :slant italic)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
-          '((bracket fg-alt)
+          '((property fg-alt)
+            (bracket fg-alt)
             (delimiter cyan-faint)
             (punctuation fg-alt)
             (variable fg-main)
