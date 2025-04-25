@@ -140,19 +140,18 @@
          `(font-lock-keyword-face ((,c :inherit modus-themes-bold
                                        :foreground ,keyword
                                        :slant italic)))
-         `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
+         `(font-lock-property-name-face ((,c :foreground ,cyan-faint)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides
           '((type cyan-cooler)
             (comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
-          '(
-            ;; (bracket ,cyan-faint)
-            ;; (delimiter ,cyan-faint)
-            ;; (punctuation ,cyan-faint)
+          '((bracket fg-alt)
+            (delimiter fg-alt)
+            (punctuation fg-alt)
             (variable fg-main)
-            (operator cyan-faint)
+            (operator slate)
             (number red-faint)
             (bg-active-argument unspecified)
             (bg-active-value unspecified)
