@@ -147,7 +147,6 @@
       (case_statement value: (identifier) @font-lock-constant-face)
 
       (sizeof_expression "sizeof" @treesit-extras-named-operator-face)
-      (sizeof_expression value: (parenthesized_expression (identifier) @font-lock-type-face))
 
       (labeled_statement label: (_) @treesit-extras-label-face)
       (goto_statement label: (_) @treesit-extras-label-face)

@@ -143,9 +143,7 @@
          `(font-lock-property-name-face ((,c :foreground ,fg-alt)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   (setopt modus-themes-italic-constructs t)
-  (setopt modus-vivendi-tinted-palette-overrides
-          '(
-            (comment fg-dim)))
+  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
           '((bracket fg-alt)
             (delimiter cyan-faint)
