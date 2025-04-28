@@ -496,6 +496,7 @@
      (note "I" compilation-info)))
   (flymake-autoresize-margins nil)
   (flymake-indicator-type 'margins)
+  ;; (flymake-show-diagnostics-at-end-of-line 'fancy)
   ;; (flymake-indicator-type nil)
   ;; (flymake-margin-indicator-position 'right-margin)
   ;; (flymake-fringe-indicator-position nil)
