@@ -176,7 +176,7 @@
   :ensure nil
   :custom
   ;; (fringe-mode '(nil . 0))
-  (fringe-mode 0)
+  ;; (fringe-mode 0)
   (isearch-lazy-count t)
   (isearch-lazy-highlight t)
   (vc-follow-symlinks t)
@@ -210,7 +210,6 @@
   (display-line-numbers-grow-only t)
   (display-line-numbers-width 3)
   (display-line-numbers-width-start t)
-  ;; (global-display-line-numbers-mode t)
   (mouse-wheel-progressive-speed nil)
   ;; (scroll-error-top-bottom t)
   (scroll-margin 6)
@@ -268,7 +267,6 @@
     (electric-indent-mode t)
     (electric-pair-mode t))
 
-  (add-hook 'prog-mode-hook #'display-line-numbers-mode)
   (add-hook 'display-line-numbers-mode-hook
             (lambda ()
               (setq left-margin-width
