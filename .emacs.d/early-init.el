@@ -212,7 +212,7 @@
   (display-line-numbers-width-start t)
   (mouse-wheel-progressive-speed nil)
   ;; (scroll-error-top-bottom t)
-  (scroll-margin 6)
+  ;; (scroll-margin 6)
   ;; (scroll-conservatively 101)
   ;; (scroll-up-aggressively 0.01)
   ;; (scroll-down-aggressively 0.01)
@@ -253,6 +253,8 @@
   (mouse-highlight nil)
   (show-help-function nil)
   (tooltip-mode nil)
+  (blink-cursor-blinks 0)
+  (blink-cursor-mode t)
   :init
   (advice-add 'recentf-cleanup :around #'suppress-messages)
   (advice-add 'recentf-mode :around #'suppress-messages)
