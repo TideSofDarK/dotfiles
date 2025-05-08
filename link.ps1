@@ -10,9 +10,12 @@ function Create-SymbolicLink {
 }
 
 Create-SymbolicLink -symlinkPath "$env:LOCALAPPDATA\nvim\" -targetPath ".\nvim\"
-Create-SymbolicLink -symlinkPath "$env:APPDATA\.emacs.d\" -targetPath ".\.emacs.d\"
 Create-SymbolicLink -symlinkPath "$env:APPDATA\alacritty\" -targetPath ".\alacritty\"
 Create-SymbolicLink -symlinkPath "$env:APPDATA\kitty\" -targetPath ".\kitty\"
+
+New-Item -path "$env:APPDATA\.emacs.d\" -ItemType Directory -Force
+Create-SymbolicLink -symlinkPath "$env:APPDATA\.emacs.d\early-init.el" -targetPath ".\.emacs.d\early-init.el"
+Create-SymbolicLink -symlinkPath "$env:APPDATA\.emacs.d\lisp\" -targetPath ".\.emacs.d\lisp\"
 
 Create-SymbolicLink -symlinkPath "$HOME\.ideavimrc" -targetPath ".\.ideavimrc"
 Create-SymbolicLink -symlinkPath "$HOME\.editorconfig" -targetPath ".\.editorconfig"
