@@ -592,7 +592,7 @@
            :inherit nil
            :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.271")
+  (treesit-langs-bundle-version "0.12.276")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
