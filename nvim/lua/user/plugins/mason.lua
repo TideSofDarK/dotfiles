@@ -1,7 +1,7 @@
 return {
   'WhoIsSethDaniel/mason-tool-installer.nvim',
   dependencies = {
-    { 'williamboman/mason.nvim', config = true },
+    { 'mason-org/mason.nvim', config = true },
   },
   config = function()
     require('mason').setup()
