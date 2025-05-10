@@ -24,7 +24,7 @@ require('lazy').setup({
     lazy = false,
   },
   install = {
-    colorscheme = { 'kanagawa' },
+    colorscheme = { 'default' },
   },
   change_detection = {
     enabled = false,
@@ -58,5 +58,4 @@ require('lazy').setup({
     }
   }
 })
-
-vim.cmd("colorscheme kanagawa-wave")
+vim.cmd("colorscheme default")

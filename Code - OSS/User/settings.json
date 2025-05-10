@@ -18,36 +18,36 @@
     "vim.operatorPendingModeKeyBindings": [
         {
             "before": [
-                "H",
+                "H"
             ],
             "after": [
-                "^",
+                "^"
             ]
         },
         {
             "before": [
-                "L",
+                "L"
             ],
             "after": [
-                "$",
+                "$"
             ]
-        },
+        }
     ],
     "vim.normalModeKeyBindingsNonRecursive": [
         {
             "before": [
-                "H",
+                "H"
             ],
             "after": [
-                "^",
+                "^"
             ]
         },
         {
             "before": [
-                "L",
+                "L"
             ],
             "after": [
-                "$",
+                "$"
             ]
         },
         {
@@ -91,7 +91,7 @@
             "before": [
                 "<leader>",
                 "s",
-                "f",
+                "f"
             ],
             "commands": [
                 "workbench.action.quickOpen"
@@ -101,7 +101,7 @@
             "before": [
                 "g",
                 "r",
-                "n",
+                "n"
             ],
             "commands": [
                 "editor.action.rename"
@@ -111,7 +111,7 @@
             "before": [
                 "<leader>",
                 "c",
-                "f",
+                "f"
             ],
             "commands": [
                 "editor.action.format"
@@ -120,7 +120,7 @@
         {
             "before": [
                 "]",
-                "d",
+                "d"
             ],
             "commands": [
                 "editor.action.marker.next"
@@ -129,7 +129,7 @@
         {
             "before": [
                 "[",
-                "d",
+                "d"
             ],
             "commands": [
                 "editor.action.marker.prev"
@@ -138,7 +138,7 @@
         {
             "before": [
                 "<leader>",
-                "<leader>",
+                "<leader>"
             ],
             "commands": [
                 "workbench.action.showAllEditors"
@@ -148,39 +148,16 @@
             "before": [
                 "<leader>",
                 "t",
-                "t",
+                "t"
             ],
             "commands": [
                 "workbench.view.explorer"
             ]
-        },
+        }
     ],
     "vim.leader": "<space>",
     "extensions.experimental.affinity": {
         "vscodevim.vim": 1
-    },
-    "editor.tokenColorCustomizations": {
-        "[Kanagawa Wave]": {
-            "textMateRules": [
-                {
-                    "name": "Constants and enums",
-                    "scope": [
-                        "variable.other.constant",
-                        "variable.other.enummember"
-                    ],
-                    "settings": {
-                        "foreground": "#f89860"
-                    }
-                },
-                {
-                    "name": "Keyword",
-                    "scope": "keyword",
-                    "settings": {
-                        "foreground": "#957fb8"
-                    }
-                }
-            ]
-        }
     },
     "editor.fontFamily": "'Sarasa Term Slab CL', 'monospace', monospace",
     "editor.fontSize": 14,
@@ -195,7 +172,6 @@
     "editor.minimap.enabled": false,
     "editor.scrollbar.verticalScrollbarSize": 0,
     "editor.cursorSurroundingLines": 5,
-    "workbench.colorTheme": "Kanagawa Wave",
     "workbench.activityBar.location": "top",
-    "chat.commandCenter.enabled": false,
+    "chat.commandCenter.enabled": false
 }
