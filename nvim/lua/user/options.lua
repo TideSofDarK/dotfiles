@@ -2,7 +2,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
 vim.o.hlsearch = false
--- vim.o.signcolumn = 'yes'
+vim.o.signcolumn = 'no'
 -- vim.wo.number = true
 -- vim.wo.relativenumber = true
 vim.o.mouse = 'nv'
