@@ -177,6 +177,7 @@
   :custom
   ;; (fringe-mode '(nil . 0))
   ;; (fringe-mode 0)
+  (fringes-outside-margins t)
   (isearch-lazy-count t)
   (isearch-lazy-highlight t)
   (vc-follow-symlinks t)
@@ -400,6 +401,7 @@
     'global (kbd "L") 'evil-end-of-line)
   (evil-define-key 'normal 'global
     (kbd "<leader>tn") 'display-line-numbers-mode)
+  (evil-define-key 'normal 'global (kbd "<leader>td") 'diff-hl-mode)
   (evil-define-key 'normal 'global (kbd "<leader>tl") 'global-hl-line-mode)
   (evil-define-key 'normal 'global (kbd "<leader>to") 'ff-find-other-file)
   (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
