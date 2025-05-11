@@ -2,8 +2,9 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = '\\'
 
 vim.o.hlsearch = false
-vim.wo.number = true
-vim.wo.relativenumber = true
+-- vim.o.signcolumn = 'yes'
+-- vim.wo.number = true
+-- vim.wo.relativenumber = true
 vim.o.mouse = 'nv'
 
 vim.schedule(function()
@@ -29,7 +30,6 @@ vim.o.incsearch = true
 vim.o.ignorecase = false
 vim.o.smartcase = true
 -- vim.o.colorcolumn = '100'
-vim.o.signcolumn = 'yes'
 -- vim.o.cursorline = true
 vim.o.cmdheight = 1
 -- vim.o.updatetime = 250
