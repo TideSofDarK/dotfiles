@@ -42,23 +42,6 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
--- Better window navigation
-
-vim.keymap.set('n', '<m-h>', '<C-w>h')
-vim.keymap.set('n', '<m-j>', '<C-w>j')
-vim.keymap.set('n', '<m-k>', '<C-w>k')
-vim.keymap.set('n', '<m-l>', '<C-w>l')
-
--- Highlight on yank
-
-vim.api.nvim_create_autocmd('TextYankPost', {
-    desc = 'Highlight when yanking (copying) text',
-    group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
-    callback = function()
-        vim.highlight.on_yank()
-    end,
-})
-
 -- Select lines and move them up/down
 
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv")
