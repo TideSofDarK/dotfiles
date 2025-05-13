@@ -382,6 +382,7 @@
   (setopt evil-echo-state nil)
   (setopt evil-kill-on-visual-paste nil)
   (setopt evil-search-module 'evil-search)
+  (setopt evil-insert-state-cursor nil)
   :config
   (evil-mode t)
   (evil-set-leader 'normal (kbd "SPC"))
@@ -481,6 +482,13 @@
   :after (transient diff-hl)
   :custom
   (magit-section-visibility-indicator nil))
+
+;;; hl-todo
+
+(use-package hl-todo
+  :ensure t
+  :config
+  (add-hook 'prog-mode-hook #'global-hl-todo-mode))
 
 ;;; flymake
 
