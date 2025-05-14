@@ -336,7 +336,12 @@
   (dired-ls-F-marks-symlinks t)
   (dired-kill-when-opening-new-dired-buffer t)
   (dired-listing-switches "-lah --group-directories-first")
-  (dired-dwim-target t))
+  (dired-dwim-target t)
+  :config
+  (add-hook 'dired-mode-hook
+            (lambda ()
+              (dired-hide-details-mode 1)
+              (hl-line-mode 1))))
 
 ;;; eldoc
 
