@@ -119,9 +119,8 @@
   :ensure nil
   :custom
   (kanagawa-themes-keyword-italic t)
-  (kanagawa-themes-comment-italic t)
-  :config
-  (load-theme 'kanagawa-wave t))
+  (kanagawa-themes-comment-italic t))
+
 (use-package modus-themes
   :ensure t
   :config
@@ -340,8 +339,13 @@
   :config
   (add-hook 'dired-mode-hook
             (lambda ()
-              (dired-hide-details-mode 1)
+              ;; (dired-hide-details-mode 1)
               (hl-line-mode 1))))
+
+(use-package diredfl
+  :ensure t
+  :config
+  (diredfl-global-mode))
 
 ;;; eldoc
 
@@ -447,6 +451,7 @@
     (pulse-momentary-highlight-region beg end)
     (apply orig-fn beg end args))
   (advice-add 'evil-yank :around 'evil-yank-highlight))
+
 (use-package
   evil-collection
   :ensure t
@@ -457,10 +462,12 @@
   (setopt evil-collection-want-find-usages-bindings t)
   :config
   (evil-collection-init))
+
 (use-package
   evil-commentary
   :ensure t
   :config (evil-commentary-mode))
+
 (elpaca-wait)
 
 ;;; drag-stuff
@@ -571,6 +578,7 @@
   (gdscript-eglot-version "4.4")
   (gdscript-indent-offset 4)
   (gdscript-use-tab-indents nil))
+
 (use-package gdshader-mode
   :ensure (gdshader-mode
            :host github
@@ -596,6 +604,7 @@
   :ensure nil
   :custom
   (treesit-font-lock-level 4))
+
 (use-package treesit-langs
   :ensure (treesit-langs
            :host github
@@ -689,10 +698,12 @@
   (evil-define-key 'normal 'global (kbd "<leader>sg") 'consult-ripgrep)
   (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
+
 (use-package consult-eglot
   :ensure t
   :config
   (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
+
 (use-package vertico
   :ensure t
   :custom
@@ -701,6 +712,7 @@
   :config
   (keymap-set vertico-map "C-y" #'vertico-insert)
   (vertico-mode 1))
+
 (use-package
   orderless
   :ensure t
@@ -712,9 +724,11 @@
      (imenu (styles flex))
      (eglot (styles orderless))
      (eglot-capf (styles orderless)))))
+
 (use-package marginalia
   :ensure t
   :init (marginalia-mode))
+
 (use-package corfu
   :ensure t
   :custom
@@ -732,6 +746,7 @@
     (corfu-popupinfo-mode))
   (keymap-set corfu-map "RET" nil)
   (keymap-set corfu-map "C-y" #'corfu-complete))
+
 (use-package cape
   :ensure t
   :custom
