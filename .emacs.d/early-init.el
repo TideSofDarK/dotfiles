@@ -723,7 +723,7 @@
   (corfu-bar-width 0.0)
   (corfu-cycle t)
   (corfu-auto t)
-  (corfu-auto-delay 0.15)
+  (corfu-auto-delay 0.1)
   (corfu-auto-prefix 2)
   (corfu-popupinfo-delay 0.25)
   :config
