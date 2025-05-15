@@ -1,14 +1,18 @@
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
+-- Toggle cursor line highlighting
+
+vim.keymap.set('n', '<leader>tl', '<cmd>:se invcursorline<cr>', { desc = 'Toggle cursor line highlighting' })
+
 -- Toggle line numbers and sign column
 
 vim.keymap.set('n', '<leader>tn',
-    function()
-        vim.o.signcolumn = vim.o.signcolumn == "yes" and "no" or "yes"
-        vim.o.number = not vim.o.number
-        vim.o.relativenumber = not vim.o.relativenumber
-    end
-    , { desc = 'Toggle line numbers and sign column' })
+  function()
+    vim.o.signcolumn = vim.o.signcolumn == "yes" and "no" or "yes"
+    vim.o.number = not vim.o.number
+    vim.o.relativenumber = not vim.o.relativenumber
+  end
+  , { desc = 'Toggle line numbers and sign column' })
 
 -- Quickly delete buffer
 
@@ -55,12 +59,12 @@ vim.keymap.set("n", "<leader>P", "m`O<ESC>p``", { desc = "Paste above current li
 -- Close location list or quickfix list if they are present, see https://superuser.com/q/355325/736190
 
 vim.keymap.set('n', "<localleader>x", '<cmd>windo lclose <bar> cclose <cr>', {
-    silent = true,
-    desc = 'Close qf and location list',
+  silent = true,
+  desc = 'Close qf and location list',
 })
 vim.keymap.set('n', "<leader>x", '<cmd>windo lclose <bar> cclose <cr>', {
-    silent = true,
-    desc = 'Close qf and location list',
+  silent = true,
+  desc = 'Close qf and location list',
 })
 
 -- Continuous visual shifting (does not exit Visual mode)
@@ -75,7 +79,7 @@ vim.keymap.set('x', '>', '>gv')
 vim.keymap.set('n', [[\c]], '<cmd>lcd %:p:h<cr><cmd>pwd<cr>', { desc = 'Change CWD to current file' })
 
 vim.keymap.set('n', [[\;]], ':cd ' .. vim.fn.stdpath 'config' .. '<cr>',
-    { desc = 'Change CWD to Neovim config directory' })
+  { desc = 'Change CWD to Neovim config directory' })
 
 -- Change text without putting it into the vim register
 -- See https://stackoverflow.com/q/54255/6064933
