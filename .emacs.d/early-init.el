@@ -695,6 +695,13 @@
   (keymap-set vertico-map "C-y" #'vertico-insert)
   (vertico-mode 1))
 
+(use-package vertico-repeat
+  :ensure nil
+  :after vertico
+  :config
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+  (evil-define-key 'normal 'global (kbd "<leader>sr") 'vertico-repeat))
+
 (use-package
   orderless
   :ensure t
