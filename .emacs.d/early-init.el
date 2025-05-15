@@ -267,9 +267,7 @@
   (modify-coding-system-alist 'file "" 'utf-8)
 
   (setopt custom-file (locate-user-emacs-file "custom.el"))
-  (load custom-file 'noerror 'nomessage)
-
-  (set-display-table-slot standard-display-table 0 ?\ ))
+  (load custom-file 'noerror 'nomessage))
 
 ;;; ansi-color
 
