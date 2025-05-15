@@ -30,30 +30,20 @@
 
 (setq gc-cons-threshold (eval-when-compile (* 1024 1024 1024)))
 (run-with-idle-timer 2 t (lambda () (garbage-collect)))
-;; (put 'gc-cons-percentage 'original-value-before-init gc-cons-percentage)
-;; (put 'gc-cons-percentage 'value-during-init 0.6)
-;; (defun restore-gc-cons-percentage-after-init ()
-;;   (let ((expected-value (get 'gc-cons-percentage 'value-during-init))
-;;         (value-to-restore (get 'gc-cons-percentage
-;;                                'original-value-before-init)))
-;;     (when (and value-to-restore (equal gc-cons-percentage expected-value))
-;;       (setq gc-cons-percentage value-to-restore))))
-;; (add-hook 'after-init-hook #'restore-gc-cons-percentage-after-init)
-;; (setq gc-cons-percentage (get 'gc-cons-percentage 'value-during-init))
 
 ;;; Maximize On Launch
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
-;;; Add Lisp Path
+;;; Lisp Settings
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
+;; (setq load-prefer-newer t)
+;; (setq native-comp-deferred-compilation t)
+;; (setq native-compile-prune-cache t)
 
 ;;; Elpaca
 
-(setq load-prefer-newer t)
-(setq native-comp-deferred-compilation t)
-(setq native-compile-prune-cache t)
 (setq package-enable-at-startup nil)
 (defvar elpaca-installer-version 0.11)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
@@ -101,7 +91,6 @@
 ;;; Fonts
 
 (let ((mono-spaced-font "Sarasa Term Slab CL")
-      ;; (proportionately-spaced-font "Sarasa UI CL"))
       (proportionately-spaced-font "Sarasa Term Slab CL"))
   (set-face-attribute 'default nil
                       :family mono-spaced-font
@@ -237,7 +226,6 @@
   (switch-to-buffer-obey-display-actions t)
   ;; (pixel-scroll-precision-mode t)
   ;; (pixel-scroll-precision-use-momentum nil)
-  ;; (global-hl-line-mode 1)
   (bidi-display-reordering 'left-to-right)
   (bidi-paragraph-direction 'left-to-right)
   (bidi-inhibit-bpa t)
@@ -281,12 +269,7 @@
   (setopt custom-file (locate-user-emacs-file "custom.el"))
   (load custom-file 'noerror 'nomessage)
 
-  (set-display-table-slot standard-display-table 0 ?\ )
-  :bind
-  ("C-=" . text-scale-increase)
-  ("C--" . text-scale-decrease)
-  ("<C-wheel-up>" . text-scale-increase)
-  ("<C-wheel-down>" . text-scale-decrease))
+  (set-display-table-slot standard-display-table 0 ?\ ))
 
 ;;; ansi-color
 
@@ -405,15 +388,16 @@
     'global (kbd "H") 'evil-first-non-blank)
   (evil-define-key '(normal motion visual)
     'global (kbd "L") 'evil-end-of-line)
+  (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
+  (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
+  (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
+  (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
+
   (evil-define-key 'normal 'global
     (kbd "<leader>tn") 'display-line-numbers-mode)
   (evil-define-key 'normal 'global (kbd "<leader>td") 'global-diff-hl-mode)
   (evil-define-key 'normal 'global (kbd "<leader>tl") 'global-hl-line-mode)
   (evil-define-key 'normal 'global (kbd "<leader>to") 'ff-find-other-file)
-  (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
-  (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
-  (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
-  (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
 
   (defmacro evil-map (state key seq)
     (let ((map (intern (format "evil-%S-state-map" state)))
@@ -649,7 +633,6 @@
   (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
   (eglot-code-action-indications '(eldoc-hint))
-  ;; (eglot-stay-out-of '(flymake eldoc))
   ;; (eldoc-idle-delay 0.1)
   :config
   (fset #'jsonrpc--log-event #'ignore)
@@ -674,6 +657,7 @@
     'normal intercept-mode-map (kbd "gra") 'eglot-code-actions)
   (evil-define-key
     'normal eglot-mode-map (kbd "<leader>cf") 'eglot-format))
+
 (use-package eglot-inactive-regions
   :ensure t
   :custom
