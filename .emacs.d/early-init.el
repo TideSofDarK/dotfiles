@@ -604,8 +604,28 @@
   (use-package glsl-ts-mode :ensure nil)
   (use-package cmake-ts-mode :ensure nil)
   (use-package rust-ts-mode :ensure nil)
-  (use-package lua-ts-mode :ensure nil)
-  (use-package treesit-extras :ensure nil))
+  (use-package lua-ts-mode :ensure nil))
+
+(use-package c-ts-mode-extras
+  :ensure (c-ts-mode-extras
+           :host github
+           :repo "TideSofDarK/c-ts-mode-extras"
+           :inherit nil
+           :after treesit-langs)
+  :config
+  ;; (defun custom-c-ts-mode-indent-style()
+  ;;   `(
+  ;;     ((node-is "preproc") column-0 0)
+  ;;     ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
+  ;;     ((node-is ")") parent-bol 0)
+  ;;     ((match nil "argument_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+  ;;     ((parent-is "argument_list") prev-sibling 0)
+  ;;     ((match nil "parameter_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
+  ;;     ((parent-is "parameter_list") prev-sibling 0)
+  ;;     ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+  (setopt c-ts-mode-indent-offset 4)
+  (setopt c-ts-mode-indent-style 'bsd)
+  (setopt c-ts-mode-enable-doxygen t))
 
 ;;; Eglot
 

@@ -872,12 +872,12 @@ names to which it refers are bound."
       (magit-section-highlight (:background ,bg-m2 :extend t))
       (magit-section-title (:background ,bg :foreground ,syn-keyword :inherit bold))
 ;;;;;;; treesit-custom
-      ;; (treesit-extras-boolean-face (:foreground ,syn-special-2 :weight bold))
-      ;; (treesit-extras-null-face (:foreground ,syn-special-2))
-      (treesit-extras-parameter-face (:foreground ,syn-parameter))
-      (treesit-extras-this-face (:inherit font-lock-keyword-face :foreground ,syn-special-2))
-      (treesit-extras-return-face (:inherit font-lock-keyword-face :foreground ,syn-special-3))
-      (treesit-extras-named-operator-face (:inherit font-lock-operator-face :weight bold)))))
+      ;; (c-ts-mode-extras-boolean-face (:foreground ,syn-special-2 :weight bold))
+      ;; (c-ts-mode-extras-null-face (:foreground ,syn-special-2))
+      (c-ts-mode-extras-parameter-face (:foreground ,syn-parameter))
+      (c-ts-mode-extras-this-face (:inherit font-lock-keyword-face :foreground ,syn-special-2))
+      (c-ts-mode-extras-return-face (:inherit font-lock-keyword-face :foreground ,syn-special-3))
+      (c-ts-mode-extras-named-operator-face (:inherit font-lock-operator-face :weight bold)))))
 
 (defmacro kanagawa-themes--with-variant-colors (variant &rest body)
   "Execute BODY with the color palette of a specified theme VARIANT."
