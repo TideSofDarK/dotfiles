@@ -348,6 +348,7 @@
 
 (use-package undo-fu
   :ensure t)
+
 (use-package undo-fu-session
   :ensure t
   :hook (after-init . undo-fu-session-global-mode))
@@ -486,16 +487,15 @@
 
 ;;; flymake
 
-(use-package
-  flymake
+(use-package flymake
   :ensure t
   :custom
   (flymake-margin-indicators-string
    '((error "E" compilation-error)
      (warning "W" compilation-warning)
      (note "I" compilation-info)))
-  (flymake-autoresize-margins nil)
   (flymake-indicator-type 'margins)
+  (flymake-autoresize-margins nil)
   ;; (flymake-show-diagnostics-at-end-of-line 'fancy)
   ;; (flymake-indicator-type nil)
   ;; (flymake-margin-indicator-position 'right-margin)
@@ -733,7 +733,7 @@
   (global-corfu-mode)
   (let ((inhibit-message t))
     (corfu-popupinfo-mode))
-  (keymap-set corfu-map "RET" nil)
+  (keymap-unset corfu-map "RET")
   (keymap-set corfu-map "C-y" #'corfu-complete))
 
 (use-package cape
