@@ -253,9 +253,9 @@
     (recentf-mode t)
     (global-auto-revert-mode t)
     (savehist-mode t)
-    (delete-selection-mode t)
-    (electric-indent-mode t)
-    (electric-pair-mode t))
+    (electric-indent-mode -1)
+    (electric-pair-mode t)
+    (delete-selection-mode t))
 
   (add-hook 'display-line-numbers-mode-hook
             (lambda ()
@@ -642,8 +642,7 @@
      eglot-mode-line-action-suggestion))
   (eglot-ignored-server-capabilities
    '(:inlayHintProvider
-     :documentHighlightProvider
-     :documentOnTypeFormattingProvider))
+     :documentHighlightProvider))
   (eglot-events-buffer-size 0)
   (eglot-autoshutdown t)
   (eglot-report-progress nil)
