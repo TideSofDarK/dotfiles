@@ -253,7 +253,7 @@
     (recentf-mode t)
     (global-auto-revert-mode t)
     (savehist-mode t)
-    (electric-indent-mode -1)
+    (electric-indent-mode t)
     (electric-pair-mode t)
     (delete-selection-mode t))
 
@@ -623,6 +623,12 @@
   ;;     ((match nil "parameter_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
   ;;     ((parent-is "parameter_list") prev-sibling 0)
   ;;     ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
+  (add-hook 'c-ts-mode-hook
+            (lambda ()
+              (electric-indent-local-mode -1)))
+  (add-hook 'c++-ts-mode-hook
+            (lambda ()
+              (electric-indent-local-mode -1)))
   (setopt c-ts-mode-indent-offset 4)
   (setopt c-ts-mode-indent-style 'bsd)
   (setopt c-ts-mode-enable-doxygen t))
