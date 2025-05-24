@@ -349,7 +349,8 @@
 ;;; org
 
 (use-package org
-  :ensure nil)
+  :ensure nil
+  :hook (org-mode . (lambda () (setq-local truncate-lines nil))))
 
 ;;; undo-fu
 
