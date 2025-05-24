@@ -39,8 +39,6 @@
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
 ;; (setq load-prefer-newer t)
-;; (setq native-comp-deferred-compilation t)
-;; (setq native-compile-prune-cache t)
 
 ;;; Elpaca
 
@@ -110,8 +108,17 @@
   (kanagawa-themes-keyword-italic t)
   (kanagawa-themes-comment-italic t))
 
+(use-package doric-themes
+  :ensure (doric-themes
+           :host github
+           :repo "protesilaos/doric-themes"
+           :inherit nil))
+
 (use-package modus-themes
-  :ensure t
+  :ensure (modus-themes
+           :host github
+           :repo "protesilaos/modus-themes"
+           :inherit nil)
   :config
   (defun better-modus-faces (&rest _)
     (when-let* ((current-theme (car custom-enabled-themes))
