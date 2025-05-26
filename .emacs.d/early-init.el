@@ -536,11 +536,6 @@
   ("<leader>bb" . cemako-build)
   ("<leader>br" . cemako-run))
 
-;;; Swift
-
-(use-package swift-mode
-  :ensure t)
-
 ;;; GLSL
 
 (use-package glsl-mode
