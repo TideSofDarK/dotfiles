@@ -38,7 +38,7 @@
 ;;; Lisp Settings
 
 (add-to-list 'load-path (concat user-emacs-directory "lisp"))
-;; (setq load-prefer-newer t)
+(setq load-prefer-newer t)
 
 ;;; Elpaca
 
