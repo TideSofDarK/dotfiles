@@ -102,12 +102,6 @@
 
 ;;; Themes
 
-(use-package kanagawa-themes
-  :ensure nil
-  :custom
-  (kanagawa-themes-keyword-italic t)
-  (kanagawa-themes-comment-italic t))
-
 (use-package doric-themes
   :ensure (doric-themes
            :host github
