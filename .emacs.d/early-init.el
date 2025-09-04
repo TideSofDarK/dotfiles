@@ -17,6 +17,16 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Notes:
+
+;;
+;; Using local package repo with Elpaca:
+;;
+;; (elpaca '(package-name :repo "~/Projects/package-name")
+;;   :init
+;;   ...)
+;;
+
 ;;; Code:
 
 (defun suppress-messages (func &rest args)
