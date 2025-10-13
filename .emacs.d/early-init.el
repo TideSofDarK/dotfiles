@@ -157,10 +157,7 @@
             (fg-line-number-active fg-main)
             (bg-line-number-inactive unspecified)
             (bg-line-number-active unspecified)))
-  (dolist (theme modus-themes-items)
-    (load-theme theme t t)
-    (enable-theme theme))
-  (enable-theme 'modus-vivendi))
+  (load-theme 'modus-vivendi t))
 
 ;;; minions
 
