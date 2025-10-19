@@ -193,7 +193,6 @@
   (inhibit-startup-screen t)
   (inhibit-splash-screen t)
   (initial-scratch-message nil)
-  (blink-cursor-mode nil)
   (revert-without-query (list "."))
   (auto-revert-stop-on-user-input nil)
   (auto-revert-verbose t)
