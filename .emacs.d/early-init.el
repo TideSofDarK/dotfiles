@@ -462,6 +462,13 @@
 
 (elpaca-wait)
 
+;;;
+
+(use-package dtrt-indent
+  :ensure t
+  :config
+  (dtrt-indent-global-mode))
+
 ;;; drag-stuff
 
 (use-package drag-stuff
@@ -598,7 +605,7 @@
            :inherit nil
            :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.301")
+  (treesit-langs-bundle-version "0.12.311")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
@@ -633,7 +640,7 @@
   (add-hook 'c++-ts-mode-hook
             (lambda ()
               (electric-indent-local-mode -1)))
-  (setopt c-ts-mode-indent-offset 4)
+  (setopt c-ts-mode-indent-offset tab-width)
   (setopt c-ts-mode-indent-style 'bsd)
   (setopt c-ts-mode-enable-doxygen t))
 
