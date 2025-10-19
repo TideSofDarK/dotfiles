@@ -462,7 +462,7 @@
 
 (elpaca-wait)
 
-;;;
+;;; dtrt-indent
 
 (use-package dtrt-indent
   :ensure t
