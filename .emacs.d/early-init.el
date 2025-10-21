@@ -466,6 +466,7 @@
 (use-package dtrt-indent
   :ensure t
   :config
+  (setopt dtrt-indent-verbosity 0)
   (dtrt-indent-global-mode))
 
 ;;; drag-stuff
@@ -623,16 +624,6 @@
            :inherit nil
            :after treesit-langs)
   :config
-  ;; (defun custom-c-ts-mode-indent-style()
-  ;;   `(
-  ;;     ((node-is "preproc") column-0 0)
-  ;;     ((n-p-gp nil "declaration_list" "namespace_definition") parent-bol 0)
-  ;;     ((node-is ")") parent-bol 0)
-  ;;     ((match nil "argument_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
-  ;;     ((parent-is "argument_list") prev-sibling 0)
-  ;;     ((match nil "parameter_list" nil 1 1) parent-bol c-ts-mode-indent-offset)
-  ;;     ((parent-is "parameter_list") prev-sibling 0)
-  ;;     ,@(alist-get 'bsd (c-ts-mode--indent-styles 'cpp))))
   (add-hook 'c-ts-mode-hook
             (lambda ()
               (electric-indent-local-mode -1)))
