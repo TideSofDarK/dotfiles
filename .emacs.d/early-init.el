@@ -110,55 +110,6 @@
                       :family proportionately-spaced-font
                       :height 1.0))
 
-;;; Themes
-
-(use-package doric-themes
-  :ensure (doric-themes
-           :host github
-           :repo "protesilaos/doric-themes"
-           :inherit nil))
-
-(use-package modus-themes
-  :ensure (modus-themes
-           :host github
-           :repo "protesilaos/modus-themes"
-           :inherit nil)
-  :config
-  (defun better-modus-faces (&rest _)
-    (when-let* ((current-theme (car custom-enabled-themes))
-                (modus-theme (member current-theme modus-themes-items)))
-      (modus-themes-with-colors
-        (custom-theme-set-faces
-         current-theme
-         `(eglot-mode-line
-           ((,c :inherit mode-line-buffer-id :weight normal)))
-         `(eglot-diagnostic-tag-unnecessary-face
-           ((,c :inherit font-lock-comment-face)))
-         `(region ((,c :background ,bg-region
-                       :extend nil)))
-         `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                       :foreground ,keyword
-                                       :slant italic)))))))
-  (add-hook 'enable-theme-functions #'better-modus-faces)
-  (setopt modus-themes-italic-constructs t)
-  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
-  (setopt modus-themes-common-palette-overrides
-          '((property fg-alt)
-            (bracket fg-alt)
-            (delimiter cyan-faint)
-            (punctuation fg-alt)
-            (variable fg-main)
-            (operator cyan-faint)
-            (number red-faint)
-            (bg-active-argument unspecified)
-            (bg-active-value unspecified)
-            (fringe unspecified)
-            (fg-line-number-inactive "gray50")
-            (fg-line-number-active fg-main)
-            (bg-line-number-inactive unspecified)
-            (bg-line-number-active unspecified)))
-  (load-theme 'modus-vivendi t))
-
 ;;; minions
 
 (use-package minions
@@ -373,7 +324,7 @@
   (setopt evil-want-Y-yank-to-eol t)
   (setopt evil-want-integration t)
   (setopt evil-want-fine-undo t)
-  (setopt evil-want-minibuffer t)
+  ;; (setopt evil-want-minibuffer t)
   (setopt evil-leader/in-all-states t)
   (setopt evil-undo-system 'undo-fu)
   (setopt evil-vsplit-window-right t)
@@ -443,8 +394,7 @@
     (apply orig-fn beg end args))
   (advice-add 'evil-yank :around 'evil-yank-highlight))
 
-(use-package
-  evil-collection
+(use-package evil-collection
   :ensure t
   :after evil
   :preface
@@ -454,8 +404,7 @@
   :config
   (evil-collection-init))
 
-(use-package
-  evil-commentary
+(use-package evil-commentary
   :ensure t
   :config (evil-commentary-mode))
 
@@ -605,7 +554,7 @@
            :inherit nil
            :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.311")
+  (treesit-langs-bundle-version "0.12.312")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
@@ -770,6 +719,37 @@
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
+
+;;; Themes
+
+(use-package modus-themes
+  :ensure t
+  :config
+  ;; (setopt modus-themes-bold-constructs t)
+  (setopt modus-themes-italic-constructs t)
+  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
+  (setopt modus-themes-common-palette-overrides
+          '((property fg-alt)
+            (bracket fg-alt)
+            (delimiter cyan-faint)
+            (punctuation fg-alt)
+            (variable fg-main)
+            (operator cyan-faint)
+            (number red-faint)
+            (bg-active-argument unspecified)
+            (bg-active-value unspecified)
+            (fringe unspecified)
+            (fg-line-number-inactive "gray50")
+            (fg-line-number-active fg-main)
+            (bg-line-number-inactive unspecified)
+            (bg-line-number-active unspecified)))
+  (modus-themes-load-theme 'modus-vivendi))
+
+(use-package doric-themes
+  :ensure t
+  :config
+  ;; (doric-themes-load-theme 'doric-dark)
+  )
 
 ;;; Done
 

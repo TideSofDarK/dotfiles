@@ -1,10 +1,10 @@
 vim.pack.add({
   "https://github.com/tpope/vim-fugitive",
   "https://github.com/tpope/vim-sleuth",
-  "https://github.com/miikanissi/modus-themes.nvim"
+  "https://github.com/rebelot/kanagawa.nvim"
 })
 
-vim.cmd [[colorscheme modus_vivendi]]
+vim.cmd [[colorscheme kanagawa]]
 
 require('user/plugins/mini')
 require('user/plugins/blink')
