@@ -734,6 +734,8 @@
             (delimiter cyan-faint)
             (punctuation fg-alt)
             (variable fg-main)
+            (variable-use variable)
+            (fnname-call fnname)
             (operator cyan-faint)
             (number red-faint)
             (bg-active-argument unspecified)
