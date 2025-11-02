@@ -725,6 +725,22 @@
 (use-package modus-themes
   :ensure t
   :config
+  (defun better-modus-faces (&rest _)
+    (when-let* ((current-theme (car custom-enabled-themes))
+                (modus-theme (member current-theme modus-themes-items)))
+      (modus-themes-with-colors
+        (custom-theme-set-faces
+         current-theme
+         `(eglot-mode-line
+           ((,c :inherit mode-line-buffer-id :weight normal)))
+         `(eglot-diagnostic-tag-unnecessary-face
+           ((,c :inherit font-lock-comment-face)))
+         `(region ((,c :background ,bg-region
+                       :extend nil)))
+         `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                       :foreground ,keyword
+                                       :slant italic)))))))
+  (add-hook 'enable-theme-functions #'better-modus-faces)
   ;; (setopt modus-themes-bold-constructs t)
   (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
