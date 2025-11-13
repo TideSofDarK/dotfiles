@@ -608,6 +608,12 @@
   (eglot-code-action-indications '(eldoc-hint))
   ;; (eldoc-idle-delay 0.1)
   :config
+  (set-face-attribute 'eglot-semantic-definition-face nil :inherit 'unspecified)
+  (set-face-attribute 'eglot-semantic-declaration-face nil :inherit 'unspecified)
+  (set-face-attribute 'eglot-semantic-static-face nil :inherit 'unspecified)
+  (set-face-attribute 'eglot-semantic-operator-face nil :inherit 'font-lock-operator-face)
+  (set-face-attribute 'eglot-semantic-number-face nil :inherit 'font-lock-number-face)
+  (set-face-attribute 'eglot-semantic-defaultLibrary-face nil :slant 'normal)
   (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
                '((c-ts-mode c++-ts-mode)
@@ -725,24 +731,24 @@
 (use-package modus-themes
   :ensure t
   :config
-  (defun better-modus-faces (&rest _)
-    (when-let* ((current-theme (car custom-enabled-themes))
-                (modus-theme (member current-theme modus-themes-items)))
-      (modus-themes-with-colors
-        (custom-theme-set-faces
-         current-theme
-         `(eglot-mode-line
-           ((,c :inherit mode-line-buffer-id :weight normal)))
-         `(eglot-diagnostic-tag-unnecessary-face
-           ((,c :inherit font-lock-comment-face)))
-         `(region ((,c :background ,bg-region
-                       :extend nil)))
-         `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                       :foreground ,keyword
-                                       :slant italic)))))))
+  (defun better-modus-faces (theme &rest _)
+    (eval
+     `(modus-themes-with-colors
+        (when (memq ',theme modus-themes-items)
+          (custom-theme-set-faces
+           ',theme
+           `(eglot-mode-line
+             ((,c :inherit mode-line-buffer-id :weight normal)))
+           `(eglot-diagnostic-tag-unnecessary-face
+             ((,c :inherit font-lock-comment-face)))
+           `(region ((,c :background ,bg-region
+                         :extend nil)))
+           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                         :foreground ,keyword
+                                         :slant italic))))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   ;; (setopt modus-themes-bold-constructs t)
-  (setopt modus-themes-italic-constructs t)
+  ;; (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
           '((property fg-alt)
@@ -761,12 +767,19 @@
             (fg-line-number-active fg-main)
             (bg-line-number-inactive unspecified)
             (bg-line-number-active unspecified)))
-  (modus-themes-load-theme 'modus-vivendi))
+  ;; (load-theme 'modus-vivendi t nil)
+  )
 
 (use-package doric-themes
   :ensure t
   :config
-  ;; (doric-themes-load-theme 'doric-dark)
+  ;; (load-theme 'doric-dark t nil)
+  )
+
+(use-package standard-themes
+  :ensure t
+  :config
+  (load-theme 'standard-dark t nil)
   )
 
 ;;; Done
