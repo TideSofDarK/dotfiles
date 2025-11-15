@@ -212,6 +212,7 @@
     (global-auto-revert-mode t)
     (savehist-mode t)
     (electric-indent-mode t)
+    (setopt electric-pair-preserve-balance nil)
     (electric-pair-mode t)
     (delete-selection-mode t))
 
