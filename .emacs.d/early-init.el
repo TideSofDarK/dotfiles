@@ -599,6 +599,7 @@
      eglot-mode-line-action-suggestion))
   (eglot-ignored-server-capabilities
    '(:inlayHintProvider
+     :semanticTokensProvider
      :documentHighlightProvider))
   (eglot-events-buffer-size 0)
   (eglot-autoshutdown t)
