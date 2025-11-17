@@ -328,6 +328,7 @@
             "\\*Warnings\\*"
             "Output\\*$"
             "\\*Async Shell Command\\*"
+            ;; magit-process-mode
             xref--xref-buffer-mode
             help-mode
             compilation-mode))
@@ -509,7 +510,10 @@
 ;;; magit
 
 (use-package transient
-  :ensure t)
+  :ensure t
+  :config
+  ;; (setopt transient-display-buffer-action '(display-buffer-below-selected))
+  (transient-bind-q-to-quit))
 (use-package diff-hl
   :ensure t)
 (use-package magit
