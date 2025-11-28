@@ -110,72 +110,6 @@
                       :family proportionately-spaced-font
                       :height 1.0))
 
-;;; Themes
-
-(use-package doric-themes
-  :ensure t
-  :config
-  ;; (load-theme 'doric-dark t nil)
-  )
-
-(use-package modus-themes
-  :ensure t
-  :config
-  (defun better-modus-faces (theme &rest _)
-    (eval
-     `(modus-themes-with-colors
-        (when (or (memq ',theme modus-themes-items)
-                  (memq ',theme ef-themes-items)
-                  (memq ',theme standard-themes-items))
-          (custom-theme-set-faces
-           ',theme
-           `(eglot-mode-line
-             ((,c :inherit mode-line-buffer-id :weight normal)))
-           `(eglot-diagnostic-tag-unnecessary-face
-             ((,c :inherit font-lock-comment-face)))
-           `(region ((,c :background ,bg-region
-                         :extend nil)))
-           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                         :foreground ,keyword
-                                         :slant italic))))))))
-  (add-hook 'enable-theme-functions #'better-modus-faces)
-  ;; (setopt modus-themes-bold-constructs t)
-  ;; (setopt modus-themes-italic-constructs t)
-  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
-  (setopt modus-themes-common-palette-overrides
-          '((property fg-alt)
-            (bracket fg-alt)
-            (delimiter cyan-faint)
-            (punctuation fg-alt)
-            (variable fg-main)
-            (variable-use variable)
-            (fnname-call fnname)
-            (operator cyan-faint)
-            (number red-faint)
-            (bg-active-argument unspecified)
-            (bg-active-value unspecified)
-            (fringe unspecified)
-            (fg-line-number-inactive "gray50")
-            (fg-line-number-active fg-main)
-            (bg-line-number-inactive unspecified)
-            (bg-line-number-active unspecified)))
-  ;; (load-theme 'modus-vivendi t nil)
-  )
-
-(use-package standard-themes
-  :after modus-themes
-  :ensure t
-  :config
-  ;; (load-theme 'standard-dark t nil)
-  )
-
-(use-package ef-themes
-  :after modus-themes
-  :ensure t
-  :config
-  (load-theme 'ef-dark t nil)
-  )
-
 ;;; minions
 
 (use-package minions
@@ -633,7 +567,7 @@
            :inherit nil
            :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.316")
+  (treesit-langs-bundle-version "0.12.319")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
@@ -718,13 +652,6 @@
   (evil-define-key
     'normal eglot-mode-map (kbd "<leader>cf") 'eglot-format))
 
-(use-package eglot-inactive-regions
-  :ensure t
-  :custom
-  (eglot-inactive-regions-style 'shadow-face)
-  :config
-  (eglot-inactive-regions-mode 1))
-
 ;;; Completion
 
 (use-package consult
@@ -806,6 +733,67 @@
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
+
+;;; Themes
+
+(use-package standard-themes
+  :ensure t
+  :config
+  ;; (load-theme 'standard-dark t nil)
+  )
+
+(use-package ef-themes
+  :ensure t
+  :config
+  ;; (load-theme 'ef-dark t nil)
+  )
+
+(use-package modus-themes
+  :ensure t
+  :after (standard-themes ef-themes)
+  :init
+  (modus-themes-include-derivatives-mode 1)
+  :config
+  (defun better-modus-faces (theme &rest _)
+    (eval
+     `(modus-themes-with-colors
+        (when (or (memq ',theme modus-themes-items)
+                  (memq ',theme ef-themes-items)
+                  (memq ',theme standard-themes-items))
+          (custom-theme-set-faces
+           ',theme
+           `(eglot-mode-line
+             ((,c :inherit mode-line-buffer-id :weight normal)))
+           `(eglot-diagnostic-tag-unnecessary-face
+             ((,c :inherit font-lock-comment-face)))
+           `(region ((,c :background ,bg-region
+                         :extend nil)))
+           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                         :foreground ,keyword
+                                         :slant italic))))))))
+  (add-hook 'enable-theme-functions #'better-modus-faces)
+  (setopt modus-themes-bold-constructs t)
+  (setopt modus-themes-italic-constructs t)
+  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
+  (setopt modus-themes-common-palette-overrides
+          '((property fg-alt)
+            (bracket fg-alt)
+            (delimiter cyan-faint)
+            (punctuation fg-alt)
+            (variable fg-main)
+            (variable-use variable)
+            (fnname-call fnname)
+            (operator cyan-faint)
+            (number red-faint)
+            (bg-active-argument unspecified)
+            (bg-active-value unspecified)
+            (fringe unspecified)
+            (fg-line-number-inactive "gray50")
+            (fg-line-number-active fg-main)
+            (bg-line-number-inactive unspecified)
+            (bg-line-number-active unspecified)))
+  (load-theme 'modus-vivendi t nil)
+  )
 
 ;;; Done
 
