@@ -96,6 +96,65 @@
   (setq elpaca-use-package-by-default t))
 (elpaca-wait)
 
+;;; Themes
+
+(use-package standard-themes
+  :ensure t
+  :config
+  ;; (load-theme 'standard-dark t nil)
+  )
+
+(use-package ef-themes
+  :ensure t
+  :config
+  ;; (load-theme 'ef-dark t nil)
+  )
+
+(use-package modus-themes
+  :ensure t
+  :after (standard-themes ef-themes)
+  :init
+  (modus-themes-include-derivatives-mode 1)
+  :config
+  (defun better-modus-faces (theme &rest _)
+    (eval
+     `(modus-themes-with-colors
+        (when (memq ',theme (modus-themes-get-themes))
+          (custom-theme-set-faces
+           ',theme
+           `(eglot-mode-line
+             ((,c :inherit mode-line-buffer-id :weight normal)))
+           `(eglot-diagnostic-tag-unnecessary-face
+             ((,c :inherit font-lock-comment-face)))
+           `(region ((,c :background ,bg-region
+                         :extend nil)))
+           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                         :foreground ,keyword
+                                         :slant italic))))))))
+  (add-hook 'enable-theme-functions #'better-modus-faces)
+  (setopt modus-themes-bold-constructs t)
+  (setopt modus-themes-italic-constructs t)
+  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
+  (setopt modus-themes-common-palette-overrides
+          '((property fg-alt)
+            (bracket fg-alt)
+            (delimiter cyan-faint)
+            (punctuation fg-alt)
+            (variable fg-main)
+            (variable-use variable)
+            (fnname-call fnname)
+            (operator cyan-faint)
+            (number red-faint)
+            (bg-active-argument unspecified)
+            (bg-active-value unspecified)
+            (fringe unspecified)
+            (fg-line-number-inactive "gray50")
+            (fg-line-number-active fg-main)
+            (bg-line-number-inactive unspecified)
+            (bg-line-number-active unspecified)))
+  (load-theme 'modus-vivendi t nil)
+  )
+
 ;;; Fonts
 
 (let ((mono-spaced-font "Sarasa Term Slab CL")
@@ -733,67 +792,6 @@
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
-
-;;; Themes
-
-(use-package standard-themes
-  :ensure t
-  :config
-  ;; (load-theme 'standard-dark t nil)
-  )
-
-(use-package ef-themes
-  :ensure t
-  :config
-  ;; (load-theme 'ef-dark t nil)
-  )
-
-(use-package modus-themes
-  :ensure t
-  :after (standard-themes ef-themes)
-  :init
-  (modus-themes-include-derivatives-mode 1)
-  :config
-  (defun better-modus-faces (theme &rest _)
-    (eval
-     `(modus-themes-with-colors
-        (when (or (memq ',theme modus-themes-items)
-                  (memq ',theme ef-themes-items)
-                  (memq ',theme standard-themes-items))
-          (custom-theme-set-faces
-           ',theme
-           `(eglot-mode-line
-             ((,c :inherit mode-line-buffer-id :weight normal)))
-           `(eglot-diagnostic-tag-unnecessary-face
-             ((,c :inherit font-lock-comment-face)))
-           `(region ((,c :background ,bg-region
-                         :extend nil)))
-           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                         :foreground ,keyword
-                                         :slant italic))))))))
-  (add-hook 'enable-theme-functions #'better-modus-faces)
-  (setopt modus-themes-bold-constructs t)
-  (setopt modus-themes-italic-constructs t)
-  (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
-  (setopt modus-themes-common-palette-overrides
-          '((property fg-alt)
-            (bracket fg-alt)
-            (delimiter cyan-faint)
-            (punctuation fg-alt)
-            (variable fg-main)
-            (variable-use variable)
-            (fnname-call fnname)
-            (operator cyan-faint)
-            (number red-faint)
-            (bg-active-argument unspecified)
-            (bg-active-value unspecified)
-            (fringe unspecified)
-            (fg-line-number-inactive "gray50")
-            (fg-line-number-active fg-main)
-            (bg-line-number-inactive unspecified)
-            (bg-line-number-active unspecified)))
-  (load-theme 'modus-vivendi t nil)
-  )
 
 ;;; Done
 
