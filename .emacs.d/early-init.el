@@ -98,21 +98,8 @@
 
 ;;; Themes
 
-(use-package standard-themes
-  :ensure t
-  :config
-  ;; (load-theme 'standard-dark t nil)
-  )
-
-(use-package ef-themes
-  :ensure t
-  :config
-  ;; (load-theme 'ef-dark t nil)
-  )
-
 (use-package modus-themes
   :ensure t
-  :after (standard-themes ef-themes)
   :init
   (modus-themes-include-derivatives-mode 1)
   :config
@@ -152,8 +139,18 @@
             (fg-line-number-active fg-main)
             (bg-line-number-inactive unspecified)
             (bg-line-number-active unspecified)))
+  ;; (load-theme 'standard-dark t nil)
+  ;; (load-theme 'ef-dark t nil)
   (load-theme 'modus-vivendi t nil)
   )
+
+(use-package standard-themes
+  :ensure t
+  :after modus-themes)
+
+(use-package ef-themes
+  :ensure t
+  :after modus-themes)
 
 ;;; Fonts
 
