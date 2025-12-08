@@ -119,8 +119,8 @@
                                          :foreground ,keyword
                                          :slant italic))))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
-  (setopt modus-themes-bold-constructs t)
-  (setopt modus-themes-italic-constructs t)
+  ;; (setopt modus-themes-bold-constructs t)
+  ;; (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
           '((property fg-alt)
