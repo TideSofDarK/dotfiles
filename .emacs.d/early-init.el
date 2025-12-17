@@ -609,6 +609,20 @@
      'cape-keyword-list
      (append '(gdshader-mode) gdshader-all-keywords))))
 
+;;; slang-mode
+
+(use-package slang-mode
+  :ensure (slang-mode
+           :host github
+           :repo "k1ngst0m/slang-mode"
+           :inherit nil)
+  :mode (("\\.slang\\'" . slang-mode)
+         ("\\.sl\\'" . slang-mode)
+         ("\\.slangh\\'" . slang-mode))
+  :config
+  (require 'slang-lsp)
+  (slang-lsp-initialize))
+
 ;;; Treesitter
 
 (use-package treesit
@@ -623,7 +637,7 @@
            :inherit nil
            :after treesit)
   :custom
-  (treesit-langs-bundle-version "0.12.319")
+  (treesit-langs-bundle-version "0.12.329")
   :init
   (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
