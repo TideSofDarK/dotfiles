@@ -104,20 +104,19 @@
   (modus-themes-include-derivatives-mode 1)
   :config
   (defun better-modus-faces (theme &rest _)
-    (eval
-     `(modus-themes-with-colors
-        (when (memq ',theme (modus-themes-get-themes))
-          (custom-theme-set-faces
-           ',theme
-           `(eglot-mode-line
-             ((,c :inherit mode-line-buffer-id :weight normal)))
-           `(eglot-diagnostic-tag-unnecessary-face
-             ((,c :inherit font-lock-comment-face)))
-           `(region ((,c :background ,bg-region
-                         :extend nil)))
-           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                         :foreground ,keyword
-                                         :slant italic))))))))
+    (modus-themes-with-colors
+      (when (memq theme (modus-themes-get-themes))
+        (custom-theme-set-faces
+         theme
+         `(eglot-mode-line
+           ((,c :inherit mode-line-buffer-id :weight normal)))
+         `(eglot-diagnostic-tag-unnecessary-face
+           ((,c :inherit font-lock-comment-face)))
+         `(region ((,c :background ,bg-region
+                       :extend nil)))
+         `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                       :foreground ,keyword
+                                       :slant italic)))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   ;; (setopt modus-themes-bold-constructs t)
   ;; (setopt modus-themes-italic-constructs t)
