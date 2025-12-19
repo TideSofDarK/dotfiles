@@ -710,16 +710,14 @@
             (lambda () (eglot-semantic-tokens-mode 0)))
   (set-face-attribute 'eglot-semantic-number nil :inherit 'font-lock-number-face)
   (set-face-attribute 'eglot-semantic-namespace nil :inherit 'font-lock-type-face)
-  ;; (setopt eglot-semantic-token-modifiers (remove "defaultLibrary" eglot-semantic-token-modifiers))
-  ;; (setopt eglot-semantic-token-modifiers (remove "definition" eglot-semantic-token-modifiers))
-  ;; (setopt eglot-semantic-token-modifiers (remove "declaration" eglot-semantic-token-modifiers))
-  ;; (setopt eglot-semantic-token-modifiers (remove "static" eglot-semantic-token-modifiers))
-  ;; (setopt eglot-semantic-token-modifiers (remove "readonly" eglot-semantic-token-modifiers))
   (setopt eglot-semantic-token-modifiers
           (cl-set-difference eglot-semantic-token-modifiers
                              '("defaultLibrary" "definition" "declaration" "static" "readonly")
                              :test #'string=))
-  (setopt eglot-semantic-token-types (remove "operator" eglot-semantic-token-types))
+  (setopt eglot-semantic-token-types
+          (cl-set-difference eglot-semantic-token-types
+                             '("variable" "operator")
+                             :test #'string=))
 
   (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
