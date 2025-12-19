@@ -141,8 +141,7 @@
             (bg-line-number-active unspecified)))
   ;; (load-theme 'standard-dark t nil)
   ;; (load-theme 'ef-dark t nil)
-  (load-theme 'modus-vivendi t nil)
-  )
+  (load-theme 'modus-vivendi t nil))
 
 (use-package standard-themes
   :ensure t
@@ -346,11 +345,6 @@
             (lambda ()
               ;; (dired-hide-details-mode 1)
               (hl-line-mode 1))))
-
-(use-package diredfl
-  :ensure t
-  :config
-  (diredfl-global-mode))
 
 ;;; eldoc
 
@@ -693,12 +687,19 @@
   :config
   (add-hook 'eglot-managed-mode-hook
             (lambda () (eglot-semantic-tokens-mode 0)))
-  (set-face-attribute 'eglot-semantic-definition-face nil :inherit 'unspecified)
-  (set-face-attribute 'eglot-semantic-declaration-face nil :inherit 'unspecified)
-  (set-face-attribute 'eglot-semantic-static-face nil :inherit 'unspecified)
-  (set-face-attribute 'eglot-semantic-operator-face nil :inherit 'font-lock-operator-face)
-  (set-face-attribute 'eglot-semantic-number-face nil :inherit 'font-lock-number-face)
-  (set-face-attribute 'eglot-semantic-defaultLibrary-face nil :slant 'normal)
+  (set-face-attribute 'eglot-semantic-number nil :inherit 'font-lock-number-face)
+  (set-face-attribute 'eglot-semantic-namespace nil :inherit 'font-lock-type-face)
+  ;; (setopt eglot-semantic-token-modifiers (remove "defaultLibrary" eglot-semantic-token-modifiers))
+  ;; (setopt eglot-semantic-token-modifiers (remove "definition" eglot-semantic-token-modifiers))
+  ;; (setopt eglot-semantic-token-modifiers (remove "declaration" eglot-semantic-token-modifiers))
+  ;; (setopt eglot-semantic-token-modifiers (remove "static" eglot-semantic-token-modifiers))
+  ;; (setopt eglot-semantic-token-modifiers (remove "readonly" eglot-semantic-token-modifiers))
+  (setopt eglot-semantic-token-modifiers
+          (cl-set-difference eglot-semantic-token-modifiers
+                             '("defaultLibrary" "definition" "declaration" "static" "readonly")
+                             :test #'string=))
+  (setopt eglot-semantic-token-types (remove "operator" eglot-semantic-token-types))
+
   (fset #'jsonrpc--log-event #'ignore)
   (add-to-list 'eglot-server-programs
                '((c-ts-mode c++-ts-mode)
@@ -777,23 +778,47 @@
   :ensure t
   :init (marginalia-mode))
 
-(use-package corfu
+;; (use-package corfu
+;;   :ensure t
+;;   :custom
+;;   (corfu-left-margin-width 0.0)
+;;   (corfu-right-margin-width 0.0)
+;;   (corfu-bar-width 0.0)
+;;   (corfu-cycle t)
+;;   (corfu-auto t)
+;;   (corfu-auto-delay 0.1)
+;;   (corfu-auto-prefix 2)
+;;   (corfu-popupinfo-delay 0.25)
+;;   :config
+;;   (global-corfu-mode)
+;;   (let ((inhibit-message t))
+;;     (corfu-popupinfo-mode))
+;;   (keymap-unset corfu-map "RET")
+;;   (keymap-set corfu-map "C-y" #'corfu-complete))
+
+(use-package
+  company
   :ensure t
+  :demand t
   :custom
-  (corfu-left-margin-width 0.0)
-  (corfu-right-margin-width 0.0)
-  (corfu-bar-width 0.0)
-  (corfu-cycle t)
-  (corfu-auto t)
-  (corfu-auto-delay 0.1)
-  (corfu-auto-prefix 2)
-  (corfu-popupinfo-delay 0.25)
+  (company-icon-margin 3)
+  (company-tooltip-align-annotations t)
+  (company-selection-wrap-around t)
+  (company-idle-delay 0.25)
+  (company-tooltip-idle-delay 0.25)
+  :bind
+  (:map company-active-map
+        ("C-y" . company-complete-selection)
+        ("RET" . nil)
+        ("<return>" . nil)
+        ("TAB" . nil)
+        ("<tab>" . nil)
+        ("<backtab>" . nil))
   :config
-  (global-corfu-mode)
-  (let ((inhibit-message t))
-    (corfu-popupinfo-mode))
-  (keymap-unset corfu-map "RET")
-  (keymap-set corfu-map "C-y" #'corfu-complete))
+  (setq company-frontends
+        '(company-pseudo-tooltip-frontend
+          company-echo-metadata-frontend))
+  (global-company-mode))
 
 (use-package cape
   :ensure t
