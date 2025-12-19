@@ -1,4 +1,4 @@
-;;; early-init.el --- Early Init -*- lexical-binding: t; -*-
+;; early-init.el --- Early Init -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025 TideS
 
@@ -179,6 +179,8 @@
   :custom
   ;; (fringe-mode '(nil . 0))
   ;; (fringe-mode 0)
+  (user-full-name "Alexandr Semenov")
+  (user-mail-address "tidesmain@gmail.com")
   (fringes-outside-margins t)
   (isearch-lazy-count t)
   (isearch-lazy-highlight t)
@@ -199,6 +201,7 @@
   (inhibit-startup-screen t)
   (inhibit-splash-screen t)
   (initial-scratch-message nil)
+  (inhibit-compacting-font-caches t)
   (revert-without-query (list "."))
   (auto-revert-stop-on-user-input nil)
   (auto-revert-verbose t)
@@ -225,6 +228,7 @@
   (tab-always-indent t)
   (indent-tabs-mode nil)
   (tab-width 4)
+  ;; (standard-indent 4)
   (use-dialog-box nil)
   (use-file-dialog nil)
   (confirm-kill-processes nil)
@@ -256,6 +260,9 @@
   (tooltip-mode nil)
   (blink-cursor-blinks 0)
   (blink-cursor-mode t)
+  (cursor-in-non-selected-windows nil)
+  (read-process-output-max (* 1024 1024))
+  (redisplay-skip-fontification-on-input t)
   :init
   (advice-add 'recentf-cleanup :around #'suppress-messages)
   (advice-add 'recentf-mode :around #'suppress-messages)
@@ -279,6 +286,20 @@
 
   (setopt custom-file (locate-user-emacs-file "custom.el"))
   (load custom-file 'noerror 'nomessage))
+
+;;; ibuffer
+
+(use-package ibuffer
+  :ensure nil
+  :custom
+  (ibuffer-default-sorting-mode 'filename/process)
+  (ibuffer-display-summary nil)
+  (ibuffer-expert t)
+  ;; (ibuffer-shrink-to-minimum-size t)
+  ;; (ibuffer-truncate-lines nil)
+  (ibuffer-use-other-window t)
+  :init
+  (defalias 'list-buffers 'ibuffer))
 
 ;;; electric
 
@@ -310,13 +331,13 @@
   ;; (setq popper-display-function #'display-buffer-pop-up-window)
   (setopt popper-reference-buffers
           '(
-            ;; "^\\*.*\\*$"
-            "\\*eldoc\\*"
-            "^\\*godot"
             "\\*Messages\\*"
             "\\*Warnings\\*"
             "Output\\*$"
             "\\*Async Shell Command\\*"
+            "\\*Ibuffer\\*"
+            "\\*eldoc\\*"
+            "^\\*godot"
             ;; magit-process-mode
             xref--xref-buffer-mode
             help-mode
