@@ -715,14 +715,21 @@
   ;;           (lambda () (eglot-semantic-tokens-mode 0)))
   (set-face-attribute 'eglot-semantic-number nil :inherit 'font-lock-number-face)
   (set-face-attribute 'eglot-semantic-namespace nil :inherit 'font-lock-type-face)
-  (setopt eglot-semantic-token-modifiers
-          (cl-set-difference eglot-semantic-token-modifiers
-                             '("defaultLibrary" "definition" "declaration" "static" "readonly")
-                             :test #'string=))
-  (setopt eglot-semantic-token-types
-          (cl-set-difference eglot-semantic-token-types
-                             '("variable" "operator")
-                             :test #'string=))
+  (defface eglot-semantic-constructorOrDestructor
+    '((default :inherit 'font-lock-function-name-face))
+    "Face for painting a ‘constructorOrDestructor’ LSP semantic token")
+  (defface eglot-semantic-deduced
+    '((default :inherit 'font-lock-keyword-face))
+    "Face for painting a ‘deduced’ LSP semantic token")
+  (cl-pushnew "constructorOrDestructor" eglot-semantic-token-modifiers)
+  (cl-pushnew "deduced" eglot-semantic-token-modifiers)
+  (cl-delete "definition" eglot-semantic-token-modifiers :test #'string=)
+  (cl-delete "defaultLibrary" eglot-semantic-token-modifiers :test #'string=)
+  (cl-delete "static" eglot-semantic-token-modifiers :test #'string=)
+  (cl-delete "readonly" eglot-semantic-token-modifiers :test #'string=)
+  (cl-delete "declaration" eglot-semantic-token-modifiers :test #'string=)
+  (cl-delete "variable" eglot-semantic-token-types :test #'string=)
+  (cl-delete "operator" eglot-semantic-token-types :test #'string=)
 
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
