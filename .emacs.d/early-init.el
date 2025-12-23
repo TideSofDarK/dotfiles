@@ -696,17 +696,23 @@
   (eglot-ignored-server-capabilities
    '(:inlayHintProvider
      :documentHighlightProvider))
-  (eglot-events-buffer-size 0)
   (eglot-autoshutdown t)
+  (eglot-autoreconnect nil)
+  (eglot-sync-connect nil)
   (eglot-report-progress nil)
   (eglot-events-buffer-config '(:size 0 :format full))
-  (eglot-send-changes-idle-time 0.1)
   (eglot-extend-to-xref t)
+  (eglot-confirm-server-edits nil)
   (eglot-code-action-indications '(eldoc-hint))
-  ;; (eldoc-idle-delay 0.1)
+  (eglot-send-changes-idle-time 0.0)
+  :hook((eglot-managed-mode . (lambda ()
+                                (setq eldoc-documentation-functions
+                                      (cons #'flymake-eldoc-function
+                                            (remove #'flymake-eldoc-function eldoc-documentation-functions)))
+                                (setq eldoc-documentation-strategy #'eldoc-documentation-compose))))
   :config
-  (add-hook 'eglot-managed-mode-hook
-            (lambda () (eglot-semantic-tokens-mode 0)))
+  ;; (add-hook 'eglot-managed-mode-hook
+  ;;           (lambda () (eglot-semantic-tokens-mode 0)))
   (set-face-attribute 'eglot-semantic-number nil :inherit 'font-lock-number-face)
   (set-face-attribute 'eglot-semantic-namespace nil :inherit 'font-lock-type-face)
   (setopt eglot-semantic-token-modifiers
@@ -718,7 +724,10 @@
                              '("variable" "operator")
                              :test #'string=))
 
+  (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
+  (setq jsonrpc-event-hook nil)
+
   (add-to-list 'eglot-server-programs
                '((c-ts-mode c++-ts-mode)
                  . ("clangd"
@@ -734,6 +743,7 @@
                `(glsl-ts-mode . ("glsl_analyzer")))
   (add-to-list 'eglot-server-programs
                `(cmake-ts-mode . ("cmake-language-server")))
+
   (evil-define-key
     'normal intercept-mode-map (kbd "grn") 'eglot-rename)
   (evil-define-key
