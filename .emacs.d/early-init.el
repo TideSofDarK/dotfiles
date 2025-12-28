@@ -726,9 +726,9 @@
   (cl-delete "definition" eglot-semantic-token-modifiers :test #'string=)
   (cl-delete "defaultLibrary" eglot-semantic-token-modifiers :test #'string=)
   (cl-delete "static" eglot-semantic-token-modifiers :test #'string=)
-  (cl-delete "readonly" eglot-semantic-token-modifiers :test #'string=)
+  ;; (cl-delete "readonly" eglot-semantic-token-modifiers :test #'string=)
   (cl-delete "declaration" eglot-semantic-token-modifiers :test #'string=)
-  (cl-delete "variable" eglot-semantic-token-types :test #'string=)
+  ;; (cl-delete "variable" eglot-semantic-token-types :test #'string=)
   (cl-delete "operator" eglot-semantic-token-types :test #'string=)
 
   (setf (plist-get eglot-events-buffer-config :size) 0)
