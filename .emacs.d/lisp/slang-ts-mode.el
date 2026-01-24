@@ -6,7 +6,7 @@
 ;; Maintainer       : TideS <tidesmain@gmail.com>
 ;; Created          : January 2026
 ;; Keywords         : slang languages tree-sitter
-;; Package-Requires : ((emacs "30.1"))
+;; Package-Requires : ((emacs "31.1"))
 
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
