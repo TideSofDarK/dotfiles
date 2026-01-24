@@ -29,8 +29,7 @@
 
 (add-to-list
  'treesit-language-source-alist
- '(slang "https://github.com/tree-sitter-grammars/tree-sitter-slang"
-         :commit "1dbcc4abc7b3cdd663eb03d93031167d6ed19f56")
+ '(slang "https://github.com/tree-sitter-grammars/tree-sitter-slang")
  t)
 
 (defmacro slang-ts--static-if (condition then-form &rest else-forms)

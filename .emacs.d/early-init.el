@@ -594,12 +594,13 @@
            :branch "better-ts-mode"
            :inherit nil)
   :init
+  (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
   (custom-set-faces
    '(glsl-extension-face
      ((t :inherit font-lock-constant-face))))
   (custom-set-faces
    '(glsl-shader-variable-name-face
-     ((t :inherit font-lock-preprocessor-face :slant italic)))))
+      ((t :inherit font-lock-preprocessor-face :slant italic)))))
 
 ;;; Godot
 
