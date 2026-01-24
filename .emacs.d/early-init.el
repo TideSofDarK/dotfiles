@@ -1,6 +1,6 @@
 ;; early-init.el --- Early Init -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2025 TideS
+;; Copyright (C) 2025-2026 TideS
 
 ;; Author: TideS <tidesmain@gmail.com>
 
@@ -103,20 +103,22 @@
   :init
   (modus-themes-include-derivatives-mode 1)
   :config
+  (defvar my/theme nil)
   (defun better-modus-faces (theme &rest _)
-    (modus-themes-with-colors
-      (when (memq theme (modus-themes-get-themes))
-        (custom-theme-set-faces
-         theme
-         `(eglot-mode-line
-           ((,c :inherit mode-line-buffer-id :weight normal)))
-         `(eglot-diagnostic-tag-unnecessary-face
-           ((,c :inherit font-lock-comment-face)))
-         `(region ((,c :background ,bg-region
-                       :extend nil)))
-         `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                       :foreground ,keyword
-                                       :slant italic)))))))
+    (let ((my/theme theme))
+      (modus-themes-with-colors
+        (when (memq my/theme (modus-themes-get-themes))
+          (custom-theme-set-faces
+           my/theme
+           `(eglot-mode-line
+             ((,c :inherit mode-line-buffer-id :weight normal)))
+           `(eglot-diagnostic-tag-unnecessary-face
+             ((,c :inherit font-lock-comment-face)))
+           `(region ((,c :background ,bg-region
+                         :extend nil)))
+           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                         :foreground ,keyword
+                                         :slant italic))))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   ;; (setopt modus-themes-bold-constructs t)
   ;; (setopt modus-themes-italic-constructs t)
@@ -490,6 +492,13 @@
 
 (elpaca-wait)
 
+;;; Treesitter
+
+(use-package treesit
+  :ensure nil
+  :custom
+  (treesit-font-lock-level 4))
+
 ;;; dtrt-indent
 
 (use-package dtrt-indent
@@ -604,64 +613,38 @@
   (gdscript-indent-offset 4)
   (gdscript-use-tab-indents nil))
 
-(use-package gdshader-mode
-  :ensure (gdshader-mode
-           :host github
-           :repo "bbbscarter/gdshader-mode"
-           :inherit nil)
-  :after cape
-  :init
-  (defvar gdshader-keyword-list
-    '("shader_type" "render_mode" "group_uniforms" "instance" "varying"))
-  (defun gdshader-config()
-    (setq-local completion-at-point-functions
-                (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
-  :hook (gdshader-mode . gdshader-config)
-  :config
-  (with-eval-after-load 'cape-keyword
-    (add-to-list
-     'cape-keyword-list
-     (append '(gdshader-mode) gdshader-all-keywords))))
+;; (use-package gdshader-mode
+;;   :ensure (gdshader-mode
+;;            :host github
+;;            :repo "bbbscarter/gdshader-mode"
+;;            :inherit nil)
+;;   :after cape
+;;   :init
+;;   (defvar gdshader-keyword-list
+;;     '("shader_type" "render_mode" "group_uniforms" "instance" "varying"))
+;;   (defun gdshader-config()
+;;     (setq-local completion-at-point-functions
+;;                 (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
+;;   :hook (gdshader-mode . gdshader-config)
+;;   :config
+;;   (with-eval-after-load 'cape-keyword
+;;     (add-to-list
+;;      'cape-keyword-list
+;;      (append '(gdshader-mode) gdshader-all-keywords))))
 
-;;; slang-mode
+;;; slang-ts-mode
 
-(use-package slang-mode
-  :ensure (slang-mode
-           :host github
-           :repo "k1ngst0m/slang-mode"
-           :inherit nil)
-  :mode (("\\.slang\\'" . slang-mode)
-         ("\\.sl\\'" . slang-mode)
-         ("\\.slangh\\'" . slang-mode))
-  :config
-  (require 'slang-lsp)
-  (slang-lsp-initialize))
-
-;;; Treesitter
-
-(use-package treesit
+(use-package slang-ts-mode
   :ensure nil
-  :custom
-  (treesit-font-lock-level 4))
-
-(use-package treesit-langs
-  :ensure (treesit-langs
-           :host github
-           :repo "emacs-tree-sitter/treesit-langs"
-           :inherit nil
-           :after treesit)
-  :custom
-  (treesit-langs-bundle-version "0.12.329")
-  :init
-  (advice-add 'treesit-langs-install-grammars :around #'suppress-messages)
   :config
-  (treesit-langs-major-mode-setup)
-  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  (use-package glsl-ts-mode :ensure nil)
-  (use-package cmake-ts-mode :ensure nil)
-  (use-package rust-ts-mode :ensure nil)
-  (use-package lua-ts-mode :ensure nil))
+  (add-hook 'slang-ts-mode-hook
+            (lambda ()
+              (setq-local eglot-semantic-token-types
+                          (cl-set-difference eglot-semantic-token-types
+                                             '("variable") :test #'string=))
+              (electric-indent-local-mode -1))))
+
+;;; c-ts-mode-extras
 
 (use-package c-ts-mode-extras
   :ensure (c-ts-mode-extras
@@ -669,13 +652,24 @@
            :repo "TideSofDarK/c-ts-mode-extras"
            :inherit nil
            :after treesit-langs)
+  :init
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
   :config
-  (add-hook 'c-ts-mode-hook
-            (lambda ()
-              (electric-indent-local-mode -1)))
-  (add-hook 'c++-ts-mode-hook
-            (lambda ()
-              (electric-indent-local-mode -1)))
+  (let ((c-or-c++-improvements
+         (lambda ()
+           (setq-local eglot-semantic-token-modifiers
+                       (cl-set-difference eglot-semantic-token-modifiers
+                                          '("definition" "defaultLibrary" "static" "abstract" "readonly" "declaration") :test #'string=))
+           ;; To consider: "variable"
+           (setq-local eglot-semantic-token-types
+                       (cl-set-difference eglot-semantic-token-types
+                                          '("operator" "modifier") :test #'string=))
+           (electric-indent-local-mode -1))))
+
+    (add-hook 'c-ts-mode-hook c-or-c++-improvements)
+    (add-hook 'c++-ts-mode-hook c-or-c++-improvements))
   (setopt c-ts-mode-indent-offset tab-width)
   (setopt c-ts-mode-indent-style 'bsd)
   (setopt c-ts-mode-enable-doxygen t))
@@ -686,7 +680,7 @@
   :ensure t
   :hook
   ((c-ts-mode c++-ts-mode gdscript-ts-mode
-              glsl-ts-mode cmake-ts-mode)
+              glsl-ts-mode cmake-ts-mode slang-ts-mode)
    . eglot-ensure)
   :custom
   (eglot-mode-line-format
@@ -723,13 +717,6 @@
     "Face for painting a ‘deduced’ LSP semantic token")
   (cl-pushnew "constructorOrDestructor" eglot-semantic-token-modifiers)
   (cl-pushnew "deduced" eglot-semantic-token-modifiers)
-  (cl-delete "definition" eglot-semantic-token-modifiers :test #'string=)
-  (cl-delete "defaultLibrary" eglot-semantic-token-modifiers :test #'string=)
-  (cl-delete "static" eglot-semantic-token-modifiers :test #'string=)
-  ;; (cl-delete "readonly" eglot-semantic-token-modifiers :test #'string=)
-  (cl-delete "declaration" eglot-semantic-token-modifiers :test #'string=)
-  ;; (cl-delete "variable" eglot-semantic-token-types :test #'string=)
-  (cl-delete "operator" eglot-semantic-token-types :test #'string=)
 
   (setf (plist-get eglot-events-buffer-config :size) 0)
   (fset #'jsonrpc--log-event #'ignore)
@@ -750,6 +737,8 @@
                `(glsl-ts-mode . ("glsl_analyzer")))
   (add-to-list 'eglot-server-programs
                `(cmake-ts-mode . ("cmake-language-server")))
+  (add-to-list 'eglot-server-programs
+               `(slang-ts-mode . ("slangd")))
 
   (evil-define-key
     'normal intercept-mode-map (kbd "grn") 'eglot-rename)
@@ -855,14 +844,14 @@
           company-echo-metadata-frontend))
   (global-company-mode))
 
-(use-package cape
-  :ensure t
-  :custom
-  (cape-dabbrev-check-other-buffers nil)
-  :config
-  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block))
+;; (use-package cape
+;;   :ensure t
+;;   :custom
+;;   (cape-dabbrev-check-other-buffers nil)
+;;   :config
+;;   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
+;;   (add-to-list 'completion-at-point-functions #'cape-file)
+;;   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 
 ;;; Done
 
