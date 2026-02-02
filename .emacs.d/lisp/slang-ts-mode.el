@@ -1,4 +1,4 @@
-;;; c-ts-mode.el --- tree-sitter support for Slang  -*- lexical-binding: t; -*-
+;;; slang-ts-mode.el --- tree-sitter support for Slang  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2026 TideS
 
@@ -24,28 +24,11 @@
 (require 'treesit)
 (require 'c-ts-common)
 (require 'c-ts-mode)
-(eval-when-compile (require 'rx))
-;; (treesit-declare-unavailable-functions)
 
 (add-to-list
  'treesit-language-source-alist
  '(slang "https://github.com/tree-sitter-grammars/tree-sitter-slang")
  t)
-
-(defmacro slang-ts--static-if (condition then-form &rest else-forms)
-  (declare (indent 2)
-           (debug (sexp sexp &rest sexp)))
-  (if (eval condition lexical-binding)
-      then-form
-    (cons 'progn else-forms)))
-
-(defun slang-ts--apply-indent-rules (style)
-  (setq-local c-ts-mode-indent-style (or style c-ts-mode-indent-style))
-  (setq-local treesit-simple-indent-rules
-              (slang-ts--static-if (< emacs-major-version 31)
-                                   (c-ts-mode--get-indent-style 'cpp)
-                                   (c-ts-mode--simple-indent-rules 'cpp c-ts-mode-indent-style)))
-  (setcar (car treesit-simple-indent-rules) 'slang))
 
 (defvar slang-ts-mode--operators
   '("=" "-" "*" "/" "+" "%" "~" "|" "&" "^" "<<" ">>" "->"
@@ -188,10 +171,13 @@ recommended to enable `electric-pair-mode' with this mode."
   (when (treesit-ensure-installed 'slang)
     (treesit-parser-create 'slang)
 
-    ;; Indent.
-    (slang-ts--apply-indent-rules c-ts-mode-indent-style)
+    (setq-local treesit-simple-indent-rules
+                (if (functionp c-ts-mode-indent-style)
+                    (funcall c-ts-mode-indent-style)
+                  (c-ts-mode--simple-indent-rules
+                   'cpp c-ts-mode-indent-style)))
+    (setcar (car treesit-simple-indent-rules) 'slang)
 
-    ;; Font-lock.
     (setq-local treesit-font-lock-settings slang-ts-mode--font-lock-settings)
     (setq-local treesit-font-lock-feature-list
                 '((comment preprocessor)
@@ -213,7 +199,7 @@ is t or contains the mode name."
           (eq treesit-enabled-modes t)
           (memq 'slang-ts-mode treesit-enabled-modes))
       (slang-ts-mode)
-    (fundamental-mode)))
+    (prog-mode)))
 
 ;;;###autoload
 (when (boundp 'treesit-major-mode-remap-alist)

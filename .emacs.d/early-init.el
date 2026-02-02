@@ -41,6 +41,10 @@
 (setq gc-cons-threshold (eval-when-compile (* 1024 1024 1024)))
 (run-with-idle-timer 2 t 'garbage-collect)
 
+;;; Optimize PGTK
+
+(setq-default pgtk-wait-for-event-timeout 0)
+
 ;;; Maximize On Launch
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -142,7 +146,8 @@
             (bg-line-number-active unspecified)))
   ;; (load-theme 'standard-dark t nil)
   ;; (load-theme 'ef-dark t nil)
-  (load-theme 'modus-vivendi t nil))
+  ;; (load-theme 'modus-vivendi t nil)
+  )
 
 (use-package standard-themes
   :ensure t
@@ -165,13 +170,6 @@
   (set-face-attribute 'variable-pitch nil
                       :family proportionately-spaced-font
                       :height 1.0))
-
-;;; minions
-
-(use-package minions
-  :ensure t
-  :config
-  (minions-mode t))
 
 ;;; emacs
 
@@ -318,6 +316,23 @@
 (use-package ansi-color
   :ensure nil
   :hook (compilation-filter . ansi-color-compilation-filter))
+
+;;; project
+
+(use-package project
+  :ensure t)
+
+;;; jsonrpc
+
+(use-package jsonrpc
+  :ensure t)
+
+;;; minions
+
+(use-package minions
+  :ensure t
+  :config
+  (minions-mode t))
 
 ;;; Popper
 
@@ -569,119 +584,16 @@
   :config
   (editorconfig-mode 1))
 
-;;; Markdown
-
-(use-package markdown-mode
-  :ensure t
-  :mode ("README\\.md\\'" . gfm-mode))
-
-;;; CMake
-
-(use-package cemako
-  :ensure nil
-  :bind
-  ("<leader>bt" . cemako-select-target)
-  ("<leader>bc" . cemako-run-cmake)
-  ("<leader>bb" . cemako-build)
-  ("<leader>br" . cemako-run))
-
-;;; GLSL
-
-(use-package glsl-mode
-  :ensure (glsl-mode
-           :host github
-           :repo "TideSofDarK/glsl-mode"
-           :branch "better-ts-mode"
-           :inherit nil)
-  :init
-  (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
-  (custom-set-faces
-   '(glsl-extension-face
-     ((t :inherit font-lock-constant-face))))
-  (custom-set-faces
-   '(glsl-shader-variable-name-face
-      ((t :inherit font-lock-preprocessor-face :slant italic)))))
-
-;;; Godot
-
-(use-package gdscript-mode
-  :ensure (gdscript-mode
-           :host github
-           :repo "godotengine/emacs-gdscript-mode"
-           :inherit nil)
-  :custom
-  (gdscript-eglot-version "4.4")
-  (gdscript-indent-offset 4)
-  (gdscript-use-tab-indents nil))
-
-;; (use-package gdshader-mode
-;;   :ensure (gdshader-mode
-;;            :host github
-;;            :repo "bbbscarter/gdshader-mode"
-;;            :inherit nil)
-;;   :after cape
-;;   :init
-;;   (defvar gdshader-keyword-list
-;;     '("shader_type" "render_mode" "group_uniforms" "instance" "varying"))
-;;   (defun gdshader-config()
-;;     (setq-local completion-at-point-functions
-;;                 (list (cape-capf-super #'cape-dabbrev #'cape-keyword))))
-;;   :hook (gdshader-mode . gdshader-config)
-;;   :config
-;;   (with-eval-after-load 'cape-keyword
-;;     (add-to-list
-;;      'cape-keyword-list
-;;      (append '(gdshader-mode) gdshader-all-keywords))))
-
-;;; slang-ts-mode
-
-(use-package slang-ts-mode
-  :ensure nil
-  :config
-  (add-hook 'slang-ts-mode-hook
-            (lambda ()
-              (setq-local eglot-semantic-token-types
-                          (cl-set-difference eglot-semantic-token-types
-                                             '("variable") :test #'string=))
-              (electric-indent-local-mode -1))))
-
-;;; c-ts-mode-extras
-
-(use-package c-ts-mode-extras
-  :ensure (c-ts-mode-extras
-           :host github
-           :repo "TideSofDarK/c-ts-mode-extras"
-           :inherit nil
-           :after treesit-langs)
-  :init
-  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
-  (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
-  :config
-  (let ((c-or-c++-improvements
-         (lambda ()
-           (setq-local eglot-semantic-token-modifiers
-                       (cl-set-difference eglot-semantic-token-modifiers
-                                          '("definition" "defaultLibrary" "static" "abstract" "readonly" "declaration") :test #'string=))
-           ;; To consider: "variable"
-           (setq-local eglot-semantic-token-types
-                       (cl-set-difference eglot-semantic-token-types
-                                          '("operator" "modifier") :test #'string=))
-           (electric-indent-local-mode -1))))
-
-    (add-hook 'c-ts-mode-hook c-or-c++-improvements)
-    (add-hook 'c++-ts-mode-hook c-or-c++-improvements))
-  (setopt c-ts-mode-indent-offset tab-width)
-  (setopt c-ts-mode-indent-style 'bsd)
-  (setopt c-ts-mode-enable-doxygen t))
-
 ;;; Eglot
 
 (use-package eglot
   :ensure t
   :hook
-  ((c-ts-mode c++-ts-mode gdscript-ts-mode
-              glsl-ts-mode cmake-ts-mode slang-ts-mode)
+  ((c-ts-mode
+    c++-ts-mode
+    glsl-ts-mode
+    cmake-ts-mode
+    slang-ts-mode)
    . eglot-ensure)
   :custom
   (eglot-mode-line-format
@@ -803,47 +715,47 @@
   :ensure t
   :init (marginalia-mode))
 
-;; (use-package corfu
-;;   :ensure t
-;;   :custom
-;;   (corfu-left-margin-width 0.0)
-;;   (corfu-right-margin-width 0.0)
-;;   (corfu-bar-width 0.0)
-;;   (corfu-cycle t)
-;;   (corfu-auto t)
-;;   (corfu-auto-delay 0.1)
-;;   (corfu-auto-prefix 2)
-;;   (corfu-popupinfo-delay 0.25)
-;;   :config
-;;   (global-corfu-mode)
-;;   (let ((inhibit-message t))
-;;     (corfu-popupinfo-mode))
-;;   (keymap-unset corfu-map "RET")
-;;   (keymap-set corfu-map "C-y" #'corfu-complete))
-
-(use-package
-  company
+(use-package corfu
   :ensure t
-  :demand t
   :custom
-  (company-icon-margin 3)
-  (company-tooltip-align-annotations t)
-  (company-selection-wrap-around t)
-  (company-idle-delay 0.25)
-  (company-tooltip-idle-delay 0.25)
-  :bind
-  (:map company-active-map
-        ("C-y" . company-complete-selection)
-        ("RET" . nil)
-        ("<return>" . nil)
-        ("TAB" . nil)
-        ("<tab>" . nil)
-        ("<backtab>" . nil))
+  (corfu-left-margin-width 0.0)
+  (corfu-right-margin-width 0.0)
+  (corfu-bar-width 0.0)
+  (corfu-cycle t)
+  (corfu-auto t)
+  (corfu-auto-delay 0.1)
+  (corfu-auto-prefix 2)
+  (corfu-popupinfo-delay 0.25)
   :config
-  (setq company-frontends
-        '(company-pseudo-tooltip-frontend
-          company-echo-metadata-frontend))
-  (global-company-mode))
+  (global-corfu-mode)
+  (let ((inhibit-message t))
+    (corfu-popupinfo-mode))
+  (keymap-unset corfu-map "RET")
+  (keymap-set corfu-map "C-y" #'corfu-complete))
+
+;; (use-package
+;;   company
+;;   :ensure t
+;;   :demand t
+;;   :custom
+;;   (company-icon-margin 3)
+;;   (company-tooltip-align-annotations t)
+;;   (company-selection-wrap-around t)
+;;   (company-idle-delay 0.25)
+;;   (company-tooltip-idle-delay 0.25)
+;;   :bind
+;;   (:map company-active-map
+;;         ("C-y" . company-complete-selection)
+;;         ("RET" . nil)
+;;         ("<return>" . nil)
+;;         ("TAB" . nil)
+;;         ("<tab>" . nil)
+;;         ("<backtab>" . nil))
+;;   :config
+;;   (setq company-frontends
+;;         '(company-pseudo-tooltip-frontend
+;;           company-echo-metadata-frontend))
+;;   (global-company-mode))
 
 ;; (use-package cape
 ;;   :ensure t
@@ -853,6 +765,89 @@
 ;;   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 ;;   (add-to-list 'completion-at-point-functions #'cape-file)
 ;;   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
+
+(elpaca-wait)
+
+;;; Markdown
+
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode))
+
+;;; CMake
+
+(use-package cemako
+  :ensure nil
+  :bind
+  ("<leader>bt" . cemako-select-target)
+  ("<leader>bc" . cemako-run-cmake)
+  ("<leader>bb" . cemako-build)
+  ("<leader>br" . cemako-run))
+
+;;; GLSL
+
+(use-package glsl-mode
+  :ensure (glsl-mode
+           :host github
+           :repo "TideSofDarK/glsl-mode"
+           :branch "better-ts-mode"
+           :inherit nil)
+  :init
+  (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
+  (custom-set-faces
+   '(glsl-extension-face
+     ((t :inherit font-lock-constant-face))))
+  (custom-set-faces
+   '(glsl-shader-variable-name-face
+     ((t :inherit font-lock-preprocessor-face :slant italic)))))
+
+;;; Godot
+
+(use-package gdscript-ts-mode
+  :ensure nil
+  :config)
+
+;;; Slang
+
+(use-package slang-ts-mode
+  :ensure nil
+  :config
+  (add-hook 'slang-ts-mode-hook
+            (lambda ()
+              (setq-local eglot-semantic-token-types
+                          (cl-set-difference eglot-semantic-token-types
+                                             '("variable") :test #'string=))
+              (electric-indent-local-mode -1))))
+
+;;; C/C++
+
+(use-package c-ts-mode-extras
+  :ensure (c-ts-mode-extras
+           :host github
+           :repo "TideSofDarK/c-ts-mode-extras"
+           :inherit nil
+           :after treesit-langs)
+  :init
+  (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
+  (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
+  :config
+  (let ((c-or-c++-improvements
+         (lambda ()
+           (setq-local eglot-semantic-token-modifiers
+                       (cl-set-difference eglot-semantic-token-modifiers
+                                          '("definition" "defaultLibrary" "static" "abstract" "readonly" "declaration") :test #'string=))
+           ;; To consider: "variable"
+           (setq-local eglot-semantic-token-types
+                       (cl-set-difference eglot-semantic-token-types
+                                          '("operator" "modifier") :test #'string=))
+           (electric-indent-local-mode -1))))
+
+    (add-hook 'c-ts-mode-hook c-or-c++-improvements)
+    (add-hook 'c++-ts-mode-hook c-or-c++-improvements))
+  (setopt c-ts-mode-indent-offset tab-width)
+  (setopt c-ts-mode-indent-style 'bsd)
+  (setopt c-ts-mode-enable-doxygen t))
 
 ;;; Done
 
