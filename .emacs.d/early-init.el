@@ -718,13 +718,13 @@
   :init
   (modus-themes-include-derivatives-mode 1)
   :config
-  (defvar my/theme nil)
-  (defun better-modus-faces (theme &rest _)
-    (let ((my/theme theme))
+  (defun better-modus-faces (theme-arg &rest _)
+    (progn
+      (setq-local theme theme-arg)
       (modus-themes-with-colors
-        (when (memq my/theme (modus-themes-get-themes))
+        (when (memq theme (modus-themes-get-themes))
           (custom-theme-set-faces
-           my/theme
+           theme
            `(eglot-mode-line
              ((,c :inherit mode-line-buffer-id :weight normal)))
            `(eglot-diagnostic-tag-unnecessary-face
