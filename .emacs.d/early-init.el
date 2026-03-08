@@ -57,15 +57,15 @@
 ;;; Elpaca
 
 (setq package-enable-at-startup nil)
-(defvar elpaca-installer-version 0.11)
+(defvar elpaca-installer-version 0.12)
 (defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
-(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
                               :ref nil :depth 1 :inherit ignore
                               :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
-(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+                              :build (:not elpaca-activate)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
        (default-directory repo))
@@ -96,9 +96,7 @@
 (add-hook 'after-init-hook #'elpaca-process-queues)
 (elpaca `(,@elpaca-order))
 (elpaca elpaca-use-package
-  (elpaca-use-package-mode)
-  (setq elpaca-use-package-by-default t))
-(elpaca-wait)
+  (elpaca-use-package-mode))
 
 ;;; Fonts
 
@@ -786,11 +784,9 @@
 ;;; GLSL
 
 (use-package glsl-mode
-  :ensure (glsl-mode
-           :host github
+  :ensure (:host github
            :repo "TideSofDarK/glsl-mode"
-           :branch "better-ts-mode"
-           :inherit nil)
+           :branch "better-ts-mode")
   :init
   (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
   (custom-set-faces
@@ -821,10 +817,8 @@
 ;;; C/C++
 
 (use-package c-ts-mode-extras
-  :ensure (c-ts-mode-extras
-           :host github
+  :ensure (:host github
            :repo "TideSofDarK/c-ts-mode-extras"
-           :inherit nil
            :after treesit-langs)
   :init
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
