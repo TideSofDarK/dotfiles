@@ -189,59 +189,63 @@ Specified via the defcustom `cemako-project-name-function'."
   "Return first artifact of a target."
   (plist-get (car (plist-get target :artifacts)) :path))
 
-(defun cemako--get-targets (project-data
-                             target-types
-                             target-executables
-                             &optional only-executables)
+(defun cemako--get-targets (project-data)
   (let* ((binary-dir (cemako--project-binary-dir))
           (reply-files (cemako--get-reply-files binary-dir))
-          (target-names))
-    (unless only-executables
-      (push "all" target-names)
-      (push "clean" target-names))
+          (targets (make-hash-table :test 'equal)))
+    (puthash "all" (list :type "SPECIAL") targets)
+    (puthash "clean" (list :type "SPECIAL") targets)
     (dolist (file reply-files)
       (let* ((json (cemako--read-json file))
               (target-name (cemako--target-name json))
-              (target-type (cemako--target-type json))
-              (is-executable (string= target-type "EXECUTABLE")))
-        (when (and only-executables (not is-executable))
-          (setq target-type nil))
+              (target-type (cemako--target-type json)))
         (unless (null target-type)
-          (push target-name target-names)
-          (puthash target-name target-type target-types)
-          (when is-executable
-            (puthash
-              target-name
-              (cemako--target-artifact json) target-executables)))))
-    target-names))
+          (puthash
+            target-name
+            (list
+              :type target-type
+              :artifact (cemako--target-artifact json))
+            targets))))
+    targets))
 
 (defun cemako--select-target (project-data
-                               &optional target-name only-executables)
-  (let* ((target-types (make-hash-table :test 'equal))
-          (target-executables (make-hash-table :test 'equal))
-          (target-names
-            (cemako--get-targets
-              project-data target-types target-executables only-executables))
+                               &optional targets target-name only-executables)
+  (let* ((targets
+           (or targets (cemako--get-targets project-data)))
+          (target-names (if only-executables
+                          (seq-filter
+                            (lambda (target)
+                              (string= "EXECUTABLE" (plist-get target :type)))
+                            (hash-table-keys targets))
+                          (hash-table-keys targets)))
           (target-name
             (or target-name
               (let* ((completion-extra-properties
                        (list
                          :annotation-function
                          (lambda (target-name)
-                           (gethash target-name target-types)))))
-                (completing-read "Select CMake target: " target-names nil t)))))
+                           (plist-get (gethash target-name targets) :type)))))
+                (prin1 targets)
+                (completing-read "Select CMake target: " target-names nil t))))
+          (target (gethash target-name targets)))
     (cemako--edit-project-data
       project-data
       'project-target target-name)
     (cemako--edit-project-data
       project-data
-      'project-target-executable (gethash target-name target-executables))
+      'project-target-executable (plist-get target :artifact))
     target-name))
 
-;;; TODO: Ensure target is real.
-(defmacro cemako--ensure-project-target ()
-  "Ensures a target is selected and returns its name."
-  `(or (cemako--project-target) (cemako--select-target project-data)))
+(defun cemako--ensure-project-target (project-data)
+  "Ensures a valid target is selected and returns its name."
+  (let ((targets (cemako--get-targets project-data)))
+    (if-let* ((selected-target (cemako--project-target))
+               (contains (seq-contains-p
+                           (hash-table-keys targets)
+                           selected-target
+                           #'string=)))
+      selected-target
+      (cemako--select-target project-data targets))))
 
 (defconst cemako--presets-filenames '("CMakePresets.json"
                                        "CMakeUserPresets.json"))
@@ -390,6 +394,7 @@ preset (or prompts to enter it) and then caches it."
               (symlink (cemako--symlink-compile-commands)))))
         (when sentinel (funcall sentinel success))))))
 
+;;; TODO: This is broken.
 (defun cemako--ensure-configured (project-data preset-name sentinel)
   (if-let* ((reply-files
               (cemako--get-reply-files (cemako--project-binary-dir))))
@@ -438,7 +443,8 @@ validating presets and ending with built binaries."
       project-data
       preset-name
       (lambda (success)
-        (if-let* ((success) (target (cemako--ensure-project-target)))
+        (if-let* ((success success)
+                   (target (cemako--ensure-project-target project-data)))
           (cemako--build
             project-data
             target
