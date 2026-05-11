@@ -51,7 +51,7 @@
 
 ;;; Lisp Settings
 
-(add-to-list 'load-path (concat user-emacs-directory "lisp"))
+(add-to-list 'load-path (concat user-emacs-directory "user-lisp"))
 (setq load-prefer-newer t)
 
 ;;; Elpaca
@@ -775,9 +775,12 @@
 
 (use-package cemako
   :ensure nil
+  :defer nil
   :bind
+  ("<leader>bp" . cemako-select-preset)
   ("<leader>bt" . cemako-select-target)
-  ("<leader>bc" . cemako-run-cmake)
+  ("<leader>bc" . cemako-configure)
+  ("<leader>bC" . cemako-clean)
   ("<leader>bb" . cemako-build)
   ("<leader>br" . cemako-run))
 

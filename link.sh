@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 cd "$(dirname "$0")"
 
-mkdir -p "${HOME}/.emacs.d/lisp"
+mkdir -p "${HOME}/.emacs.d/user-lisp"
 
 HOME_FILES=(
     ".fakevimrc"
@@ -17,7 +17,7 @@ for file in "${HOME_FILES[@]}";do
 done
 
 HOME_FOLDERS=(
-    ".emacs.d/lisp"
+    ".emacs.d/user-lisp"
 )
 
 for folder in "${HOME_FOLDERS[@]}";do
