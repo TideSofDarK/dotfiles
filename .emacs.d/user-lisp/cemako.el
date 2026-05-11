@@ -225,7 +225,6 @@ Specified via the defcustom `cemako-project-name-function'."
                          :annotation-function
                          (lambda (target-name)
                            (plist-get (gethash target-name targets) :type)))))
-                (prin1 targets)
                 (completing-read "Select CMake target: " target-names nil t))))
           (target (gethash target-name targets)))
     (cemako--edit-project-data
