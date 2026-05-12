@@ -170,9 +170,16 @@ Specified via the defcustom `cemako-project-name-function'."
   `(cdr (assoc 'project-binary-dir project-data)))
 
 (defun cemako--get-reply-files (binary-dir)
-  (let* ((reply-directory (expand-file-name ".cmake/api/v1/reply/" binary-dir)))
-    (and (file-exists-p reply-directory)
-      (directory-files reply-directory 'full-name ".*\\.json"))))
+  "Return a list of reply files (or nil if there are errors)."
+  (when-let* ((reply-directory
+                (expand-file-name ".cmake/api/v1/reply/" binary-dir))
+               (reply-directory-exists (file-exists-p reply-directory))
+               (reply-files
+                 (directory-files reply-directory 'full-name ".*\\.json")))
+    (if (any (lambda (reply-file)
+               (string-match-p "error" reply-file)) reply-files)
+      nil
+      reply-files)))
 
 (defun cemako--read-json (file)
   (with-temp-buffer
