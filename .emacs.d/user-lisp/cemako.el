@@ -175,9 +175,9 @@ Specified via the defcustom `cemako-project-name-function'."
                 (expand-file-name ".cmake/api/v1/reply/" binary-dir))
                (reply-directory-exists (file-exists-p reply-directory))
                (reply-files
-                 (directory-files reply-directory 'full-name ".*\\.json")))
+                 (directory-files reply-directory t ".*\\.json")))
     (if (any (lambda (reply-file)
-               (string-match-p "^error" reply-file))
+               (string-match-p "^error" (file-name-nondirectory reply-file)))
           reply-files)
       nil
       reply-files)))
