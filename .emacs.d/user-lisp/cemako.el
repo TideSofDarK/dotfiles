@@ -177,7 +177,8 @@ Specified via the defcustom `cemako-project-name-function'."
                (reply-files
                  (directory-files reply-directory 'full-name ".*\\.json")))
     (if (any (lambda (reply-file)
-               (string-match-p "error" reply-file)) reply-files)
+               (string-match-p "^error" reply-file))
+          reply-files)
       nil
       reply-files)))
 
@@ -400,7 +401,6 @@ preset (or prompts to enter it) and then caches it."
               (symlink (cemako--symlink-compile-commands)))))
         (when sentinel (funcall sentinel success))))))
 
-;;; TODO: This is broken.
 (defun cemako--ensure-configured (project-data preset-name sentinel)
   (if-let* ((reply-files
               (cemako--get-reply-files (cemako--project-binary-dir))))
