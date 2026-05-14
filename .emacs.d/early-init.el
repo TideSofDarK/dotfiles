@@ -33,7 +33,7 @@
   (cl-flet ((silence (&rest args1) (ignore)))
     (advice-add 'message :around #'silence)
     (unwind-protect
-        (apply func args)
+      (apply func args)
       (advice-remove 'message #'silence))))
 
 ;;; Optimize GC
@@ -62,32 +62,32 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-sources-directory (expand-file-name "sources/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1 :inherit ignore
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca-activate)))
+                        :ref nil :depth 1 :inherit ignore
+                        :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                        :build (:not elpaca-activate)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-sources-directory))
-       (build (expand-file-name "elpaca/" elpaca-builds-directory))
-       (order (cdr elpaca-order))
-       (default-directory repo))
+        (build (expand-file-name "elpaca/" elpaca-builds-directory))
+        (order (cdr elpaca-order))
+        (default-directory repo))
   (add-to-list 'load-path (if (file-exists-p build) build repo))
   (unless (file-exists-p repo)
     (make-directory repo t)
     (when (<= emacs-major-version 28) (require 'subr-x))
     (condition-case-unless-debug err
-        (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
-                  ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+      (if-let* ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
                                                   ,@(when-let* ((depth (plist-get order :depth)))
                                                       (list (format "--depth=%d" depth) "--no-single-branch"))
                                                   ,(plist-get order :repo) ,repo))))
-                  ((zerop (call-process "git" nil buffer t "checkout"
-                                        (or (plist-get order :ref) "--"))))
-                  (emacs (concat invocation-directory invocation-name))
-                  ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
-                                        "--eval" "(byte-recompile-directory \".\" 0 'force)")))
-                  ((require 'elpaca))
-                  ((elpaca-generate-autoloads "elpaca" repo)))
-            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
-          (error "%s" (with-current-buffer buffer (buffer-string))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                           (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                           "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+        (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+        (error "%s" (with-current-buffer buffer (buffer-string))))
       ((error) (warn "%s" err) (delete-directory repo 'recursive))))
   (unless (require 'elpaca-autoloads nil t)
     (require 'elpaca)
@@ -101,16 +101,16 @@
 ;;; Fonts
 
 (let ((mono-spaced-font "Sarasa Term Slab CL")
-      (proportionately-spaced-font "Sarasa Term Slab CL"))
+       (proportionately-spaced-font "Sarasa Term Slab CL"))
   (set-face-attribute 'default nil
-                      :family mono-spaced-font
-                      :height 120)
+    :family mono-spaced-font
+    :height 120)
   (set-face-attribute 'fixed-pitch nil
-                      :family mono-spaced-font
-                      :height 1.0)
+    :family mono-spaced-font
+    :height 1.0)
   (set-face-attribute 'variable-pitch nil
-                      :family proportionately-spaced-font
-                      :height 1.0))
+    :family proportionately-spaced-font
+    :height 1.0))
 
 ;;; emacs
 
@@ -150,7 +150,7 @@
   (truncate-lines t)
   (text-mode-ispell-word-completion nil)
   (read-extended-command-predicate
-   #'command-completion-default-include-p)
+    #'command-completion-default-include-p)
   (display-line-numbers-type 'relative)
   (display-line-numbers-grow-only t)
   (display-line-numbers-width 3)
@@ -179,7 +179,7 @@
   (auto-save-default nil)
   (enable-recursive-minibuffers t)
   (minibuffer-prompt-properties
-   '(read-only t cursor-intangible t face minibuffer-prompt))
+    '(read-only t cursor-intangible t face minibuffer-prompt))
   (switch-to-buffer-obey-display-actions t)
   ;; (pixel-scroll-precision-mode t)
   ;; (pixel-scroll-precision-use-momentum nil)
@@ -216,11 +216,11 @@
     (delete-selection-mode t))
 
   (add-hook 'display-line-numbers-mode-hook
-            (lambda ()
-              (setq left-margin-width
-                    (if display-line-numbers-mode 1 0))
-              (set-window-buffer (selected-window)
-                                 (window-buffer (selected-window)))))
+    (lambda ()
+      (setq left-margin-width
+        (if display-line-numbers-mode 1 0))
+      (set-window-buffer (selected-window)
+        (window-buffer (selected-window)))))
 
   (modify-coding-system-alist 'file "" 'utf-8)
 
@@ -287,23 +287,23 @@
   (setopt popper-display-control t)
   ;; (setq popper-display-function #'display-buffer-pop-up-window)
   (setopt popper-reference-buffers
-          '(
-            "\\*Messages\\*"
-            "\\*Warnings\\*"
-            "Output\\*$"
-            "\\*Async Shell Command\\*"
-            "\\*Ibuffer\\*"
-            "\\*eldoc\\*"
-            "^\\*godot"
-            ;; magit-process-mode
-            xref--xref-buffer-mode
-            help-mode
-            compilation-mode))
+    '(
+       "\\*Messages\\*"
+       "\\*Warnings\\*"
+       "Output\\*$"
+       "\\*Async Shell Command\\*"
+       "\\*Ibuffer\\*"
+       "^\\*eldoc"
+       "^\\*godot"
+       ;; magit-process-mode
+       xref--xref-buffer-mode
+       help-mode
+       compilation-mode))
   (setopt popper-window-height (lambda (win)
                                  (fit-window-to-buffer
-                                  win
-                                  (* 2 (floor (frame-height) 5))
-                                  (floor (frame-height) 3))))
+                                   win
+                                   (* 2 (floor (frame-height) 5))
+                                   (floor (frame-height) 3))))
   (popper-mode t))
 
 ;;; dired
@@ -320,9 +320,9 @@
   (dired-dwim-target t)
   :config
   (add-hook 'dired-mode-hook
-            (lambda ()
-              ;; (dired-hide-details-mode 1)
-              (hl-line-mode 1))))
+    (lambda ()
+      ;; (dired-hide-details-mode 1)
+      (hl-line-mode 1))))
 
 ;;; eldoc
 
@@ -354,6 +354,7 @@
 
 (use-package evil
   :ensure t
+  :defer nil
   :preface
   (setopt evil-want-empty-ex-last-command nil)
   (setopt evil-want-keybinding nil)
@@ -386,7 +387,7 @@
     'global (kbd "L") 'evil-end-of-line)
   (evil-define-key 'normal 'global (kbd "<leader>w") 'evil-write)
   (evil-define-key 'normal 'global (kbd "<leader>a") 'evil-write-all)
-  (evil-define-key 'normal 'global (kbd "<leader>d") 'kill-current-buffer)
+  (evil-define-key 'normal 'global (kbd "<leader>d") 'evil-delete-buffer)
   (evil-define-key 'normal 'global (kbd "<leader>q") 'evil-window-delete)
 
   (evil-define-key 'normal 'global
@@ -397,40 +398,27 @@
 
   (defmacro evil-map (state key seq)
     (let ((map (intern (format "evil-%S-state-map" state)))
-          (key-cmd (lookup-key evil-normal-state-map key)))
+           (key-cmd (lookup-key evil-normal-state-map key)))
       `(define-key ,map ,key
-                   (lambda ()
-                     (interactive)
-                     ,(if (string-equal key (substring seq 0 1))
-                          `(let ((orig-this-command this-command))
-                             (setq this-command ',key-cmd)
-                             (call-interactively ',key-cmd)
-                             (run-hooks 'post-command-hook)
-                             (setq this-command orig-this-command)
-                             (execute-kbd-macro ,(substring seq 1)))
-                        (execute-kbd-macro ,seq))))))
+         (lambda ()
+           (interactive)
+           ,(if (string-equal key (substring seq 0 1))
+              `(let ((orig-this-command this-command))
+                 (setq this-command ',key-cmd)
+                 (call-interactively ',key-cmd)
+                 (run-hooks 'post-command-hook)
+                 (setq this-command orig-this-command)
+                 (execute-kbd-macro ,(substring seq 1)))
+              (execute-kbd-macro ,seq))))))
 
   (evil-map visual "<" "<gv")
   (evil-map visual ">" ">gv")
 
-  (defvar intercept-mode-map (make-sparse-keymap))
-  (define-minor-mode intercept-mode
-    "High precedence keymap for evil."
-    :global t)
-  (intercept-mode)
-  (dolist (state '(normal))
-    (evil-make-intercept-map
-     (evil-get-auxiliary-keymap
-      intercept-mode-map state t t)
-     state))
-
-  (defun scroll-to-center-after-goto-mark (char &optional noerror) (recenter))
-  (evil--advice-add 'evil-goto-mark :after #'scroll-to-center-after-goto-mark)
-
-  (defun evil-yank-highlight (orig-fn beg end &rest args)
-    (pulse-momentary-highlight-region beg end)
-    (apply orig-fn beg end args))
-  (advice-add 'evil-yank :around 'evil-yank-highlight))
+  (evil--advice-add 'evil-goto-mark :after (lambda (char &optional noerror)
+                                             (recenter)))
+  (advice-add 'evil-yank :around (lambda (orig-fn beg end &rest args)
+                                   (pulse-momentary-highlight-region beg end)
+                                   (apply orig-fn beg end args))))
 
 (use-package evil-collection
   :ensure t
@@ -438,7 +426,7 @@
   :preface
   (setopt evil-collection-magit-section-use-z-for-folds t)
   (setopt evil-collection-setup-minibuffer t)
-  (setopt evil-collection-want-find-usages-bindings t)
+  (setopt evil-collection-want-find-usages-bindings nil) ;; Binds `gr'!
   :config
   (evil-collection-init))
 
@@ -504,9 +492,9 @@
   :ensure t
   :custom
   (flymake-margin-indicators-string
-   '((error "E" compilation-error)
-     (warning "W" compilation-warning)
-     (note "I" compilation-info)))
+    '((error "E" compilation-error)
+       (warning "W" compilation-warning)
+       (note "I" compilation-info)))
   (flymake-indicator-type 'margins)
   (flymake-autoresize-margins nil)
   ;; (flymake-show-diagnostics-at-end-of-line 'fancy)
@@ -515,8 +503,8 @@
   ;; (flymake-fringe-indicator-position nil)
   :bind
   (:map evil-normal-state-map
-        ("[d" . flymake-goto-prev-error)
-        ("]d" . flymake-goto-next-error)))
+    ("[d" . flymake-goto-prev-error)
+    ("]d" . flymake-goto-next-error)))
 
 ;;; EditorConfig
 
@@ -529,21 +517,22 @@
 
 (use-package eglot
   :ensure t
+  :defer nil
   :hook
   ((c-ts-mode
-    c++-ts-mode
-    glsl-ts-mode
-    cmake-ts-mode
-    slang-ts-mode)
-   . eglot-ensure)
+     c++-ts-mode
+     glsl-ts-mode
+     cmake-ts-mode
+     slang-ts-mode)
+    . eglot-ensure)
   :custom
   (eglot-mode-line-format
-   '(eglot-mode-line-menu
-     eglot-mode-line-session
-     eglot-mode-line-action-suggestion))
+    '(eglot-mode-line-menu
+       eglot-mode-line-session
+       eglot-mode-line-action-suggestion))
   (eglot-ignored-server-capabilities
-   '(:inlayHintProvider
-     :documentHighlightProvider))
+    '(:inlayHintProvider
+       :documentHighlightProvider))
   (eglot-autoshutdown t)
   (eglot-autoreconnect nil)
   (eglot-sync-connect nil)
@@ -553,16 +542,14 @@
   (eglot-confirm-server-edits nil)
   (eglot-code-action-indications '(eldoc-hint))
   (eglot-send-changes-idle-time 0.0)
-  :hook((eglot-managed-mode . (lambda ()
-                                (setq eldoc-documentation-functions
-                                      (cons #'flymake-eldoc-function
-                                            (remove #'flymake-eldoc-function eldoc-documentation-functions)))
-                                (setq eldoc-documentation-strategy #'eldoc-documentation-compose))))
   :config
   ;; (add-hook 'eglot-managed-mode-hook
   ;;           (lambda () (eglot-semantic-tokens-mode 0)))
-  (set-face-attribute 'eglot-semantic-number nil :inherit 'font-lock-number-face)
-  (set-face-attribute 'eglot-semantic-namespace nil :inherit 'font-lock-type-face)
+
+  (set-face-attribute 'eglot-semantic-number nil
+    :inherit 'font-lock-number-face)
+  (set-face-attribute 'eglot-semantic-namespace nil
+    :inherit 'font-lock-type-face)
   (defface eglot-semantic-constructorOrDestructor
     '((default :inherit 'font-lock-function-name-face))
     "Face for painting a ‘constructorOrDestructor’ LSP semantic token")
@@ -577,29 +564,27 @@
   (setq jsonrpc-event-hook nil)
 
   (add-to-list 'eglot-server-programs
-               '((c-ts-mode c++-ts-mode)
-                 . ("clangd"
-                    "-j=8"
-                    "--log=error"
-                    "--background-index"
-                    "--clang-tidy"
-                    "--completion-style=detailed"
-                    "--pch-storage=memory"
-                    "--header-insertion=never"
-                    "--header-insertion-decorators=0")))
+    '((c-ts-mode c++-ts-mode)
+       . ("clangd"
+           "-j=8"
+           "--log=error"
+           "--background-index"
+           "--clang-tidy"
+           "--completion-style=detailed"
+           "--pch-storage=memory"
+           "--header-insertion=never"
+           "--header-insertion-decorators=0")))
   (add-to-list 'eglot-server-programs
-               `(glsl-ts-mode . ("glsl_analyzer")))
+    `(glsl-ts-mode . ("glsl_analyzer")))
   (add-to-list 'eglot-server-programs
-               `(cmake-ts-mode . ("cmake-language-server")))
+    `(cmake-ts-mode . ("cmake-language-server")))
   (add-to-list 'eglot-server-programs
-               `(slang-ts-mode . ("slangd")))
-
-  (evil-define-key
-    'normal intercept-mode-map (kbd "grn") 'eglot-rename)
-  (evil-define-key
-    'normal intercept-mode-map (kbd "gra") 'eglot-code-actions)
-  (evil-define-key
-    'normal eglot-mode-map (kbd "<leader>cf") 'eglot-format))
+    `(slang-ts-mode . ("slangd")))
+  :bind
+  (:map eglot-mode-map
+    ("grn" . eglot-rename)
+    ("gra" . eglot-code-actions)
+    ("<leader>cf" . eglot-format)))
 
 ;;; Completion
 
@@ -611,7 +596,7 @@
   (xref-show-definitions-function #'consult-xref)
   :config
   (advice-add #'register-preview :override #'consult-register-window)
-  (evil-define-key 'normal intercept-mode-map (kbd "grr") 'xref-find-references)
+  (evil-define-key 'normal 'global (kbd "grr") 'xref-find-references)
   (evil-define-key 'normal 'global (kbd "gO") 'consult-imenu)
   (evil-define-key 'normal 'global (kbd "<leader>/") 'consult-line)
   (evil-define-key 'normal 'global (kbd "<leader>st") 'consult-theme)
@@ -621,8 +606,9 @@
 
 (use-package consult-eglot
   :ensure t
-  :config
-  (evil-define-key 'normal 'global (kbd "gW") 'consult-eglot-symbols))
+  :bind
+  (:map eglot-mode-map
+    ("gW" . consult-eglot-symbols)))
 
 (use-package vertico
   :ensure t
@@ -647,10 +633,10 @@
   (completion-styles '(orderless flex))
   (completion-category-defaults nil)
   (completion-category-overrides
-   '((file (styles basic partial-completion))
-     (imenu (styles flex))
-     (eglot (styles orderless))
-     (eglot-capf (styles orderless)))))
+    '((file (styles basic partial-completion))
+       (imenu (styles flex))
+       (eglot (styles orderless))
+       (eglot-capf (styles orderless)))))
 
 (use-package marginalia
   :ensure t
@@ -722,37 +708,37 @@
       (modus-themes-with-colors
         (when (memq theme (modus-themes-get-themes))
           (custom-theme-set-faces
-           theme
-           `(eglot-mode-line
-             ((,c :inherit mode-line-buffer-id :weight normal)))
-           `(eglot-diagnostic-tag-unnecessary-face
-             ((,c :inherit font-lock-comment-face)))
-           `(region ((,c :background ,bg-region
-                         :extend nil)))
-           `(font-lock-keyword-face ((,c :inherit modus-themes-bold
-                                         :foreground ,keyword
-                                         :slant italic))))))))
+            theme
+            `(eglot-mode-line
+               ((,c :inherit mode-line-buffer-id :weight normal)))
+            `(eglot-diagnostic-tag-unnecessary-face
+               ((,c :inherit font-lock-comment-face)))
+            `(region ((,c :background ,bg-region
+                        :extend nil)))
+            `(font-lock-keyword-face ((,c :inherit modus-themes-bold
+                                        :foreground ,keyword
+                                        :slant italic))))))))
   (add-hook 'enable-theme-functions #'better-modus-faces)
   ;; (setopt modus-themes-bold-constructs t)
   ;; (setopt modus-themes-italic-constructs t)
   (setopt modus-vivendi-tinted-palette-overrides '((comment fg-dim)))
   (setopt modus-themes-common-palette-overrides
-          '((property fg-alt)
-            (bracket fg-alt)
-            (delimiter cyan-faint)
-            (punctuation fg-alt)
-            (variable fg-main)
-            (variable-use variable)
-            (fnname-call fnname)
-            (operator cyan-faint)
-            (number red-faint)
-            (bg-active-argument unspecified)
-            (bg-active-value unspecified)
-            (fringe unspecified)
-            (fg-line-number-inactive "gray50")
-            (fg-line-number-active fg-main)
-            (bg-line-number-inactive unspecified)
-            (bg-line-number-active unspecified)))
+    '((property fg-alt)
+       (bracket fg-alt)
+       (delimiter cyan-faint)
+       (punctuation fg-alt)
+       (variable fg-main)
+       (variable-use variable)
+       (fnname-call fnname)
+       (operator cyan-faint)
+       (number red-faint)
+       (bg-active-argument unspecified)
+       (bg-active-value unspecified)
+       (fringe unspecified)
+       (fg-line-number-inactive "gray50")
+       (fg-line-number-active fg-main)
+       (bg-line-number-inactive unspecified)
+       (bg-line-number-active unspecified)))
   ;; (load-theme 'standard-dark t nil)
   ;; (load-theme 'ef-dark t nil)
   (load-theme 'modus-vivendi t nil))
@@ -775,7 +761,6 @@
 
 (use-package cemako
   :ensure nil
-  :defer nil
   :bind
   ("<leader>bp" . cemako-select-preset)
   ("<leader>bt" . cemako-select-target)
@@ -788,16 +773,16 @@
 
 (use-package glsl-mode
   :ensure (:host github
-           :repo "TideSofDarK/glsl-mode"
-           :branch "better-ts-mode")
+            :repo "TideSofDarK/glsl-mode"
+            :branch "better-ts-mode")
   :init
   (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
   (custom-set-faces
-   '(glsl-extension-face
-     ((t :inherit font-lock-constant-face))))
+    '(glsl-extension-face
+       ((t :inherit font-lock-constant-face))))
   (custom-set-faces
-   '(glsl-shader-variable-name-face
-     ((t :inherit font-lock-preprocessor-face :slant italic)))))
+    '(glsl-shader-variable-name-face
+       ((t :inherit font-lock-preprocessor-face :slant italic)))))
 
 ;;; Godot
 
@@ -811,33 +796,40 @@
   :ensure nil
   :config
   (add-hook 'slang-ts-mode-hook
-            (lambda ()
-              (setq-local eglot-semantic-token-types
-                          (cl-set-difference eglot-semantic-token-types
-                                             '("variable") :test #'string=))
-              (electric-indent-local-mode -1))))
+    (lambda ()
+      (setq-local eglot-semantic-token-types
+        (cl-set-difference eglot-semantic-token-types
+          '("variable") :test #'string=))
+      (electric-indent-local-mode -1))))
 
 ;;; C/C++
 
 (use-package c-ts-mode-extras
   :ensure (:host github
-           :repo "TideSofDarK/c-ts-mode-extras"
-           :after treesit-langs)
+            :repo "TideSofDarK/c-ts-mode-extras")
   :init
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
   :config
   (let ((c-or-c++-improvements
-         (lambda ()
-           (setq-local eglot-semantic-token-modifiers
-                       (cl-set-difference eglot-semantic-token-modifiers
-                                          '("definition" "defaultLibrary" "static" "abstract" "readonly" "declaration") :test #'string=))
-           ;; To consider: "variable"
-           (setq-local eglot-semantic-token-types
-                       (cl-set-difference eglot-semantic-token-types
-                                          '("operator" "modifier") :test #'string=))
-           (electric-indent-local-mode -1))))
+          (lambda ()
+            (setq-local eglot-semantic-token-modifiers
+              (cl-set-difference eglot-semantic-token-modifiers
+                '("definition"
+                   "defaultLibrary"
+                   "static"
+                   "abstract"
+                   "readonly"
+                   "declaration")
+                :test #'string=))
+            ;; To consider: "variable"
+            (setq-local eglot-semantic-token-types
+              (cl-set-difference eglot-semantic-token-types
+                '("operator"
+                   "modifier")
+                :test #'string=))
+            (electric-indent-local-mode -1))))
 
     (add-hook 'c-ts-mode-hook c-or-c++-improvements)
     (add-hook 'c++-ts-mode-hook c-or-c++-improvements))

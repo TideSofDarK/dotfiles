@@ -52,12 +52,6 @@
   :type 'boolean
   :group 'cemako)
 
-(defcustom cemako-build-dir-name-function 'cemako-default-build-dir-function
-  "Specify a function to customize the build directory name.
-By default, the name is in the form `build/<profile>`."
-  :type 'function
-  :group 'cemako)
-
 (defcustom cemako-export-compile-commands 'copy
   "Either copy or symlink generated compile_commands.json to project root."
   :type 'symbol
@@ -113,7 +107,7 @@ this template."
     (error "cemako.el needs active project!")))
 
 (defun cemako-edit-project-data ()
-  "Open Cemako project file."
+  "Open `.cemako.el' project file."
   (interactive)
   (find-file (cemako--project-data-path)))
 
@@ -138,7 +132,7 @@ this template."
     (setcdr project-data (cdr merged))))
 
 (defun cemako--write-project-data (project-data)
-  "Write PROJECT-DATA to .cemako.el file."
+  "Write PROJECT-DATA to `.cemako.el' file."
   (when-let* ((project-data-path (cemako--project-data-path)))
     (with-temp-buffer
       (erase-buffer)
@@ -341,7 +335,7 @@ preset (or prompts to enter it) and then caches it."
     (cemako--select-preset project-data presets)))
 
 (defun cemako--copy-compile-commands ()
-  "Copy compile_commands.json to project root."
+  "Copy `compile_commands.json' to project root."
   (let ((project-root (cemako--get-project-root)))
     (let ((filename
             (expand-file-name "compile_commands.json" project-root)))
@@ -351,7 +345,7 @@ preset (or prompts to enter it) and then caches it."
     (copy-file "compile_commands.json" project-root)))
 
 (defun cemako--symlink-compile-commands ()
-  "Symlink compile_commands.json to project root."
+  "Symlink `compile_commands.json' to project root."
   (let ((project-root (cemako--get-project-root)))
     (let ((filename
             (expand-file-name "compile_commands.json" project-root)))
@@ -486,6 +480,7 @@ validating presets and ending with built binaries."
             (compile target-executable-path))))
       (compile target-executable-path))))
 
+;;;###autoload
 (defun cemako-select-preset ()
   "Prompts to select a CMake preset."
   (interactive)
@@ -494,6 +489,7 @@ validating presets and ending with built binaries."
     (when (cemako--select-preset project-data presets)
       (cemako--write-project-data project-data))))
 
+;;;###autoload
 (defun cemako-configure ()
   "Configure CMake project with current preset."
   (interactive)
@@ -507,6 +503,7 @@ validating presets and ending with built binaries."
         (cemako--write-project-data project-data)))
     (cemako--write-project-data project-data)))
 
+;;;###autoload
 (defun cemako-select-target ()
   "Prompts to select a CMake target."
   (interactive)
@@ -523,6 +520,7 @@ validating presets and ending with built binaries."
         (cemako--write-project-data project-data)))
     (cemako--write-project-data project-data)))
 
+;;;###autoload
 (defun cemako-build ()
   "Build selected CMake target."
   (interactive)
@@ -532,6 +530,7 @@ validating presets and ending with built binaries."
     (cemako--build project-data target)
     (cemako--pipeline project-data)))
 
+;;;###autoload
 (defun cemako-run ()
   "Run selected CMake target."
   (interactive)
@@ -542,6 +541,7 @@ validating presets and ending with built binaries."
         (lambda ()
           (cemako--run project-data))))))
 
+;;;###autoload
 (defun cemako-clean ()
   "Clean CMake project."
   (interactive)
@@ -550,6 +550,7 @@ validating presets and ending with built binaries."
                (command (concat "cmake --build . --target clean")))
     (cemako--compile command)))
 
+;;;###autoload
 (defun cemako-clear-cmake-cache ()
   "Clear CMake caches."
   (interactive)
