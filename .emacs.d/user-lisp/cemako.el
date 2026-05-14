@@ -26,22 +26,15 @@
 
 ;;; Commentary:
 
-;; Minimal CMake integration for Emacs (that just works)
-;;
-;; Based on cmake-build.el by Ryan Pavlik
-;;
-;; This package stores configuration profiles and current state in .cemako.el
-;; file at the project root (name and relative path may be customized).
-;; That file is intended to be modified by hand but the package
-;; also provides some convenient interactive prompts.
+;; This package stores project configuration in `.cemako.el' file.
+;; That file should be excluded from VC and is not meant to by edited by hand.
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl-lib)
-  (require 'project)
-  (require 'compile)
-  (require 'json))
+(require 'cl-lib)
+(require 'project)
+(require 'compile)
+(require 'json)
 
 (defgroup cemako ()
   "Configure, build and run CMake projects using CMake presets feature."
@@ -60,11 +53,6 @@
 
 (defcustom cemako-project-root-function 'cemako-default-project-root-function
   "Return the project root."
-  :type 'function
-  :group 'cemako)
-
-(defcustom cemako-project-name-function 'cemako-default-project-name-function
-  "Return the project name."
   :type 'function
   :group 'cemako)
 
@@ -94,11 +82,6 @@ this template."
   "Return the project root."
   (funcall cemako-project-root-function))
 
-(defun cemako-default-project-name-function ()
-  "Return the project name."
-  (when-let* ((project (project-current)))
-    (project-name project)))
-
 (defun cemako--project-data-path ()
   "Return path to project data file."
   (if-let* ((project-root (cemako--get-project-root)))
@@ -106,15 +89,10 @@ this template."
       (file-name-as-directory project-root) ".cemako.el")
     (error "cemako.el needs active project!")))
 
-(defun cemako-edit-project-data ()
-  "Open `.cemako.el' project file."
-  (interactive)
-  (find-file (cemako--project-data-path)))
-
 (defconst cemako--empty-project-data '((version . 1)))
 
 (defun cemako--read-project-data ()
-  "Read project data from .cemako.el file."
+  "Read project data from `.cemako.el' file."
   (if-let* ((project-data-path (cemako--project-data-path))
              (exists (file-exists-p project-data-path)))
     (with-temp-buffer
@@ -126,7 +104,7 @@ this template."
     (map-copy cemako--empty-project-data)))
 
 (defun cemako--edit-project-data (project-data key value)
-  "Set KEY to VALUE within PROJECT-DATA."
+  "Set KEY to VALUE within PROJECT-DATA (destructively)."
   (let ((merged (map-merge 'list project-data `((,key . ,value)))))
     (setcar project-data (car merged))
     (setcdr project-data (cdr merged))))
@@ -141,27 +119,21 @@ this template."
       (delete-char 1)
       (write-region (point-min) (point-max) project-data-path))))
 
-(defun cemako-project-name ()
-  "Return the project name.
-Specified via the defcustom `cemako-project-name-function'."
-  (let ((default-directory (cemako--get-project-root)))
-    (funcall cemako-project-name-function)))
-
 (defmacro cemako--project-target ()
   "Return current CMake target."
-  `(cdr (assoc 'project-target project-data)))
+  `(cdr (assoc 'target project-data)))
 
 (defmacro cemako--project-target-executable ()
   "Return current CMake target executable."
-  `(cdr (assoc 'project-target-executable project-data)))
+  `(cdr (assoc 'target-executable project-data)))
 
 (defmacro cemako--project-preset-name ()
   "Return current CMake preset name."
-  `(cdr (assoc 'project-preset-name project-data)))
+  `(cdr (assoc 'preset-name project-data)))
 
 (defmacro cemako--project-binary-dir ()
   "Return current CMake binary directory."
-  `(cdr (assoc 'project-binary-dir project-data)))
+  `(cdr (assoc 'binary-dir project-data)))
 
 (defun cemako--get-reply-files (binary-dir)
   "Return a list of reply files (or nil if there are errors)."
@@ -233,10 +205,10 @@ Specified via the defcustom `cemako-project-name-function'."
           (target (gethash target-name targets)))
     (cemako--edit-project-data
       project-data
-      'project-target target-name)
+      'target target-name)
     (cemako--edit-project-data
       project-data
-      'project-target-executable (plist-get target :artifact))
+      'target-executable (plist-get target :artifact))
     target-name))
 
 (defun cemako--ensure-project-target (project-data)
@@ -302,7 +274,7 @@ preset (or prompts to enter it) and then caches it."
                    (read-directory-name "Output directory: "))))
      (cemako--edit-project-data
        project-data
-       'project-binary-dir project-binary-dir)))
+       'binary-dir project-binary-dir)))
 
 (defun cemako--select-preset (project-data presets)
   (when-let* ((default-directory (cemako--get-project-root))
@@ -319,7 +291,7 @@ preset (or prompts to enter it) and then caches it."
                (preset (cemako--combine-preset presets preset-name)))
     (cemako--edit-project-data
       project-data
-      'project-preset-name
+      'preset-name
       preset-name)
     (cemako--cache-project-binary-dir preset)
     preset-name))
@@ -479,6 +451,15 @@ validating presets and ending with built binaries."
           (when success
             (compile target-executable-path))))
       (compile target-executable-path))))
+
+;;;###autoload
+;; (defun cemako-edit-project-data ()
+;;   "Open `.cemako.el' project file."
+;;   (interactive)
+;;   (if-let* ((project-data-path (cemako--project-data-path))
+;;              (project-data-exists (file-exists-p project-data-path)))
+;;     (find-file (cemako--project-data-path))
+;;     (error "cemako.el is not initialized in this project!")))
 
 ;;;###autoload
 (defun cemako-select-preset ()
