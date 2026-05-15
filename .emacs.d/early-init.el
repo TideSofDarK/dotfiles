@@ -580,11 +580,10 @@
     `(cmake-ts-mode . ("cmake-language-server")))
   (add-to-list 'eglot-server-programs
     `(slang-ts-mode . ("slangd")))
-  :bind
-  (:map eglot-mode-map
-    ("grn" . eglot-rename)
-    ("gra" . eglot-code-actions)
-    ("<leader>cf" . eglot-format)))
+
+  (evil-define-key 'normal eglot-mode-map (kbd "grn") 'eglot-rename)
+  (evil-define-key 'normal eglot-mode-map (kbd "gra") 'eglot-code-actions)
+  (evil-define-key 'normal eglot-mode-map (kbd "<leader>cf") 'eglot-format))
 
 ;;; Completion
 
@@ -606,9 +605,8 @@
 
 (use-package consult-eglot
   :ensure t
-  :bind
-  (:map eglot-mode-map
-    ("gW" . consult-eglot-symbols)))
+  :config
+  (evil-define-key 'normal eglot-mode-map (kbd "gW") 'consult-eglot-symbols))
 
 (use-package vertico
   :ensure t

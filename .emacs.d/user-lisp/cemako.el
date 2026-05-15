@@ -234,15 +234,51 @@ this template."
                                         (json-read-file filename))
              collect (cons (alist-get 'name preset) preset))))
 
-;;; TODO: Add support for multiple inherits.
-;;; TODO: Array merging is probably broken.
+(defun cemako--selectable-presets (presets)
+  "Filters out hidden presets and maps to `displayName'."
+  (cl-loop
+    for preset in (map-values presets)
+    for hidden = (alist-get 'hidden preset)
+    for preset-name = (alist-get 'name preset)
+    for display-name = (alist-get 'displayName preset)
+    for description = (alist-get 'description preset)
+    if (or (not hidden) (eq hidden :json-false))
+    collect `(,(or display-name preset-name)
+               . ((name . ,preset-name)
+                   (description . ,description)))))
+
+;;; TODO: Merging is definitely not 100% correct.
+;;; TODO: e. g. `cacheVariables' are not being merged properly.
 (defun cemako--combine-preset (presets preset-name)
   "Recursively travels up the preset inheritance chain
 and merges everything into single object."
   (when-let* ((preset (alist-get preset-name presets nil nil #'string=)))
-    (map-merge 'list
-      (cemako--combine-preset presets (alist-get 'inherits preset))
-      preset)))
+    (let* ((inherits (alist-get 'inherits preset))
+            (inherits-presets '())
+            (index 0))
+      ;; `inherits' could be either a string or a vector.
+      (cond
+        ((vectorp inherits)
+          (while (< index (length inherits))
+            (push
+              (cemako--combine-preset presets (aref inherits index))
+              inherits-presets)
+            (setq index (1+ index))))
+        ((stringp inherits)
+          (push
+            (cemako--combine-preset presets inherits)
+            inherits-presets)))
+      ;; Strip uninheritable properties.
+      (let ((combined-parent (map-filter
+                               (lambda (key _value)
+                                 (not (or
+                                        (eq key 'name)
+                                        (eq key 'hidden)
+                                        (eq key 'inherits)
+                                        (eq key 'description)
+                                        (eq key 'displayName))))
+                               (apply 'map-merge 'list inherits-presets))))
+        (map-merge 'list combined-parent preset)))))
 
 (defun cemako--expand-preset-string (preset raw-string)
   "Replaces variety of macros in a preset string."
@@ -278,7 +314,8 @@ preset (or prompts to enter it) and then caches it."
 
 (defun cemako--select-preset (project-data presets)
   (when-let* ((default-directory (cemako--get-project-root))
-               (preset-name
+               (selectable-presets (cemako--selectable-presets presets))
+               (selectable-preset-name
                  (let* ((completion-extra-properties
                           (list
                             :annotation-function
@@ -286,8 +323,13 @@ preset (or prompts to enter it) and then caches it."
                               (alist-get
                                 'description
                                 (alist-get preset-name
-                                  presets nil nil #'string=))))))
-                   (completing-read "Select CMake preset: " presets nil t)))
+                                  selectable-presets nil nil #'string=))))))
+                   (completing-read
+                     "Select CMake preset: " selectable-presets nil t)))
+               (preset-name (alist-get
+                              'name
+                              (alist-get selectable-preset-name
+                                selectable-presets nil nil #'string=)))
                (preset (cemako--combine-preset presets preset-name)))
     (cemako--edit-project-data
       project-data
@@ -451,15 +493,6 @@ validating presets and ending with built binaries."
           (when success
             (compile target-executable-path))))
       (compile target-executable-path))))
-
-;;;###autoload
-;; (defun cemako-edit-project-data ()
-;;   "Open `.cemako.el' project file."
-;;   (interactive)
-;;   (if-let* ((project-data-path (cemako--project-data-path))
-;;              (project-data-exists (file-exists-p project-data-path)))
-;;     (find-file (cemako--project-data-path))
-;;     (error "cemako.el is not initialized in this project!")))
 
 ;;;###autoload
 (defun cemako-select-preset ()
