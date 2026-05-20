@@ -211,7 +211,7 @@ is t or contains the mode name."
 (when (boundp 'treesit-major-mode-remap-alist)
   (add-to-list 'auto-mode-alist
                '("\\(?:.slang\\|\\.sl\\|\\.slangh\\)\\'" . slang-ts-mode-maybe))
-  ;; To be able to toggle between an external package and core ts-mode:
+  ;; To be able to toggle between an external package and this ts-mode:
   (add-to-list 'treesit-major-mode-remap-alist
                '(slang-mode . slang-ts-mode)))
 
