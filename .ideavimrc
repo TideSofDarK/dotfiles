@@ -1,7 +1,7 @@
 let mapleader = " "
 
-set hlsearch
 set clipboard+=unnamed
+set hlsearch
 set visualbell
 set noerrorbells
 set scrolloff=5
@@ -23,6 +23,11 @@ nmap <M-h> <C-w>h
 nmap <M-j> <C-w>j
 nmap <M-k> <C-w>k
 nmap <M-l> <C-w>l
+
+nmap H <Action>(EditorLineStart)
+vmap H <Action>(EditorLineStartWithSelection)
+nmap L <Action>(EditorLineEnd)
+vmap L <Action>(EditorLineEndWithSelection)
 
 map <leader>\\x <Action>(HideActiveWindow)
 map <leader>bd <Action>(Debug)

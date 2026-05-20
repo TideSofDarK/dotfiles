@@ -30,6 +30,13 @@
  '(slang "https://github.com/tree-sitter-grammars/tree-sitter-slang")
  t)
 
+(defcustom slang-ts-indent-offset 4
+  "Number of spaces for each indentation step in `slang-ts-mode'."
+  :version "31.1"
+  :type 'integer
+  :safe 'integerp
+  :group 'slang)
+
 (defvar slang-ts-mode--operators
   '("=" "-" "*" "/" "+" "%" "~" "|" "&" "^" "<<" ">>" "->"
     "." "<" "<=" ">=" ">" "==" "!=" "!" "&&" "||" "-="
@@ -171,11 +178,10 @@ recommended to enable `electric-pair-mode' with this mode."
   (when (treesit-ensure-installed 'slang)
     (treesit-parser-create 'slang)
 
+    (setq-local c-ts-common-indent-offset 'slang-ts-indent-offset)
     (setq-local treesit-simple-indent-rules
-                (if (functionp c-ts-mode-indent-style)
-                    (funcall c-ts-mode-indent-style)
-                  (c-ts-mode--simple-indent-rules
-                   'cpp c-ts-mode-indent-style)))
+                (c-ts-mode--simple-indent-rules
+                  'cpp c-ts-mode-indent-style))
     (setcar (car treesit-simple-indent-rules) 'slang)
 
     (setq-local treesit-font-lock-settings slang-ts-mode--font-lock-settings)

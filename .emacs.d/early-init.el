@@ -797,8 +797,7 @@
     (lambda ()
       (setq-local eglot-semantic-token-types
         (cl-set-difference eglot-semantic-token-types
-          '("variable") :test #'string=))
-      (electric-indent-local-mode -1))))
+          '("variable") :test #'string=)))))
 
 ;;; C/C++
 
