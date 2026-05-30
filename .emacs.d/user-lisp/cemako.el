@@ -29,6 +29,13 @@
 ;; This package stores project configuration in `.cemako.el' file.
 ;; That file should be excluded from VC and is not meant to by edited by hand.
 
+;;; TODO:
+
+;; Hidden presets are not always hidden?
+;; Make sure current preset is pre-selected when selecting.
+;; Add platform checking.
+;; Display an error on bad JSON.
+
 ;;; Code:
 
 (require 'cl-lib)
