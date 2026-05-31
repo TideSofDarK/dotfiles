@@ -7,7 +7,7 @@ vim.pack.add({ "https://github.com/mason-org/mason.nvim" })
 vim.pack.add({ "https://github.com/mason-org/mason-lspconfig.nvim" })
 
 require('mason').setup()
-require('mason-lspconfig').setup { ensure_installed = { 'clangd', 'cmake', 'lua_ls', 'glsl_analyzer' } }
+require('mason-lspconfig').setup { ensure_installed = { 'clangd', 'slangd', 'glsl_analyzer', 'lua_ls' } }
 
 vim.api.nvim_create_autocmd("LspAttach", {
   group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),

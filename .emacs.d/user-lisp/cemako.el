@@ -27,7 +27,7 @@
 ;;; Commentary:
 
 ;; This package stores project configuration in `.cemako.el' file.
-;; That file should be excluded from VC and is not meant to by edited by hand.
+;; That file should be excluded from VC and is not meant to be edited by hand.
 
 ;;; TODO:
 
@@ -35,6 +35,7 @@
 ;; Make sure current preset is pre-selected when selecting.
 ;; Add platform checking.
 ;; Display an error on bad JSON.
+;; Prevent creation of `.cemako.el' in arbitrary projects.
 
 ;;; Code:
 

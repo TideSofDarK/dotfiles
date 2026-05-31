@@ -1,7 +1,7 @@
 vim.pack.add({ { src = "https://github.com/nvim-treesitter/nvim-treesitter", version = 'main' } })
 
 require('nvim-treesitter').install({ 'c', 'cpp', 'lua', 'python', 'vimdoc', 'vim', 'bash', 'glsl', 'markdown',
-  'markdown_inline', 'yaml', 'gdscript', 'rust' })
+  'markdown_inline', 'yaml', 'gdscript', 'rust', 'slang' })
 vim.api.nvim_create_autocmd('FileType', {
   callback = function(ctx)
     local has_started = pcall(vim.treesitter.start)

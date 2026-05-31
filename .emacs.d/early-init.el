@@ -245,8 +245,6 @@
 
 (use-package electric
   :ensure nil
-  :custom
-  (electric-pair-preserve-balance nil)
   :config
   (let ((inhibit-message t))
     (electric-indent-mode t)
@@ -825,8 +823,7 @@
               (cl-set-difference eglot-semantic-token-types
                 '("operator"
                    "modifier")
-                :test #'string=))
-            (electric-indent-local-mode -1))))
+                :test #'string=)))))
 
     (add-hook 'c-ts-mode-hook c-or-c++-improvements)
     (add-hook 'c++-ts-mode-hook c-or-c++-improvements))

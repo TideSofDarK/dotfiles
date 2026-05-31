@@ -30,6 +30,13 @@
  '(gdscript "https://github.com/PrestonKnopp/tree-sitter-gdscript")
  t)
 
+(defcustom gdscript-ts-mode-indent-offset 4
+  "Number of spaces for each indentation step in `gdscript-ts-mode'."
+  :version "31.1"
+  :type 'integer
+  :safe 'integerp
+  :group 'gdscript)
+
 (defvar gdscript-ts--keyword-regex
   (rx bot (| "func" "var" "const" "set" "get" "setget" "signal" "extends"
              "match" "if" "elif" "else" "for" "in" "while" "break" "continue"
@@ -40,7 +47,8 @@
              "remotesync" "mastersync" "puppetsync"
              "trait" "namespace" "super"
              "and" "or" "not"
-             "await" "yield" "self") eot))
+             "await" "yield" "self")
+    eot))
 
 (defvar gdscript-ts--builtin-type-regex
   "\\`\\(int\\|bool\\|float\\|void\\|Vector2\\|Vector2i\\|Vector3\\|Vector3i\\|Vector4\\|Vector4i\\|Color\\|Rect2\\|Rect2i\\|Array\\|Basis\\|Dictionary\\|Plane\\|Quat\\|RID\\|Rect3\\|Transform\\|Transform2D\\|Transform3D\\|AABB\\|String\\|Color\\|NodePath\\|PoolByteArray\\|PoolIntArray\\|PoolRealArray\\|PoolStringArray\\|PoolVector2Array\\|PoolVector3Array\\|PoolColorArray\\|bool\\|int\\|float\\|Signal\\|Callable\\|StringName\\|Quaternion\\|Projection\\|PackedByteArray\\|PackedInt32Array\\|PackedInt64Array\\|PackedFloat32Array\\|PackedFloat64Array\\|PackedStringArray\\|PackedVector2Array\\|PackedVector2iArray\\|PackedVector3Array\\|PackedVector3iArray\\|PackedVector4Array\\|PackedColorArray\\|JSON\\|UPNP\\|OS\\|IP\\|JSONRPC\\|XRVRS\\)\\'")
@@ -130,8 +138,6 @@
    :feature 'escape-sequence
    '((escape_sequence) @font-lock-escape-face)))
 
-(defvar gdscript-ts-mode-indent-offset 4)
-
 (defvar gdscript-ts-mode--simple-indent-rules
   `((gdscript
      ((parent-is "block") parent 0)
@@ -185,7 +191,7 @@ is t or contains the mode name."
 (when (boundp 'treesit-major-mode-remap-alist)
   (add-to-list 'auto-mode-alist
                '("\\(?:.gd\\)\\'" . gdscript-ts-mode-maybe))
-  ;; To be able to toggle between an external package and core ts-mode:
+  ;; To be able to toggle between an external package and this ts-mode:
   (add-to-list 'treesit-major-mode-remap-alist
                '(gdscript-mode . gdscript-ts-mode)))
 
