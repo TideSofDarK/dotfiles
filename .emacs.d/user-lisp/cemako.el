@@ -36,6 +36,7 @@
 ;; Add platform checking.
 ;; Display an error on bad JSON.
 ;; Prevent creation of `.cemako.el' in arbitrary projects.
+;; Prompt to select a target when the current one is not available anymore.
 
 ;;; Code:
 
