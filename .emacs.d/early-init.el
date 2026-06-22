@@ -744,8 +744,6 @@
 ;;   (add-to-list 'completion-at-point-functions #'cape-file)
 ;;   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 
-(elpaca-wait)
-
 ;;; Markdown
 
 (use-package markdown-mode
@@ -831,6 +829,8 @@
   (setopt c-ts-mode-enable-doxygen t))
 
 ;;; Done
+
+(elpaca-wait)
 
 (provide 'early-init)
 ;;; early-init.el ends here
