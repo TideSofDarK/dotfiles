@@ -32,9 +32,9 @@
 (treesit-declare-unavailable-functions)
 
 (add-to-list
- 'treesit-language-source-alist
- '(gdscript "https://github.com/PrestonKnopp/tree-sitter-gdscript")
- t)
+  'treesit-language-source-alist
+  '(gdscript "https://github.com/PrestonKnopp/tree-sitter-gdscript")
+  t)
 
 (defcustom gdscript-ts-indent-offset 4
   "Number of spaces for each indentation step in `gdscript-ts-mode'."
@@ -45,15 +45,15 @@
 
 (defvar gdscript-ts--keyword-regex
   (rx bot (| "func" "var" "const" "set" "get" "setget" "signal" "extends"
-             "match" "if" "elif" "else" "for" "in" "while" "break" "continue"
-             "pass" "return" "when" "yield" "await"
-             "class" "class_name" "abstract" "is" "onready" "tool" "static"
-             "export" "as" "void" "enum" "assert" "breakpoint"
-             "sync" "remote" "master" "puppet"
-             "remotesync" "mastersync" "puppetsync"
-             "trait" "namespace" "super"
-             "and" "or" "not"
-             "await" "yield" "self")
+            "match" "if" "elif" "else" "for" "in" "while" "break" "continue"
+            "pass" "return" "when" "yield" "await"
+            "class" "class_name" "abstract" "is" "onready" "tool" "static"
+            "export" "as" "void" "enum" "assert" "breakpoint"
+            "sync" "remote" "master" "puppet"
+            "remotesync" "mastersync" "puppetsync"
+            "trait" "namespace" "super"
+            "and" "or" "not"
+            "await" "yield" "self")
     eot))
 
 (defvar gdscript-ts--builtin-type-regex
@@ -66,90 +66,90 @@
 
 (defvar gdscript-ts--treesit-settings
   (treesit-font-lock-rules
-   :language 'gdscript
-   :feature 'comment
-   '((comment) @font-lock-comment-face)
+    :language 'gdscript
+    :feature 'comment
+    '((comment) @font-lock-comment-face)
 
-   :language 'gdscript
-   :feature 'constant
-   `(([(null) (false) (true)] @font-lock-constant-face)
-     (const_statement name: (name) @font-lock-constant-face)
-     (enumerator left: (identifier) @font-lock-constant-face)
-     ((identifier) @font-lock-constant-face
-      (:match ,gdscript-ts--constant-regex @font-lock-constant-face))
-     (variable_statement
-      name: (name) @font-lock-constant-face
-      (:match ,gdscript-ts--constant-regex @font-lock-constant-face)))
+    :language 'gdscript
+    :feature 'constant
+    `(([(null) (false) (true)] @font-lock-constant-face)
+       (const_statement name: (name) @font-lock-constant-face)
+       (enumerator left: (identifier) @font-lock-constant-face)
+       ((identifier) @font-lock-constant-face
+         (:match ,gdscript-ts--constant-regex @font-lock-constant-face))
+       (variable_statement
+         name: (name) @font-lock-constant-face
+         (:match ,gdscript-ts--constant-regex @font-lock-constant-face)))
 
-   :language 'gdscript
-   :feature 'bracket
-   `(["[" "]" "(" ")" "{" "}"] @font-lock-bracket-face)
+    :language 'gdscript
+    :feature 'bracket
+    `(["[" "]" "(" ")" "{" "}"] @font-lock-bracket-face)
 
-   :language 'gdscript
-   :feature 'delimiter
-   `(["," ":" "."] @font-lock-delimiter-face)
+    :language 'gdscript
+    :feature 'delimiter
+    `(["," ":" "."] @font-lock-delimiter-face)
 
-   :language 'gdscript
-   :feature 'type
-   `(((identifier) @font-lock-builtin-face
-      (:match ,gdscript-ts--builtin-type-regex @font-lock-builtin-face))
-     (get_node) @font-lock-builtin-face
-     ((identifier) @font-lock-type-face
-      (:match ,gdscript-ts--type-regex @font-lock-type-face))
-     (enum_definition name: (_) @font-lock-type-face)
-     (class_name_statement (name) @font-lock-type-face)
-     (class_definition (name) @font-lock-type-face))
+    :language 'gdscript
+    :feature 'type
+    `(((identifier) @font-lock-builtin-face
+        (:match ,gdscript-ts--builtin-type-regex @font-lock-builtin-face))
+       (get_node) @font-lock-builtin-face
+       ((identifier) @font-lock-type-face
+         (:match ,gdscript-ts--type-regex @font-lock-type-face))
+       (enum_definition name: (_) @font-lock-type-face)
+       (class_name_statement (name) @font-lock-type-face)
+       (class_definition (name) @font-lock-type-face))
 
-   :language 'gdscript
-   :feature 'definition
-   '((function_definition (name) @font-lock-function-name-face))
+    :language 'gdscript
+    :feature 'definition
+    '((function_definition (name) @font-lock-function-name-face))
 
-   :language 'gdscript
-   :feature 'annotation
-   '((annotation "@" @font-lock-preprocessor-face
-                 (identifier) @font-lock-preprocessor-face))
+    :language 'gdscript
+    :feature 'annotation
+    '((annotation "@" @font-lock-preprocessor-face
+        (identifier) @font-lock-preprocessor-face))
 
-   :language 'gdscript
-   :feature 'keyword
-   `((ERROR _ @font-lock-keyword-face (:match ,gdscript-ts--keyword-regex @font-lock-keyword-face))
-     (_ _ @font-lock-keyword-face (:match ,gdscript-ts--keyword-regex @font-lock-keyword-face)))
+    :language 'gdscript
+    :feature 'keyword
+    `((ERROR _ @font-lock-keyword-face (:match ,gdscript-ts--keyword-regex @font-lock-keyword-face))
+       (_ _ @font-lock-keyword-face (:match ,gdscript-ts--keyword-regex @font-lock-keyword-face)))
 
-   :language 'gdscript
-   :feature 'string
-   '((string) @font-lock-string-face)
+    :language 'gdscript
+    :feature 'string
+    '((string) @font-lock-string-face)
 
-   :language 'gdscript
-   :feature 'function
-   '((call (identifier) @font-lock-builtin-face (:match "preload" @font-lock-builtin-face))
-     (call (identifier) @font-lock-function-call-face)
-     (attribute_call (identifier) @font-lock-function-call-face))
+    :language 'gdscript
+    :feature 'function
+    '((call (identifier) @font-lock-builtin-face (:match "preload" @font-lock-builtin-face))
+       (call (identifier) @font-lock-function-call-face)
+       (attribute_call (identifier) @font-lock-function-call-face))
 
-   :language 'gdscript
-   :feature 'number
-   '(([(integer) (float)] @font-lock-number-face))
+    :language 'gdscript
+    :feature 'number
+    '(([(integer) (float)] @font-lock-number-face))
 
-   :language 'gdscript
-   :feature 'property
-   '((attribute (identifier) (identifier) @font-lock-property-use-face))
+    :language 'gdscript
+    :feature 'property
+    '((attribute (identifier) (identifier) @font-lock-property-use-face))
 
-   :feature 'operator
-   :language 'gdscript
-   `(["+" "+="   "-" "-=" "*" "*=" "/" "/=" "^"  "^="  ">"  ">="
-      "<" "<="   "|" "|=" "%" "%=" "&" "&=" ">>" ">>=" "<<" "<<="
-      "||" "&&" "==" "!=" "->" "~" "=" ":="]
-     @font-lock-operator-face)
+    :feature 'operator
+    :language 'gdscript
+    `(["+" "+="   "-" "-=" "*" "*=" "/" "/=" "^"  "^="  ">"  ">="
+        "<" "<="   "|" "|=" "%" "%=" "&" "&=" ">>" ">>=" "<<" "<<="
+        "||" "&&" "==" "!=" "->" "~" "=" ":="]
+       @font-lock-operator-face)
 
-   :language 'gdscript
-   :override t
-   :feature 'escape-sequence
-   '((escape_sequence) @font-lock-escape-face)))
+    :language 'gdscript
+    :override t
+    :feature 'escape-sequence
+    '((escape_sequence) @font-lock-escape-face)))
 
 (defvar gdscript-ts-mode--simple-indent-rules
   `((gdscript
-     ((parent-is "block") parent 0)
-     ((parent-is "chunk") column-0 0)
-     ((parent-is "ERROR") no-indent 0)
-     c-ts-common-baseline-indent-rule)))
+      ((parent-is "block") parent 0)
+      ((parent-is "chunk") column-0 0)
+      ((parent-is "ERROR") no-indent 0)
+      c-ts-common-baseline-indent-rule)))
 
 ;;;###autoload
 (define-derived-mode gdscript-ts-mode prog-mode "GDScript"
@@ -161,7 +161,7 @@ recommended to enable `electric-pair-mode' with this mode."
   :group 'gdscript
 
   (when (and (treesit-ready-p 'gdscript t)
-             (treesit-ensure-installed 'gdscript))
+          (treesit-ensure-installed 'gdscript))
     (treesit-parser-create 'gdscript)
 
     (setq-local c-ts-common-indent-offset 'gdscript-ts-indent-offset)
@@ -173,10 +173,10 @@ recommended to enable `electric-pair-mode' with this mode."
 
     (setq-local treesit-font-lock-settings gdscript-ts--treesit-settings)
     (setq-local treesit-font-lock-feature-list
-                '(( comment definition)
-                  ( keyword string type annotation)
-                  ( number constant escape-sequence)
-                  ( bracket delimiter function operator property)))
+      '(( comment definition)
+         ( keyword string type annotation)
+         ( number constant escape-sequence)
+         ( bracket delimiter function operator property)))
 
     (treesit-major-mode-setup)))
 
@@ -189,18 +189,18 @@ Also propose to install the grammar when `treesit-enabled-modes'
 is t or contains the mode name."
   (declare-function treesit-language-available-p "treesit.c")
   (if (or (treesit-language-available-p 'gdscript)
-          (eq treesit-enabled-modes t)
-          (memq 'gdscript-ts-mode treesit-enabled-modes))
-      (gdscript-ts-mode)
+        (eq treesit-enabled-modes t)
+        (memq 'gdscript-ts-mode treesit-enabled-modes))
+    (gdscript-ts-mode)
     (prog-mode)))
 
 ;;;###autoload
 (when (boundp 'treesit-major-mode-remap-alist)
   (add-to-list 'auto-mode-alist
-               '("\\(?:.gd\\)\\'" . gdscript-ts-mode-maybe))
+    '("\\(?:.gd\\)\\'" . gdscript-ts-mode-maybe))
   ;; To be able to toggle between an external package and this ts-mode:
   (add-to-list 'treesit-major-mode-remap-alist
-               '(gdscript-mode . gdscript-ts-mode)))
+    '(gdscript-mode . gdscript-ts-mode)))
 
 (provide 'gdscript-ts-mode)
 
