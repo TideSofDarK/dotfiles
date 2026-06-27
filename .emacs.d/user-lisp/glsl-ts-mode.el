@@ -285,7 +285,10 @@
 
     :language 'glsl
     :feature 'qualifier
-    '(((type_qualifier) @font-lock-keyword-face))
+    `(((layout_qualifiers
+         (qualifier (identifier) @font-lock-type-face
+           (:match ,(rx-to-string `(seq bol (or ,@glsl-ts--layout-qualifiers) eol)) @font-lock-type-face))))
+       ((type_qualifier) @font-lock-keyword-face))
 
     :language 'glsl
     :feature 'operator
