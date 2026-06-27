@@ -175,7 +175,8 @@ some breakage in indentation/fontification.  Therefore, it's
 recommended to enable `electric-pair-mode' with this mode."
   :group 'slang
 
-  (when (treesit-ensure-installed 'slang)
+  (when (and (treesit-ensure-installed 'slang)
+             (treesit-ready-p 'slang))
     (treesit-parser-create 'slang)
 
     (setq-local c-ts-common-indent-offset 'slang-ts-indent-offset)

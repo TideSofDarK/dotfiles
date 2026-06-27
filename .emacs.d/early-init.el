@@ -764,18 +764,9 @@
 
 ;;; GLSL
 
-(use-package glsl-mode
-  :ensure (:host github
-            :repo "TideSofDarK/glsl-mode"
-            :branch "better-ts-mode")
-  :init
-  (add-to-list 'major-mode-remap-alist '(glsl-mode . glsl-ts-mode))
-  (custom-set-faces
-    '(glsl-extension-face
-       ((t :inherit font-lock-constant-face))))
-  (custom-set-faces
-    '(glsl-shader-variable-name-face
-       ((t :inherit font-lock-preprocessor-face :slant italic)))))
+(use-package glsl-ts-mode
+  :ensure nil
+  :config)
 
 ;;; Godot
 
