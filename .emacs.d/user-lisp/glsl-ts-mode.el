@@ -22,14 +22,15 @@
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ;;; Commentary:
-
-;; Major mode for editing OpenGL GLSL shader files using Tree-sitter.
+;;
 
 ;;; Code:
 
 (require 'treesit)
+(eval-when-compile (require 'rx))
 (require 'c-ts-common)
 (require 'c-ts-mode)
+(treesit-declare-unavailable-functions)
 
 (add-to-list
  'treesit-language-source-alist
@@ -345,7 +346,7 @@ recommended to enable `electric-pair-mode' with this mode."
                   (keyword preprocessor string type qualifier builtin)
                   (assignment constant escape-sequence literal)
                   (bracket delimiter error function operator property variable)))
-    
+
     (treesit-major-mode-setup)))
 
 ;;;###autoload

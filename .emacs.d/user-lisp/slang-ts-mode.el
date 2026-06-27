@@ -21,9 +21,15 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;
+
+;;; Code:
+
 (require 'treesit)
 (require 'c-ts-common)
 (require 'c-ts-mode)
+(treesit-declare-unavailable-functions)
 
 (add-to-list
  'treesit-language-source-alist

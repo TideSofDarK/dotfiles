@@ -21,16 +21,22 @@
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+;;; Commentary:
+;;
+
+;;; Code:
+
 (require 'treesit)
-(require 'c-ts-common)
 (eval-when-compile (require 'rx))
+(require 'c-ts-common)
+(treesit-declare-unavailable-functions)
 
 (add-to-list
  'treesit-language-source-alist
  '(gdscript "https://github.com/PrestonKnopp/tree-sitter-gdscript")
  t)
 
-(defcustom gdscript-ts-mode-indent-offset 4
+(defcustom gdscript-ts-indent-offset 4
   "Number of spaces for each indentation step in `gdscript-ts-mode'."
   :version "31.1"
   :type 'integer
@@ -154,10 +160,11 @@ some breakage in indentation/fontification.  Therefore, it's
 recommended to enable `electric-pair-mode' with this mode."
   :group 'gdscript
 
-  (when (treesit-ensure-installed 'gdscript)
+  (when (and (treesit-ready-p 'gdscript t)
+             (treesit-ensure-installed 'gdscript))
     (treesit-parser-create 'gdscript)
 
-    (setq-local c-ts-common-indent-offset 'gdscript-ts-mode-indent-offset)
+    (setq-local c-ts-common-indent-offset 'gdscript-ts-indent-offset)
     (setq-local c-ts-common-list-indent-style 'simple)
     (setq-local treesit-simple-indent-rules gdscript-ts-mode--simple-indent-rules)
 
