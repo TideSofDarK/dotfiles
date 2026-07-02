@@ -788,8 +788,7 @@
 ;;; C/C++
 
 (use-package c-ts-mode-extras
-  :ensure (:host github
-            :repo "TideSofDarK/c-ts-mode-extras")
+  :ensure nil
   :init
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
