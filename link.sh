@@ -28,9 +28,7 @@ done
 CONFIG_FOLDERS=(
     "foot"
     "kitty"
-    "nvim"
     "alacritty"
-    "Code - OSS"
 )
 
 for folder in "${CONFIG_FOLDERS[@]}";do

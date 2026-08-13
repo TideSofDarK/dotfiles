@@ -693,47 +693,47 @@
   :ensure t
   :init (marginalia-mode))
 
-(use-package corfu
-  :ensure t
-  :custom
-  (corfu-left-margin-width 0.0)
-  (corfu-right-margin-width 0.0)
-  (corfu-bar-width 0.0)
-  (corfu-cycle t)
-  (corfu-auto t)
-  (corfu-auto-delay 0.1)
-  (corfu-auto-prefix 2)
-  (corfu-popupinfo-delay 0.25)
-  :config
-  (global-corfu-mode)
-  (let ((inhibit-message t))
-    (corfu-popupinfo-mode))
-  (keymap-unset corfu-map "RET")
-  (keymap-set corfu-map "C-y" #'corfu-complete))
-
-;; (use-package
-;;   company
+;; (use-package corfu
 ;;   :ensure t
-;;   :demand t
 ;;   :custom
-;;   (company-icon-margin 3)
-;;   (company-tooltip-align-annotations t)
-;;   (company-selection-wrap-around t)
-;;   (company-idle-delay 0.25)
-;;   (company-tooltip-idle-delay 0.25)
-;;   :bind
-;;   (:map company-active-map
-;;         ("C-y" . company-complete-selection)
-;;         ("RET" . nil)
-;;         ("<return>" . nil)
-;;         ("TAB" . nil)
-;;         ("<tab>" . nil)
-;;         ("<backtab>" . nil))
+;;   (corfu-left-margin-width 0.0)
+;;   (corfu-right-margin-width 0.0)
+;;   (corfu-bar-width 0.0)
+;;   (corfu-cycle t)
+;;   (corfu-auto t)
+;;   (corfu-auto-delay 0.1)
+;;   (corfu-auto-prefix 2)
+;;   (corfu-popupinfo-delay 0.25)
 ;;   :config
-;;   (setq company-frontends
-;;         '(company-pseudo-tooltip-frontend
-;;           company-echo-metadata-frontend))
-;;   (global-company-mode))
+;;   (global-corfu-mode)
+;;   (let ((inhibit-message t))
+;;     (corfu-popupinfo-mode))
+;;   (keymap-unset corfu-map "RET")
+;;   (keymap-set corfu-map "C-y" #'corfu-complete))
+
+(use-package
+  company
+  :ensure t
+  :demand t
+  :custom
+  (company-icon-margin 3)
+  (company-tooltip-align-annotations t)
+  (company-selection-wrap-around t)
+  (company-idle-delay 0.25)
+  (company-tooltip-idle-delay 0.25)
+  :bind
+  (:map company-active-map
+        ("C-y" . company-complete-selection)
+        ("RET" . nil)
+        ("<return>" . nil)
+        ("TAB" . nil)
+        ("<tab>" . nil)
+        ("<backtab>" . nil))
+  :config
+  (setq company-frontends
+        '(company-pseudo-tooltip-frontend
+          company-echo-metadata-frontend))
+  (global-company-mode))
 
 ;; (use-package cape
 ;;   :ensure t
@@ -799,16 +799,16 @@
             (setq-local eglot-semantic-token-modifiers
               (cl-set-difference eglot-semantic-token-modifiers
                 '("definition"
-                   "defaultLibrary"
+                   ;; "defaultLibrary"
                    "static"
                    "abstract"
-                   "readonly"
+                   ;; "readonly"
                    "declaration")
                 :test #'string=))
-            ;; To consider: "variable"
             (setq-local eglot-semantic-token-types
               (cl-set-difference eglot-semantic-token-types
                 '("operator"
+                   ;; "variable"
                    "modifier")
                 :test #'string=)))))
 

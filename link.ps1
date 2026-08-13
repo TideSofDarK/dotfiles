@@ -9,7 +9,6 @@ function Create-SymbolicLink {
     New-Item -Path $symlinkPath -ItemType SymbolicLink -Value (Get-Item $targetPath).FullName
 }
 
-Create-SymbolicLink -symlinkPath "$env:LOCALAPPDATA\nvim\" -targetPath ".\nvim\"
 Create-SymbolicLink -symlinkPath "$env:APPDATA\alacritty\" -targetPath ".\alacritty\"
 Create-SymbolicLink -symlinkPath "$env:APPDATA\kitty\" -targetPath ".\kitty\"
 
