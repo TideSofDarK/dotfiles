@@ -572,12 +572,7 @@
   :ensure t
   :defer nil
   :hook
-  ((c-ts-mode
-     c++-ts-mode
-     glsl-ts-mode
-     cmake-ts-mode
-     slang-ts-mode)
-    . eglot-ensure)
+  ((glsl-ts-mode cmake-ts-mode slang-ts-mode) . eglot-ensure)
   :custom
   (eglot-mode-line-format
     '(eglot-mode-line-menu
@@ -723,16 +718,16 @@
   (company-tooltip-idle-delay 0.25)
   :bind
   (:map company-active-map
-        ("C-y" . company-complete-selection)
-        ("RET" . nil)
-        ("<return>" . nil)
-        ("TAB" . nil)
-        ("<tab>" . nil)
-        ("<backtab>" . nil))
+    ("C-y" . company-complete-selection)
+    ("RET" . nil)
+    ("<return>" . nil)
+    ("TAB" . nil)
+    ("<tab>" . nil)
+    ("<backtab>" . nil))
   :config
   (setq company-frontends
-        '(company-pseudo-tooltip-frontend
-          company-echo-metadata-frontend))
+    '(company-pseudo-tooltip-frontend
+       company-echo-metadata-frontend))
   (global-company-mode))
 
 ;; (use-package cape
@@ -793,27 +788,30 @@
   (add-to-list 'major-mode-remap-alist '(c-mode . c-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c++-mode . c++-ts-mode))
   (add-to-list 'major-mode-remap-alist '(c-or-c++-mode . c-or-c++-ts-mode))
+  :hook
+  ((c-ts-mode c++-ts-mode)
+    .
+    (lambda ()
+      (when-let* (((project-current))
+                   (path (concat (project-root (project-current)) "compile_commands.json"))
+                   ((file-exists-p path)))
+        (eglot-ensure)
+        (setq-local eglot-semantic-token-modifiers
+          (cl-set-difference eglot-semantic-token-modifiers
+            '("definition"
+               ;; "defaultLibrary"
+               "static"
+               "abstract"
+               ;; "readonly"
+               "declaration")
+            :test #'string=))
+        (setq-local eglot-semantic-token-types
+          (cl-set-difference eglot-semantic-token-types
+            '("operator"
+               ;; "variable"
+               "modifier")
+            :test #'string=)))))
   :config
-  (let ((c-or-c++-improvements
-          (lambda ()
-            (setq-local eglot-semantic-token-modifiers
-              (cl-set-difference eglot-semantic-token-modifiers
-                '("definition"
-                   ;; "defaultLibrary"
-                   "static"
-                   "abstract"
-                   ;; "readonly"
-                   "declaration")
-                :test #'string=))
-            (setq-local eglot-semantic-token-types
-              (cl-set-difference eglot-semantic-token-types
-                '("operator"
-                   ;; "variable"
-                   "modifier")
-                :test #'string=)))))
-
-    (add-hook 'c-ts-mode-hook c-or-c++-improvements)
-    (add-hook 'c++-ts-mode-hook c-or-c++-improvements))
   (setopt c-ts-mode-indent-offset tab-width)
   (setopt c-ts-mode-indent-style 'bsd)
   (setopt c-ts-mode-enable-doxygen t))
