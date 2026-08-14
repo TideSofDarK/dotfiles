@@ -54,7 +54,21 @@
 (add-to-list 'load-path (concat user-emacs-directory "user-lisp"))
 (setq load-prefer-newer t)
 
-;;; Elpaca
+;;; Fonts
+
+(let ((mono-spaced-font "Sarasa Term Slab CL")
+       (proportionately-spaced-font "Sarasa Term Slab CL"))
+  (set-face-attribute 'default nil
+    :family mono-spaced-font
+    :height 120)
+  (set-face-attribute 'fixed-pitch nil
+    :family mono-spaced-font
+    :height 1.0)
+  (set-face-attribute 'variable-pitch nil
+    :family proportionately-spaced-font
+    :height 1.0))
+
+;;; elpaca
 
 (setq package-enable-at-startup nil)
 (defvar elpaca-installer-version 0.12)
@@ -98,7 +112,7 @@
 (elpaca elpaca-use-package
   (elpaca-use-package-mode))
 
-;;; Themes
+;;; modus-themes
 
 (use-package modus-themes
   :ensure t
@@ -145,27 +159,17 @@
        (bg-line-number-active unspecified)))
   (load-theme 'modus-vivendi t nil))
 
+;;; standard-themes
+
 (use-package standard-themes
   :ensure t
   :after modus-themes)
 
+;;; ef-themes
+
 (use-package ef-themes
   :ensure t
   :after modus-themes)
-
-;;; Fonts
-
-(let ((mono-spaced-font "Sarasa Term Slab CL")
-       (proportionately-spaced-font "Sarasa Term Slab CL"))
-  (set-face-attribute 'default nil
-    :family mono-spaced-font
-    :height 120)
-  (set-face-attribute 'fixed-pitch nil
-    :family mono-spaced-font
-    :height 1.0)
-  (set-face-attribute 'variable-pitch nil
-    :family proportionately-spaced-font
-    :height 1.0))
 
 ;;; emacs
 
@@ -323,7 +327,7 @@
   :config
   (minions-mode t))
 
-;;; Popper
+;;; popper
 
 (use-package popper
   :ensure t
@@ -394,6 +398,8 @@
 (use-package undo-fu
   :ensure t)
 
+;;; undo-fu-session
+
 (use-package undo-fu-session
   :ensure t
   :hook (after-init . undo-fu-session-global-mode))
@@ -440,8 +446,6 @@
 
   (evil-define-key 'normal 'global
     (kbd "<leader>tn") 'display-line-numbers-mode)
-  (evil-define-key 'normal 'global (kbd "<leader>td") 'global-diff-hl-mode)
-  (evil-define-key 'normal 'global (kbd "<leader>tl") 'global-hl-line-mode)
   (evil-define-key 'normal 'global (kbd "<leader>to") 'ff-find-other-file)
 
   (defmacro evil-map (state key seq)
@@ -503,29 +507,30 @@
 
 (use-package drag-stuff
   :ensure t
-  :config
-  (evil-define-key 'visual 'global (kbd "J") 'drag-stuff-down)
-  (evil-define-key 'visual 'global (kbd "K") 'drag-stuff-up))
+  :bind
+  (:map evil-visual-state-map
+    ("J" . drag-stuff-down)
+    ("K" . drag-stuff-up)))
 
-;;; Apheleia
+;;; apheleia
 
 (use-package apheleia
   :ensure t)
 
-;;; magit
+;;; diff-hl
 
-(use-package transient
-  :ensure t
-  :config
-  ;; (setopt transient-display-buffer-action '(display-buffer-below-selected))
-  (transient-bind-q-to-quit))
 (use-package diff-hl
-  :ensure t)
-(use-package magit
   :ensure t
-  :after (transient diff-hl)
+  :bind
+  (:map evil-normal-state-map ("<leader>td" . global-diff-hl-mode)))
+
+;;; hl-line
+
+(use-package hl-line
   :custom
-  (magit-section-visibility-indicator nil))
+  (global-hl-line-mode 1)
+  :bind
+  (:map evil-normal-state-map ("<leader>tl" . global-hl-line-mode)))
 
 ;;; hl-todo
 
@@ -533,6 +538,21 @@
   :ensure t
   :config
   (add-hook 'prog-mode-hook #'global-hl-todo-mode))
+
+;;; transient
+
+(use-package transient
+  :ensure t
+  :config
+  (transient-bind-q-to-quit))
+
+;;; magit
+
+(use-package magit
+  :ensure t
+  :after (transient diff-hl)
+  :custom
+  (magit-section-visibility-indicator nil))
 
 ;;; flymake
 
@@ -554,14 +574,14 @@
     ("[d" . flymake-goto-prev-error)
     ("]d" . flymake-goto-next-error)))
 
-;;; EditorConfig
+;;; editorconfig
 
 (use-package editorconfig
   :ensure t
   :config
   (editorconfig-mode 1))
 
-;;; Eglot
+;;; eglot
 
 (use-package eglot
   :ensure t
@@ -628,7 +648,7 @@
   (evil-define-key 'normal eglot-mode-map (kbd "gra") 'eglot-code-actions)
   (evil-define-key 'normal eglot-mode-map (kbd "<leader>cf") 'eglot-format))
 
-;;; Completion
+;;; consult
 
 (use-package consult
   :ensure t
@@ -646,10 +666,14 @@
   (evil-define-key 'normal 'global (kbd "<leader>sf") 'project-find-file)
   (evil-define-key 'normal 'global (kbd "<leader>SPC") 'consult-buffer))
 
+;;; consult-eglot
+
 (use-package consult-eglot
   :ensure t
   :config
   (evil-define-key 'normal eglot-mode-map (kbd "gW") 'consult-eglot-symbols))
+
+;;; vertico
 
 (use-package vertico
   :ensure t
@@ -660,6 +684,8 @@
   (keymap-set vertico-map "C-y" #'vertico-insert)
   (vertico-mode 1))
 
+;;; vertico-repeat
+
 (use-package vertico-repeat
   :ensure nil
   :after vertico
@@ -667,8 +693,9 @@
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
   (evil-define-key 'normal 'global (kbd "<leader>sr") 'vertico-repeat))
 
-(use-package
-  orderless
+;;; orderless
+
+(use-package orderless
   :ensure t
   :custom
   (completion-styles '(orderless flex))
@@ -679,9 +706,13 @@
        (eglot (styles orderless))
        (eglot-capf (styles orderless)))))
 
+;;; marginalia
+
 (use-package marginalia
   :ensure t
   :init (marginalia-mode))
+
+;;; corfu
 
 ;; (use-package corfu
 ;;   :ensure t
@@ -701,8 +732,9 @@
 ;;   (keymap-unset corfu-map "RET")
 ;;   (keymap-set corfu-map "C-y" #'corfu-complete))
 
-(use-package
-  company
+;;; company
+
+(use-package company
   :ensure t
   :demand t
   :custom
@@ -725,6 +757,8 @@
        company-echo-metadata-frontend))
   (global-company-mode))
 
+;;; cape
+
 ;; (use-package cape
 ;;   :ensure t
 ;;   :custom
@@ -734,13 +768,13 @@
 ;;   (add-to-list 'completion-at-point-functions #'cape-file)
 ;;   (add-to-list 'completion-at-point-functions #'cape-elisp-block))
 
-;;; Markdown
+;;; markdown-mode
 
 (use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode))
 
-;;; CMake
+;;; cemako
 
 (use-package cemako
   :ensure nil
@@ -752,19 +786,19 @@
   ("<leader>bb" . cemako-build)
   ("<leader>br" . cemako-run))
 
-;;; GLSL
+;;; glsl-ts-mode
 
 (use-package glsl-ts-mode
   :ensure nil
   :config)
 
-;;; Godot
+;;; gdscript-ts-mode
 
 (use-package gdscript-ts-mode
   :ensure nil
   :config)
 
-;;; Slang
+;;; slang-ts-mode
 
 (use-package slang-ts-mode
   :ensure nil
@@ -775,7 +809,7 @@
         (cl-set-difference eglot-semantic-token-types
           '("variable") :test #'string=)))))
 
-;;; C/C++
+;;; c-ts-mode-extras
 
 (use-package c-ts-mode-extras
   :ensure nil
@@ -811,9 +845,8 @@
   (setopt c-ts-mode-indent-style 'bsd)
   (setopt c-ts-mode-enable-doxygen t))
 
-;;; Done
-
-(elpaca-wait)
+;; (elpaca-wait)
 
 (provide 'early-init)
+
 ;;; early-init.el ends here
