@@ -311,11 +311,6 @@
   :ensure nil
   :hook (compilation-filter . ansi-color-compilation-filter))
 
-;;; project
-
-(use-package project
-  :ensure t)
-
 ;;; jsonrpc
 
 (use-package jsonrpc
